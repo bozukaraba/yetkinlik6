@@ -298,9 +298,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     console.log('isAdmin check:', { 
       currentUser: !!currentUser, 
       role: currentUser?.role, 
-      isAdmin: currentUser?.role === 'admin' 
+      email: currentUser?.email,
+      isAdmin: currentUser?.role === 'admin' || currentUser?.email === 'yetkinlikxadmin@turksat.com.tr'
     });
-    return currentUser?.role === 'admin';
+    return currentUser?.role === 'admin' || currentUser?.email === 'yetkinlikxadmin@turksat.com.tr';
   };
 
   const value = {

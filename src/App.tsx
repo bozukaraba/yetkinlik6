@@ -8,11 +8,14 @@ import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
 import CVForm from './pages/CVForm';
 import AdminDashboard from './pages/AdminDashboard';
+import EvaluationReport from './pages/EvaluationReport';
 import NotFoundPage from './pages/NotFoundPage';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 // Import RLS tests for development/testing
 import './tests/rlsTest';
+// Import admin debug script
+import './debug/checkAdmin';
 
 function App() {
   return (
@@ -46,6 +49,14 @@ function App() {
                 element={
                   <AdminRoute>
                     <AdminDashboard />
+                  </AdminRoute>
+                } 
+              />
+              <Route 
+                path="/admin/reports" 
+                element={
+                  <AdminRoute>
+                    <EvaluationReport />
                   </AdminRoute>
                 } 
               />
