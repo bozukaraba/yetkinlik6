@@ -193,34 +193,59 @@ export const getCVData = async (userId: string): Promise<CVData | null> => {
 // Save CV data to Supabase
 export const saveCVData = async (userId: string, data: CVData): Promise<CVData> => {
   try {
-    // Start transaction
+    console.log('saveCVData called for user:', userId);
+    
+    // Check authentication in multiple ways
+    const { data: { session } } = await supabase.auth.getSession();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      throw new Error('Kullanıcı oturumu bulunamadı');
+    
+    console.log('Session check:', !!session);
+    console.log('User check:', !!user);
+    console.log('User ID from auth:', user?.id);
+    console.log('User ID from param:', userId);
+    
+    if (!session || !user) {
+      console.error('No active session or user found');
+      throw new Error('Kullanıcı oturumu bulunamadı. Lütfen tekrar giriş yapın.');
+    }
+    
+    if (user.id !== userId) {
+      console.error('User ID mismatch:', { authUserId: user.id, paramUserId: userId });
+      throw new Error('Kullanıcı ID eşleşmiyor');
     }
 
     // Create or get CV record
     let cvId = data.id;
     if (!cvId) {
+      console.log('Creating new CV record');
       const { data: cvData, error: cvError } = await supabase
         .from('cvs')
         .insert({ user_id: userId })
         .select()
         .single();
 
-      if (cvError) throw cvError;
+      if (cvError) {
+        console.error('CV creation error:', cvError);
+        throw cvError;
+      }
       cvId = cvData.id;
+      console.log('New CV created with ID:', cvId);
     } else {
+      console.log('Updating existing CV:', cvId);
       const { error: cvUpdateError } = await supabase
         .from('cvs')
         .update({ updated_at: new Date().toISOString() })
         .eq('id', cvId);
 
-      if (cvUpdateError) throw cvUpdateError;
+      if (cvUpdateError) {
+        console.error('CV update error:', cvUpdateError);
+        throw cvUpdateError;
+      }
     }
 
     // Save personal info
     if (data.personalInfo) {
+      console.log('Saving personal info');
       const personalData = {
         cv_id: cvId,
         first_name: data.personalInfo.firstName,
@@ -259,7 +284,11 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
         .from('personal_info')
         .upsert(personalData, { onConflict: 'cv_id' });
 
-      if (personalError) throw personalError;
+      if (personalError) {
+        console.error('Personal info save error:', personalError);
+        throw personalError;
+      }
+      console.log('Personal info saved successfully');
     }
 
     // Clear existing data and insert new data for arrays

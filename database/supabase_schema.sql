@@ -170,7 +170,7 @@ CREATE TABLE volunteer (
 );
 
 -- 12. Referanslar tablosu (References)
-CREATE TABLE references (
+CREATE TABLE user_references (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     cv_id UUID NOT NULL REFERENCES cvs(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
@@ -226,7 +226,7 @@ CREATE INDEX idx_certificates_cv_id ON certificates(cv_id);
 CREATE INDEX idx_projects_cv_id ON projects(cv_id);
 CREATE INDEX idx_publications_cv_id ON publications(cv_id);
 CREATE INDEX idx_volunteer_cv_id ON volunteer(cv_id);
-CREATE INDEX idx_references_cv_id ON references(cv_id);
+CREATE INDEX idx_user_references_cv_id ON user_references(cv_id);
 CREATE INDEX idx_hobbies_cv_id ON hobbies(cv_id);
 CREATE INDEX idx_awards_cv_id ON awards(cv_id);
 CREATE INDEX idx_evaluations_cv_id ON evaluations(cv_id);
@@ -252,7 +252,7 @@ CREATE TRIGGER update_certificates_updated_at BEFORE UPDATE ON certificates FOR 
 CREATE TRIGGER update_projects_updated_at BEFORE UPDATE ON projects FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_publications_updated_at BEFORE UPDATE ON publications FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_volunteer_updated_at BEFORE UPDATE ON volunteer FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_references_updated_at BEFORE UPDATE ON references FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_user_references_updated_at BEFORE UPDATE ON user_references FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_hobbies_updated_at BEFORE UPDATE ON hobbies FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_awards_updated_at BEFORE UPDATE ON awards FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_evaluations_updated_at BEFORE UPDATE ON evaluations FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -269,7 +269,7 @@ ALTER TABLE certificates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE publications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE volunteer ENABLE ROW LEVEL SECURITY;
-ALTER TABLE references ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_references ENABLE ROW LEVEL SECURITY;
 ALTER TABLE hobbies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE awards ENABLE ROW LEVEL SECURITY;
 ALTER TABLE evaluations ENABLE ROW LEVEL SECURITY;
@@ -321,8 +321,8 @@ CREATE POLICY "Users can manage own volunteer" ON volunteer FOR ALL USING (
     EXISTS (SELECT 1 FROM cvs WHERE cvs.id = volunteer.cv_id AND cvs.user_id = auth.uid())
 );
 
-CREATE POLICY "Users can manage own references" ON references FOR ALL USING (
-    EXISTS (SELECT 1 FROM cvs WHERE cvs.id = references.cv_id AND cvs.user_id = auth.uid())
+CREATE POLICY "Users can manage own references" ON user_references FOR ALL USING (
+    EXISTS (SELECT 1 FROM cvs WHERE cvs.id = user_references.cv_id AND cvs.user_id = auth.uid())
 );
 
 CREATE POLICY "Users can manage own hobbies" ON hobbies FOR ALL USING (

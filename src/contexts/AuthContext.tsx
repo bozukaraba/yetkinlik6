@@ -42,6 +42,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const getSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
+        console.log('Initial session check:', session ? 'User logged in' : 'No session');
         if (session?.user) {
           await loadUserProfile(session.user);
         }
@@ -56,6 +57,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session ? 'User logged in' : 'No session');
       if (session?.user) {
         await loadUserProfile(session.user);
       } else {
@@ -69,6 +71,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const loadUserProfile = async (supabaseUser: SupabaseUser) => {
     try {
+      console.log('Loading user profile for:', supabaseUser.id);
+      
       // Check if user exists in our users table
       const { data: userData, error } = await supabase
         .from('users')
@@ -77,7 +81,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
         .single();
 
       if (error && error.code !== 'PGRST116') { // PGRST116 = not found
+        console.error('Error loading user profile:', error);
         throw error;
+      }
+
+      if (!userData) {
+        console.log('User not found in users table, creating fallback profile');
       }
 
       const user: User = {
@@ -89,15 +98,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
         role: userData?.role || 'user'
       };
 
+      console.log('User profile loaded:', user);
       setCurrentUser(user);
     } catch (error) {
       console.error('Kullanıcı profili yüklenirken hata:', error);
-      setCurrentUser({
+      // Create fallback user profile
+      const fallbackUser: User = {
         id: supabaseUser.id,
         email: supabaseUser.email || '',
         name: supabaseUser.email?.split('@')[0] || '',
         role: 'user'
-      });
+      };
+      console.log('Using fallback user profile:', fallbackUser);
+      setCurrentUser(fallbackUser);
     }
   };
 
@@ -127,14 +140,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const register = async (email: string, password: string, name: string) => {
     setLoading(true);
     try {
+      console.log('Registering user:', email);
+      
       const { data, error } = await supabase.auth.signUp({
         email,
-        password
+        password,
+        options: {
+          data: {
+            first_name: name.split(' ')[0] || '',
+            last_name: name.split(' ').slice(1).join(' ') || ''
+          }
+        }
       });
 
       if (error) {
+        console.error('Auth signup error:', error);
         throw new Error(error.message);
       }
+
+      console.log('Auth signup successful:', data);
 
       if (data.user) {
         // Create user profile in users table
@@ -142,6 +166,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const firstName = nameParts[0] || '';
         const lastName = nameParts.slice(1).join(' ') || '';
 
+        console.log('Creating user profile in users table');
         const { error: profileError } = await supabase
           .from('users')
           .insert({
@@ -154,6 +179,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         if (profileError) {
           console.error('Profil oluşturma hatası:', profileError);
+          // Don't throw here, continue with fallback
+        } else {
+          console.log('User profile created successfully');
         }
 
         await loadUserProfile(data.user);
