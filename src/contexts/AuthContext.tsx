@@ -161,27 +161,41 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.log('Auth signup successful:', data);
 
       if (data.user) {
-        // Create user profile in users table
-        const nameParts = name.split(' ');
-        const firstName = nameParts[0] || '';
-        const lastName = nameParts.slice(1).join(' ') || '';
-
-        console.log('Creating user profile in users table');
-        const { error: profileError } = await supabase
+        // Wait a bit for the trigger to potentially work
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Check if user exists in users table
+        const { data: existingUser } = await supabase
           .from('users')
-          .insert({
-            id: data.user.id,
-            email: data.user.email,
-            first_name: firstName,
-            last_name: lastName,
-            role: 'user'
-          });
+          .select('*')
+          .eq('id', data.user.id)
+          .single();
 
-        if (profileError) {
-          console.error('Profil oluşturma hatası:', profileError);
-          // Don't throw here, continue with fallback
+        if (!existingUser) {
+          console.log('User not found in users table, creating manually');
+          // Create user profile in users table manually if trigger failed
+          const nameParts = name.split(' ');
+          const firstName = nameParts[0] || '';
+          const lastName = nameParts.slice(1).join(' ') || '';
+
+          const { error: profileError } = await supabase
+            .from('users')
+            .insert({
+              id: data.user.id,
+              email: data.user.email,
+              first_name: firstName,
+              last_name: lastName,
+              role: 'user'
+            });
+
+          if (profileError) {
+            console.error('Manual user creation error:', profileError);
+            // Don't throw here, continue with fallback
+          } else {
+            console.log('User created manually in users table');
+          }
         } else {
-          console.log('User profile created successfully');
+          console.log('User already exists in users table (trigger worked)');
         }
 
         await loadUserProfile(data.user);
