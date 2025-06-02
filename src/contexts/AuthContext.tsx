@@ -161,41 +161,35 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.log('Auth signup successful:', data);
 
       if (data.user) {
-        // Wait a bit for the trigger to potentially work
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Check if user exists in users table
-        const { data: existingUser } = await supabase
+        // Always try to create user profile manually (trigger might not work)
+        const nameParts = name.split(' ');
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
+
+        console.log('Creating user profile manually...');
+        const { data: insertData, error: profileError } = await supabase
           .from('users')
-          .select('*')
-          .eq('id', data.user.id)
+          .insert({
+            id: data.user.id,
+            email: data.user.email,
+            first_name: firstName,
+            last_name: lastName,
+            role: 'user'
+          })
+          .select()
           .single();
 
-        if (!existingUser) {
-          console.log('User not found in users table, creating manually');
-          // Create user profile in users table manually if trigger failed
-          const nameParts = name.split(' ');
-          const firstName = nameParts[0] || '';
-          const lastName = nameParts.slice(1).join(' ') || '';
-
-          const { error: profileError } = await supabase
-            .from('users')
-            .insert({
-              id: data.user.id,
-              email: data.user.email,
-              first_name: firstName,
-              last_name: lastName,
-              role: 'user'
-            });
-
-          if (profileError) {
-            console.error('Manual user creation error:', profileError);
-            // Don't throw here, continue with fallback
+        if (profileError) {
+          console.error('Manual user creation error:', profileError);
+          
+          // If it's a unique constraint violation, user might already exist
+          if (profileError.code === '23505') {
+            console.log('User already exists in users table, continuing...');
           } else {
-            console.log('User created manually in users table');
+            console.error('Failed to create user profile, but continuing with auth user');
           }
         } else {
-          console.log('User already exists in users table (trigger worked)');
+          console.log('User profile created successfully:', insertData);
         }
 
         await loadUserProfile(data.user);
