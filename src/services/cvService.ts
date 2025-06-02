@@ -456,7 +456,7 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
       description: award.description
     }));
 
-    // Save evaluation using upsert
+    // Save evaluation using manual check and update
     if (data.evaluation) {
       const evaluationData = {
         cv_id: cvId,
@@ -467,15 +467,42 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
         application_satisfaction: data.evaluation.applicationSatisfaction
       };
 
-      const { error: evalError } = await supabase
+      // Check if evaluation exists
+      const { data: existingEval, error: checkError } = await supabase
         .from('evaluations')
-        .upsert(evaluationData, { onConflict: 'cv_id' });
+        .select('id')
+        .eq('cv_id', cvId)
+        .single();
 
-      if (evalError) {
-        console.error('Evaluation save error:', evalError);
-        throw evalError;
+      if (checkError && checkError.code !== 'PGRST116') {
+        console.error('Error checking existing evaluation:', checkError);
+        throw checkError;
       }
-      console.log('Evaluation saved successfully');
+
+      if (existingEval) {
+        // Update existing evaluation
+        const { error: updateError } = await supabase
+          .from('evaluations')
+          .update(evaluationData)
+          .eq('cv_id', cvId);
+
+        if (updateError) {
+          console.error('Evaluation update error:', updateError);
+          throw updateError;
+        }
+        console.log('Evaluation updated successfully');
+      } else {
+        // Insert new evaluation
+        const { error: insertError } = await supabase
+          .from('evaluations')
+          .insert(evaluationData);
+
+        if (insertError) {
+          console.error('Evaluation insert error:', insertError);
+          throw insertError;
+        }
+        console.log('Evaluation inserted successfully');
+      }
     }
 
     console.log('CV saved successfully, fetching updated data...');
