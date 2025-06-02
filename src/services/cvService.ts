@@ -214,6 +214,39 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
       throw new Error('Kullanıcı ID eşleşmiyor');
     }
 
+    // Check if user exists in users table, if not create it
+    console.log('Checking if user exists in users table...');
+    const { data: existingUser, error: userCheckError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('id', userId)
+      .single();
+
+    if (userCheckError && userCheckError.code === 'PGRST116') {
+      // User doesn't exist, create it
+      console.log('User not found in users table, creating...');
+      const { error: userCreateError } = await supabase
+        .from('users')
+        .insert({
+          id: userId,
+          email: user.email || '',
+          first_name: user.user_metadata?.first_name || '',
+          last_name: user.user_metadata?.last_name || '',
+          role: 'user'
+        });
+
+      if (userCreateError) {
+        console.error('Failed to create user in users table:', userCreateError);
+        throw new Error('Kullanıcı profili oluşturulamadı');
+      }
+      console.log('User created successfully in users table');
+    } else if (userCheckError) {
+      console.error('Error checking user existence:', userCheckError);
+      throw userCheckError;
+    } else {
+      console.log('User exists in users table');
+    }
+
     // Create or get CV record
     let cvId = data.id;
     if (!cvId) {
