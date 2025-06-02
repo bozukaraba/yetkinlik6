@@ -67,13 +67,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state change:', event, !!session);
+        console.log('Auth state change:', event, !!session, session?.user?.id);
         
         if (!mounted) return;
 
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           if (session?.user) {
-            console.log('User signed in:', session.user.id);
+            console.log('User signed in or token refreshed:', session.user.id);
+            // Don't reload profile on token refresh if user already exists
+            if (event === 'TOKEN_REFRESHED' && currentUser) {
+              console.log('Token refreshed, maintaining existing session');
+              return;
+            }
             await loadUserProfile(session.user);
           }
         } else if (event === 'SIGNED_OUT') {
@@ -94,9 +99,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       console.log('Loading user profile for:', user.id);
       
-      // Add timeout for the query
+      // Reduce timeout to 5 seconds and add retry logic
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout: User profile query took too long')), 10000)
+        setTimeout(() => reject(new Error('Timeout: User profile query took too long')), 5000)
       );
       
       // Check if user exists in our users table with timeout
@@ -106,7 +111,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
         .eq('id', user.id)
         .single();
       
-      const { data: userData, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
+      let userData, error;
+      try {
+        const result = await Promise.race([queryPromise, timeoutPromise]) as any;
+        userData = result.data;
+        error = result.error;
+      } catch (timeoutError) {
+        console.warn('User profile query timed out, using fallback');
+        // Create fallback user object on timeout
+        setCurrentUser({
+          id: user.id,
+          email: user.email || '',
+          name: user.user_metadata?.full_name || user.email || '',
+          role: user.email === 'yetkinlikxadmin@turksat.com.tr' ? 'admin' : 'user'
+        });
+        setLoading(false);
+        return;
+      }
 
       console.log('User data query result:', { userData: !!userData, error: !!error, errorCode: error?.code });
 
@@ -118,35 +139,46 @@ export function AuthProvider({ children }: AuthProviderProps) {
           console.log('User not found in users table, creating...');
           const nameParts = user.user_metadata?.full_name?.split(' ') || ['', ''];
           
-          const { data: newUser, error: createError } = await supabase
-            .from('users')
-            .insert({
-              id: user.id,
-              email: user.email || '',
-              first_name: nameParts[0] || '',
-              last_name: nameParts.slice(1).join(' ') || '',
-              role: 'user'
-            })
-            .select()
-            .single();
+          try {
+            const { data: newUser, error: createError } = await supabase
+              .from('users')
+              .insert({
+                id: user.id,
+                email: user.email || '',
+                first_name: nameParts[0] || '',
+                last_name: nameParts.slice(1).join(' ') || '',
+                role: user.email === 'yetkinlikxadmin@turksat.com.tr' ? 'admin' : 'user'
+              })
+              .select()
+              .single();
 
-          if (createError) {
-            console.error('Error creating user profile:', createError);
-            // Create fallback profile without database insert
-            console.log('Creating fallback profile');
+            if (createError) {
+              console.error('Error creating user profile:', createError);
+              // Create fallback profile without database insert
+              console.log('Creating fallback profile');
+              setCurrentUser({
+                id: user.id,
+                email: user.email || '',
+                name: user.user_metadata?.full_name || user.email || '',
+                role: user.email === 'yetkinlikxadmin@turksat.com.tr' ? 'admin' : 'user'
+              });
+            } else {
+              console.log('User profile created successfully:', newUser);
+              setCurrentUser({
+                id: newUser.id,
+                email: newUser.email,
+                name: `${newUser.first_name} ${newUser.last_name}`.trim(),
+                role: newUser.role as 'user' | 'admin'
+              });
+            }
+          } catch (createError) {
+            console.error('Failed to create user profile:', createError);
+            // Fallback user object
             setCurrentUser({
               id: user.id,
               email: user.email || '',
               name: user.user_metadata?.full_name || user.email || '',
-              role: 'user'
-            });
-          } else {
-            console.log('User profile created successfully:', newUser);
-            setCurrentUser({
-              id: newUser.id,
-              email: newUser.email,
-              name: `${newUser.first_name} ${newUser.last_name}`.trim(),
-              role: newUser.role as 'user' | 'admin'
+              role: user.email === 'yetkinlikxadmin@turksat.com.tr' ? 'admin' : 'user'
             });
           }
         } else {
@@ -156,7 +188,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             id: user.id,
             email: user.email || '',
             name: user.user_metadata?.full_name || user.email || '',
-            role: 'user'
+            role: user.email === 'yetkinlikxadmin@turksat.com.tr' ? 'admin' : 'user'
           });
         }
       } else {
@@ -176,7 +208,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         id: user.id,
         email: user.email || '',
         name: user.user_metadata?.full_name || user.email || '',
-        role: 'user'
+        role: user.email === 'yetkinlikxadmin@turksat.com.tr' ? 'admin' : 'user'
       });
     } finally {
       console.log('Setting loading to false');
@@ -283,14 +315,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = async () => {
     try {
+      console.log('Starting logout process...');
+      setLoading(true);
+      
       const { error } = await supabase.auth.signOut();
       if (error) {
+        console.error('Supabase logout error:', error);
         throw error;
       }
+      
+      console.log('Logout successful, clearing user state');
       setCurrentUser(null);
     } catch (error) {
       console.error('Çıkış hatası:', error);
+      // Even if logout fails, clear the user state
+      setCurrentUser(null);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
