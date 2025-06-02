@@ -48,8 +48,8 @@ const Navbar: React.FC = () => {
                   <span>CV'im</span>
                 </Link>
                 {isAdmin() && (
-                  <Link to="/admin" className="text-gray-600 hover:text-blue-600 transition-colors">
-                    Yönetici
+                  <Link to="/admin" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
+                    🔧 Yönetici Paneli
                   </Link>
                 )}
                 <div className="flex items-center">
@@ -114,10 +114,10 @@ const Navbar: React.FC = () => {
                 {isAdmin() && (
                   <Link 
                     to="/admin" 
-                    className="block py-2 text-gray-600 hover:text-blue-600 transition-colors"
+                    className="block py-2 text-gray-600 hover:text-blue-600 transition-colors font-medium"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Yönetici
+                    🔧 Yönetici Paneli
                   </Link>
                 )}
                 <button 

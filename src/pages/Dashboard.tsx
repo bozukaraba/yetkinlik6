@@ -1,23 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { FileEdit, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
-import { getCVData } from '../services/cvService';
+import { FileEdit, Clock, CheckCircle2, AlertCircle, Settings, Users } from 'lucide-react';
+import { getCVData, getAllCVs } from '../services/cvService';
 import { CVData } from '../types/cv';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 const Dashboard: React.FC = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, isAdmin } = useAuth();
   const [cvData, setCVData] = useState<CVData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [adminStats, setAdminStats] = useState<{ totalCVs: number; totalUsers: number } | null>(null);
 
   useEffect(() => {
-    const loadCVData = async () => {
+    const loadData = async () => {
       if (currentUser) {
         try {
           const data = await getCVData(currentUser.id);
           setCVData(data);
+          
+          // Load admin stats if user is admin
+          if (isAdmin()) {
+            try {
+              const allCVs = await getAllCVs();
+              setAdminStats({
+                totalCVs: allCVs.length,
+                totalUsers: new Set(allCVs.map(cv => cv.userId)).size
+              });
+            } catch (error) {
+              console.error('Error loading admin stats:', error);
+            }
+          }
         } catch (error) {
           console.error('Error loading CV data:', error);
         } finally {
@@ -26,8 +40,8 @@ const Dashboard: React.FC = () => {
       }
     };
 
-    loadCVData();
-  }, [currentUser]);
+    loadData();
+  }, [currentUser, isAdmin]);
 
   // Calculate CV completion percentage
   const calculateCompletion = () => {
@@ -481,6 +495,44 @@ const Dashboard: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* Admin Panel Card - Only show for admins */}
+        {isAdmin() && (
+          <div className="bg-white bg-opacity-95 rounded-lg shadow-md p-6 border-t-4 border-red-500 backdrop-blur-sm">
+            <div className="flex justify-between items-start">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800">Yönetici Paneli</h2>
+                <p className="text-gray-600 mt-1">
+                  Tüm CV'leri görüntüleyin ve yönetin
+                </p>
+              </div>
+              <Settings className="h-8 w-8 text-red-500" />
+            </div>
+            
+            {adminStats && (
+              <div className="mt-4 grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900">{adminStats.totalCVs}</div>
+                  <div className="text-sm text-gray-600">Toplam CV</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900">{adminStats.totalUsers}</div>
+                  <div className="text-sm text-gray-600">Kullanıcı</div>
+                </div>
+              </div>
+            )}
+            
+            <div className="mt-4">
+              <Link
+                to="/admin"
+                className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Yönetici Paneline Git
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
