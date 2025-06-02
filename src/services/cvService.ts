@@ -315,7 +315,7 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
 
       const { error: personalError } = await supabase
         .from('personal_info')
-        .upsert(personalData, { onConflict: 'cv_id' });
+        .upsert(personalData);
 
       if (personalError) {
         console.error('Personal info save error:', personalError);
