@@ -276,7 +276,7 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
       }
     }
 
-    // Save personal info
+    // Save personal info using upsert
     if (data.personalInfo) {
       console.log('Saving personal info');
       const personalData = {
@@ -315,7 +315,7 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
 
       const { error: personalError } = await supabase
         .from('personal_info')
-        .upsert(personalData);
+        .upsert(personalData, { onConflict: 'cv_id' });
 
       if (personalError) {
         console.error('Personal info save error:', personalError);
@@ -324,145 +324,139 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
       console.log('Personal info saved successfully');
     }
 
-    // Clear existing data and insert new data for arrays
-    const tables = [
-      'education', 'experience', 'skills', 'languages', 'certificates', 
-      'publications', 'user_references', 'hobbies', 'awards', 'evaluations'
-    ];
+    // Helper function to safely update array data
+    const updateArrayData = async (tableName: string, dataArray: any[] | undefined, mapFunction: (item: any, index: number) => any) => {
+      if (!dataArray || dataArray.length === 0) {
+        // If no data, delete existing records
+        const { error: deleteError } = await supabase
+          .from(tableName)
+          .delete()
+          .eq('cv_id', cvId);
+        
+        if (deleteError) {
+          console.error(`Error deleting ${tableName}:`, deleteError);
+          throw deleteError;
+        }
+        return;
+      }
 
-    for (const table of tables) {
+      // Get existing records
+      const { data: existingData, error: fetchError } = await supabase
+        .from(tableName)
+        .select('*')
+        .eq('cv_id', cvId);
+
+      if (fetchError) {
+        console.error(`Error fetching existing ${tableName}:`, fetchError);
+        throw fetchError;
+      }
+
+      // Prepare new data with cv_id
+      const newData = dataArray.map((item, index) => mapFunction(item, index));
+
+      // Delete existing records
       const { error: deleteError } = await supabase
-        .from(table)
+        .from(tableName)
         .delete()
         .eq('cv_id', cvId);
 
-      if (deleteError) throw deleteError;
-    }
+      if (deleteError) {
+        console.error(`Error deleting ${tableName}:`, deleteError);
+        throw deleteError;
+      }
 
-    // Insert new data
-    if (data.education?.length) {
-      const educationData = data.education.map(edu => ({
-        cv_id: cvId,
-        institution: edu.institution,
-        degree: edu.degree,
-        field_of_study: edu.fieldOfStudy,
-        start_date: edu.startDate ? convertDateFormat(edu.startDate) : null,
-        end_date: edu.endDate ? convertDateFormat(edu.endDate) : null,
-        current: edu.current,
-        description: edu.description
-      }));
+      // Insert new data
+      const { error: insertError } = await supabase
+        .from(tableName)
+        .insert(newData);
 
-      const { error } = await supabase.from('education').insert(educationData);
-      if (error) throw error;
-    }
+      if (insertError) {
+        console.error(`Error inserting ${tableName}:`, insertError);
+        throw insertError;
+      }
 
-    if (data.experience?.length) {
-      const experienceData = data.experience.map(exp => ({
-        cv_id: cvId,
-        title: exp.title,
-        company: exp.company,
-        start_date: exp.startDate ? convertDateFormat(exp.startDate) : null,
-        end_date: exp.endDate ? convertDateFormat(exp.endDate) : null,
-        current: exp.current,
-        description: exp.description,
-        work_duration: exp.workDuration
-      }));
+      console.log(`${tableName} updated successfully`);
+    };
 
-      const { error } = await supabase.from('experience').insert(experienceData);
-      if (error) throw error;
-    }
+    // Update all array data
+    await updateArrayData('education', data.education, (edu) => ({
+      cv_id: cvId,
+      institution: edu.institution,
+      degree: edu.degree,
+      field_of_study: edu.fieldOfStudy,
+      start_date: edu.startDate ? convertDateFormat(edu.startDate) : null,
+      end_date: edu.endDate ? convertDateFormat(edu.endDate) : null,
+      current: edu.current,
+      description: edu.description
+    }));
 
-    if (data.skills?.length) {
-      const skillsData = data.skills.map(skill => ({
-        cv_id: cvId,
-        name: skill.name,
-        level: skill.level,
-        category: skill.category,
-        years_of_experience: skill.yearsOfExperience
-      }));
+    await updateArrayData('experience', data.experience, (exp) => ({
+      cv_id: cvId,
+      title: exp.title,
+      company: exp.company,
+      start_date: exp.startDate ? convertDateFormat(exp.startDate) : null,
+      end_date: exp.endDate ? convertDateFormat(exp.endDate) : null,
+      current: exp.current,
+      description: exp.description,
+      work_duration: exp.workDuration
+    }));
 
-      const { error } = await supabase.from('skills').insert(skillsData);
-      if (error) throw error;
-    }
+    await updateArrayData('skills', data.skills, (skill) => ({
+      cv_id: cvId,
+      name: skill.name,
+      level: skill.level,
+      category: skill.category,
+      years_of_experience: skill.yearsOfExperience
+    }));
 
-    if (data.languages?.length) {
-      const languagesData = data.languages.map(lang => ({
-        cv_id: cvId,
-        name: lang.name,
-        exam_type: lang.examType,
-        certificate_date: lang.certificateDate ? convertDateFormat(lang.certificateDate) : null,
-        exam_score: lang.examScore
-      }));
+    await updateArrayData('languages', data.languages, (lang) => ({
+      cv_id: cvId,
+      name: lang.name,
+      exam_type: lang.examType,
+      certificate_date: lang.certificateDate ? convertDateFormat(lang.certificateDate) : null,
+      exam_score: lang.examScore
+    }));
 
-      const { error } = await supabase.from('languages').insert(languagesData);
-      if (error) throw error;
-    }
+    await updateArrayData('certificates', data.certificates, (cert) => ({
+      cv_id: cvId,
+      name: cert.name,
+      start_date: cert.startDate ? convertDateFormat(cert.startDate) : null,
+      end_date: cert.endDate ? convertDateFormat(cert.endDate) : null,
+      duration: cert.duration
+    }));
 
-    if (data.certificates?.length) {
-      const certificatesData = data.certificates.map(cert => ({
-        cv_id: cvId,
-        name: cert.name,
-        start_date: cert.startDate ? convertDateFormat(cert.startDate) : null,
-        end_date: cert.endDate ? convertDateFormat(cert.endDate) : null,
-        duration: cert.duration
-      }));
+    await updateArrayData('publications', data.publications, (pub) => ({
+      cv_id: cvId,
+      title: pub.title,
+      authors: pub.authors,
+      publish_date: pub.publishDate ? convertDateFormat(pub.publishDate) : null,
+      publisher: pub.publisher,
+      url: pub.url,
+      description: pub.description
+    }));
 
-      const { error } = await supabase.from('certificates').insert(certificatesData);
-      if (error) throw error;
-    }
+    await updateArrayData('user_references', data.references, (ref) => ({
+      cv_id: cvId,
+      name: ref.name,
+      company: ref.company,
+      phone: ref.phone,
+      type: ref.type
+    }));
 
-    if (data.publications?.length) {
-      const publicationsData = data.publications.map(pub => ({
-        cv_id: cvId,
-        title: pub.title,
-        authors: pub.authors,
-        publish_date: pub.publishDate ? convertDateFormat(pub.publishDate) : null,
-        publisher: pub.publisher,
-        url: pub.url,
-        description: pub.description
-      }));
+    await updateArrayData('hobbies', data.hobbies, (hobby) => ({
+      cv_id: cvId,
+      name: hobby
+    }));
 
-      const { error } = await supabase.from('publications').insert(publicationsData);
-      if (error) throw error;
-    }
+    await updateArrayData('awards', data.awards, (award) => ({
+      cv_id: cvId,
+      title: award.title,
+      organization: award.organization,
+      date: award.date ? convertDateFormat(award.date) : null,
+      description: award.description
+    }));
 
-    if (data.references?.length) {
-      const referencesData = data.references.map(ref => ({
-        cv_id: cvId,
-        name: ref.name,
-        company: ref.company,
-        phone: ref.phone,
-        type: ref.type
-      }));
-
-      const { error } = await supabase.from('user_references').insert(referencesData);
-      if (error) throw error;
-    }
-
-    if (data.hobbies?.length) {
-      const hobbiesData = data.hobbies.map(hobby => ({
-        cv_id: cvId,
-        name: hobby
-      }));
-
-      const { error } = await supabase.from('hobbies').insert(hobbiesData);
-      if (error) throw error;
-    }
-
-    if (data.awards?.length) {
-      const awardsData = data.awards.map(award => ({
-        cv_id: cvId,
-        title: award.title,
-        organization: award.organization,
-        date: award.date ? convertDateFormat(award.date) : null,
-        description: award.description
-      }));
-
-      const { error } = await supabase.from('awards').insert(awardsData);
-      if (error) throw error;
-    }
-
-    // Save evaluation
+    // Save evaluation using upsert
     if (data.evaluation) {
       const evaluationData = {
         cv_id: cvId,
@@ -473,10 +467,18 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
         application_satisfaction: data.evaluation.applicationSatisfaction
       };
 
-      const { error } = await supabase.from('evaluations').insert(evaluationData);
-      if (error) throw error;
+      const { error: evalError } = await supabase
+        .from('evaluations')
+        .upsert(evaluationData, { onConflict: 'cv_id' });
+
+      if (evalError) {
+        console.error('Evaluation save error:', evalError);
+        throw evalError;
+      }
+      console.log('Evaluation saved successfully');
     }
 
+    console.log('CV saved successfully, fetching updated data...');
     // Return updated CV data
     return await getCVData(userId) || data;
   } catch (error) {
