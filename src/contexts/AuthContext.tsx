@@ -295,6 +295,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const isAdmin = () => {
+    console.log('isAdmin check:', { 
+      currentUser: !!currentUser, 
+      role: currentUser?.role, 
+      isAdmin: currentUser?.role === 'admin' 
+    });
     return currentUser?.role === 'admin';
   };
 
