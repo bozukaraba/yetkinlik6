@@ -101,6 +101,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         .eq('id', user.id)
         .single();
 
+      console.log('User data query result:', { userData: !!userData, error: !!error });
+
       if (error) {
         console.error('Error loading user profile:', error);
         
@@ -123,6 +125,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
           if (createError) {
             console.error('Error creating user profile:', createError);
+            // Create fallback profile without database insert
+            console.log('Creating fallback profile');
             setCurrentUser({
               id: user.id,
               email: user.email || '',
@@ -139,7 +143,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
             });
           }
         } else {
-          // Fallback user object
+          // Fallback user object for other errors
+          console.log('Creating fallback profile for error:', error.code);
           setCurrentUser({
             id: user.id,
             email: user.email || '',
@@ -158,7 +163,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     } catch (error) {
       console.error('Unexpected error loading user profile:', error);
-      // Fallback user object
+      // Always create fallback user object
+      console.log('Creating fallback profile due to unexpected error');
       setCurrentUser({
         id: user.id,
         email: user.email || '',
@@ -166,6 +172,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         role: 'user'
       });
     } finally {
+      console.log('Setting loading to false');
       setLoading(false);
     }
   };
@@ -173,23 +180,32 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
+      console.log('Starting login for:', email);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
+      console.log('Login response:', { data: !!data, error: !!error });
+
       if (error) {
+        console.error('Login error:', error);
         throw new Error(error.message);
       }
 
       if (data.user) {
+        console.log('User found, loading profile:', data.user.id);
         await loadUserProfile(data.user);
+        console.log('Profile loaded successfully');
+      } else {
+        console.error('No user in login response');
+        throw new Error('Giriş başarısız');
       }
     } catch (error) {
       console.error('Giriş hatası:', error);
-      throw error;
-    } finally {
       setLoading(false);
+      throw error;
     }
   };
 
