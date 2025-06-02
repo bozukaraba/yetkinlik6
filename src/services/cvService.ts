@@ -1,159 +1,425 @@
-import { v4 as uuidv4 } from 'uuid';
-import { CVData } from '../types/cv';
+import { supabase } from '../lib/supabase';
+import { CVData, PersonalInfo, Education, Experience, Skill, Language, Certificate, Award, Publication, Reference, Evaluation } from '../types/cv';
 
-// Get CV data from localStorage
+// Helper function to convert date format from DD-MM-YYYY to YYYY-MM-DD
+const convertDateFormat = (dateStr: string): string => {
+  if (!dateStr || !dateStr.includes('-')) return dateStr;
+  const parts = dateStr.split('-');
+  if (parts.length === 3 && parts[0].length === 2) {
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  }
+  return dateStr;
+};
+
+// Helper function to convert date format from YYYY-MM-DD to DD-MM-YYYY
+const convertDateFormatBack = (dateStr: string): string => {
+  if (!dateStr || !dateStr.includes('-')) return dateStr;
+  const parts = dateStr.split('-');
+  if (parts.length === 3 && parts[0].length === 4) {
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  }
+  return dateStr;
+};
+
+// Get CV data from Supabase
 export const getCVData = async (userId: string): Promise<CVData | null> => {
-  // Simulate server delay
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  const storedData = localStorage.getItem(`cv_data_${userId}`);
-  return storedData ? JSON.parse(storedData) : null;
-};
-
-// Veri optimizasyon fonksiyonu
-const optimizeCVData = (data: CVData): CVData => {
-  const optimizedData = { ...data };
-  
-  // Profil resmini daha agresif optimize et
-  if (optimizedData.personalInfo?.profileImage) {
-    const img = optimizedData.personalInfo.profileImage;
-    // Eğer resim çok büyükse, daha da sıkıştır
-    if (img.length > 50000) { // ~37KB base64
-      console.log('Profil resmi çok büyük, daha da optimize ediliyor...');
-      // Bu durumda frontend'de zaten optimize edilmiş olmalı ama yine de uyarı ver
-    }
-  }
-  
-  // SGK belgesini optimize et - 5MB'a kadar kabul et
-  if (optimizedData.personalInfo?.sgkServiceDocument) {
-    const doc = optimizedData.personalInfo.sgkServiceDocument;
-    const sizeInMB = doc.length * 0.75 / (1024 * 1024);
-    
-    if (sizeInMB > 5) {
-      console.log(`SGK belgesi çok büyük (${sizeInMB.toFixed(2)}MB), kaldırılıyor...`);
-      optimizedData.personalInfo.sgkServiceDocument = undefined;
-    } else {
-      console.log(`SGK belgesi boyutu: ${sizeInMB.toFixed(2)}MB - Kabul edildi`);
-    }
-  }
-  
-  // Boş alanları temizle
-  if (optimizedData.projects?.length === 0) delete optimizedData.projects;
-  if (optimizedData.volunteer?.length === 0) delete optimizedData.volunteer;
-  if (optimizedData.publications?.length === 0) delete optimizedData.publications;
-  if (optimizedData.awards?.length === 0) delete optimizedData.awards;
-  if (optimizedData.hobbies?.length === 0) delete optimizedData.hobbies;
-  if (optimizedData.certificates?.length === 0) delete optimizedData.certificates;
-  if (optimizedData.languages?.length === 0) delete optimizedData.languages;
-  if (optimizedData.references?.length === 0) delete optimizedData.references;
-  if (optimizedData.skills?.length === 0) delete optimizedData.skills;
-  if (optimizedData.experience?.length === 0) delete optimizedData.experience;
-  if (optimizedData.education?.length === 0) delete optimizedData.education;
-  
-  return optimizedData;
-};
-
-// Save CV data to localStorage
-export const saveCVData = async (userId: string, data: CVData): Promise<CVData> => {
-  // Simulate server delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Veriyi otomatik olarak optimize et
-  const optimizedData = optimizeCVData(data);
-  
-  // Ensure the data has ID and timestamps
-  const updatedData = {
-    ...optimizedData,
-    id: optimizedData.id || uuidv4(),
-    userId,
-    createdAt: optimizedData.createdAt || new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-  
   try {
-    const dataString = JSON.stringify(updatedData);
-    const sizeInMB = dataString.length / (1024 * 1024);
-    
-    console.log(`CV verisi boyutu: ${sizeInMB.toFixed(2)}MB`);
-    
-    // Eğer hala çok büyükse, kritik olmayan verileri temizle
-    if (sizeInMB > 6) {
-      console.log('CV verisi çok büyük, otomatik optimizasyon yapılıyor...');
-      
-      // Kritik olmayan alanları temizle
-      const compactData = { ...updatedData };
-      
-      // Büyük dosyaları kaldır
-      if (compactData.personalInfo?.profileImage) {
-        compactData.personalInfo.profileImage = undefined;
-        console.log('Profil resmi kaldırıldı');
+    // Get CV record
+    const { data: cvData, error: cvError } = await supabase
+      .from('cvs')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (cvError) {
+      if (cvError.code === 'PGRST116') { // Not found
+        return null;
       }
-      if (compactData.personalInfo?.sgkServiceDocument) {
-        compactData.personalInfo.sgkServiceDocument = undefined;
-        console.log('SGK belgesi kaldırıldı');
-      }
-      
-      // Boş dizileri temizle
-      if (compactData.projects?.length === 0) delete compactData.projects;
-      if (compactData.volunteer?.length === 0) delete compactData.volunteer;
-      if (compactData.publications?.length === 0) delete compactData.publications;
-      if (compactData.awards?.length === 0) delete compactData.awards;
-      if (compactData.hobbies?.length === 0) delete compactData.hobbies;
-      
-      const compactString = JSON.stringify(compactData);
-      const newSizeInMB = compactString.length / (1024 * 1024);
-      
-      console.log(`Optimizasyon sonrası boyut: ${newSizeInMB.toFixed(2)}MB`);
-      
-      localStorage.setItem(`cv_data_${userId}`, compactString);
-      return compactData;
+      throw cvError;
     }
-    
-    localStorage.setItem(`cv_data_${userId}`, dataString);
-    return updatedData;
+
+    // Get all related data in parallel
+    const [
+      personalInfoResult,
+      educationResult,
+      experienceResult,
+      skillsResult,
+      languagesResult,
+      certificatesResult,
+      publicationsResult,
+      referencesResult,
+      hobbiesResult,
+      awardsResult,
+      evaluationResult
+    ] = await Promise.all([
+      supabase.from('personal_info').select('*').eq('cv_id', cvData.id).single(),
+      supabase.from('education').select('*').eq('cv_id', cvData.id),
+      supabase.from('experience').select('*').eq('cv_id', cvData.id),
+      supabase.from('skills').select('*').eq('cv_id', cvData.id),
+      supabase.from('languages').select('*').eq('cv_id', cvData.id),
+      supabase.from('certificates').select('*').eq('cv_id', cvData.id),
+      supabase.from('publications').select('*').eq('cv_id', cvData.id),
+      supabase.from('user_references').select('*').eq('cv_id', cvData.id),
+      supabase.from('hobbies').select('*').eq('cv_id', cvData.id),
+      supabase.from('awards').select('*').eq('cv_id', cvData.id),
+      supabase.from('evaluations').select('*').eq('cv_id', cvData.id).single()
+    ]);
+
+    // Build CV data object
+    const cv: CVData = {
+      id: cvData.id,
+      userId: cvData.user_id,
+      personalInfo: personalInfoResult.data ? {
+        firstName: personalInfoResult.data.first_name,
+        lastName: personalInfoResult.data.last_name,
+        email: personalInfoResult.data.email,
+        phone: personalInfoResult.data.phone,
+        birthDate: personalInfoResult.data.birth_date ? convertDateFormatBack(personalInfoResult.data.birth_date) : '',
+        address: personalInfoResult.data.address,
+        city: personalInfoResult.data.city,
+        postalCode: personalInfoResult.data.postal_code,
+        country: personalInfoResult.data.country,
+        summary: personalInfoResult.data.summary,
+        maritalStatus: personalInfoResult.data.marital_status,
+        militaryStatus: personalInfoResult.data.military_status,
+        drivingLicense: personalInfoResult.data.driving_license || [],
+        profileImage: personalInfoResult.data.profile_image,
+        sgkServiceDocument: personalInfoResult.data.sgk_service_document,
+        linkedIn: personalInfoResult.data.linkedin,
+        github: personalInfoResult.data.github,
+        twitter: personalInfoResult.data.twitter,
+        instagram: personalInfoResult.data.instagram,
+        facebook: personalInfoResult.data.facebook,
+        youtube: personalInfoResult.data.youtube,
+        tiktok: personalInfoResult.data.tiktok,
+        discord: personalInfoResult.data.discord,
+        telegram: personalInfoResult.data.telegram,
+        whatsapp: personalInfoResult.data.whatsapp,
+        medium: personalInfoResult.data.medium,
+        behance: personalInfoResult.data.behance,
+        dribbble: personalInfoResult.data.dribbble,
+        stackoverflow: personalInfoResult.data.stackoverflow,
+        website: personalInfoResult.data.website
+      } : undefined,
+      education: educationResult.data?.map(edu => ({
+        id: edu.id,
+        institution: edu.institution,
+        degree: edu.degree,
+        fieldOfStudy: edu.field_of_study,
+        startDate: edu.start_date ? convertDateFormatBack(edu.start_date) : '',
+        endDate: edu.end_date ? convertDateFormatBack(edu.end_date) : '',
+        current: edu.current,
+        description: edu.description
+      })) || [],
+      experience: experienceResult.data?.map(exp => ({
+        id: exp.id,
+        title: exp.title,
+        company: exp.company,
+        startDate: exp.start_date ? convertDateFormatBack(exp.start_date) : '',
+        endDate: exp.end_date ? convertDateFormatBack(exp.end_date) : '',
+        current: exp.current,
+        description: exp.description,
+        workDuration: exp.work_duration
+      })) || [],
+      skills: skillsResult.data?.map(skill => ({
+        id: skill.id,
+        name: skill.name,
+        level: skill.level,
+        category: skill.category,
+        yearsOfExperience: skill.years_of_experience
+      })) || [],
+      languages: languagesResult.data?.map(lang => ({
+        id: lang.id,
+        name: lang.name,
+        examType: lang.exam_type,
+        certificateDate: lang.certificate_date ? convertDateFormatBack(lang.certificate_date) : '',
+        examScore: lang.exam_score
+      })) || [],
+      certificates: certificatesResult.data?.map(cert => ({
+        id: cert.id,
+        name: cert.name,
+        startDate: cert.start_date ? convertDateFormatBack(cert.start_date) : '',
+        endDate: cert.end_date ? convertDateFormatBack(cert.end_date) : '',
+        duration: cert.duration
+      })) || [],
+      publications: publicationsResult.data?.map(pub => ({
+        id: pub.id,
+        title: pub.title,
+        authors: pub.authors || [],
+        publishDate: pub.publish_date ? convertDateFormatBack(pub.publish_date) : '',
+        publisher: pub.publisher,
+        url: pub.url,
+        description: pub.description
+      })) || [],
+      references: referencesResult.data?.map(ref => ({
+        id: ref.id,
+        name: ref.name,
+        company: ref.company,
+        phone: ref.phone,
+        type: ref.type
+      })) || [],
+      hobbies: hobbiesResult.data?.map(hobby => hobby.name) || [],
+      awards: awardsResult.data?.map(award => ({
+        id: award.id,
+        title: award.title,
+        organization: award.organization,
+        date: award.date ? convertDateFormatBack(award.date) : '',
+        description: award.description
+      })) || [],
+      evaluation: evaluationResult.data ? {
+        workSatisfaction: evaluationResult.data.work_satisfaction,
+        facilitiesSatisfaction: evaluationResult.data.facilities_satisfaction,
+        longTermIntent: evaluationResult.data.long_term_intent,
+        recommendation: evaluationResult.data.recommendation,
+        applicationSatisfaction: evaluationResult.data.application_satisfaction
+      } : {
+        workSatisfaction: 0,
+        facilitiesSatisfaction: 0,
+        longTermIntent: 0,
+        recommendation: 0,
+        applicationSatisfaction: 0
+      },
+      createdAt: cvData.created_at,
+      updatedAt: cvData.updated_at
+    };
+
+    return cv;
   } catch (error) {
-    if (error instanceof Error) {
-      if (error.name === 'QuotaExceededError' || error.message.includes('quota')) {
-        // Son çare: Sadece temel bilgileri kaydet
-        console.log('Depolama alanı dolu, sadece temel bilgiler kaydediliyor...');
-        
-        // Önce mevcut CV verilerini temizle
-        for (let i = localStorage.length - 1; i >= 0; i--) {
-          const key = localStorage.key(i);
-          if (key && key.startsWith('cv_data_') && key !== `cv_data_${userId}`) {
-            localStorage.removeItem(key);
-            console.log(`Eski CV verisi temizlendi: ${key}`);
-          }
-        }
-        
-        const essentialData = {
-          ...updatedData,
-          personalInfo: {
-            ...updatedData.personalInfo,
-            profileImage: undefined, // Resmi kaldır
-            sgkServiceDocument: undefined // Belgeyi kaldır
-          }
-        };
-        
-        try {
-          localStorage.setItem(`cv_data_${userId}`, JSON.stringify(essentialData));
-          throw new Error('Depolama alanı dolu olduğu için profil resmi ve belgeler kaydedilemedi. CV\'nin geri kalanı başarıyla kaydedildi.');
-        } catch (finalError) {
-          // Tüm localStorage'ı temizle
-          localStorage.clear();
-          console.log('Tüm localStorage temizlendi');
-          
-          try {
-            localStorage.setItem(`cv_data_${userId}`, JSON.stringify(essentialData));
-            throw new Error('Depolama alanı temizlendi ve CV kaydedildi. Profil resmi ve belgeler kaydedilemedi.');
-          } catch (veryFinalError) {
-            throw new Error('Depolama alanı tamamen dolu. Lütfen tarayıcı verilerini manuel olarak temizleyin.');
-          }
-        }
-      }
-      throw error;
+    console.error('CV verisi yüklenirken hata:', error);
+    throw error;
+  }
+};
+
+// Save CV data to Supabase
+export const saveCVData = async (userId: string, data: CVData): Promise<CVData> => {
+  try {
+    // Start transaction
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error('Kullanıcı oturumu bulunamadı');
     }
-    throw new Error('CV kaydedilirken bilinmeyen bir hata oluştu.');
+
+    // Create or get CV record
+    let cvId = data.id;
+    if (!cvId) {
+      const { data: cvData, error: cvError } = await supabase
+        .from('cvs')
+        .insert({ user_id: userId })
+        .select()
+        .single();
+
+      if (cvError) throw cvError;
+      cvId = cvData.id;
+    } else {
+      const { error: cvUpdateError } = await supabase
+        .from('cvs')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', cvId);
+
+      if (cvUpdateError) throw cvUpdateError;
+    }
+
+    // Save personal info
+    if (data.personalInfo) {
+      const personalData = {
+        cv_id: cvId,
+        first_name: data.personalInfo.firstName,
+        last_name: data.personalInfo.lastName,
+        email: data.personalInfo.email,
+        phone: data.personalInfo.phone,
+        birth_date: data.personalInfo.birthDate ? convertDateFormat(data.personalInfo.birthDate) : null,
+        address: data.personalInfo.address,
+        city: data.personalInfo.city,
+        postal_code: data.personalInfo.postalCode,
+        country: data.personalInfo.country,
+        summary: data.personalInfo.summary,
+        marital_status: data.personalInfo.maritalStatus,
+        military_status: data.personalInfo.militaryStatus,
+        driving_license: data.personalInfo.drivingLicense,
+        profile_image: data.personalInfo.profileImage,
+        sgk_service_document: data.personalInfo.sgkServiceDocument,
+        linkedin: data.personalInfo.linkedIn,
+        github: data.personalInfo.github,
+        twitter: data.personalInfo.twitter,
+        instagram: data.personalInfo.instagram,
+        facebook: data.personalInfo.facebook,
+        youtube: data.personalInfo.youtube,
+        tiktok: data.personalInfo.tiktok,
+        discord: data.personalInfo.discord,
+        telegram: data.personalInfo.telegram,
+        whatsapp: data.personalInfo.whatsapp,
+        medium: data.personalInfo.medium,
+        behance: data.personalInfo.behance,
+        dribbble: data.personalInfo.dribbble,
+        stackoverflow: data.personalInfo.stackoverflow,
+        website: data.personalInfo.website
+      };
+
+      const { error: personalError } = await supabase
+        .from('personal_info')
+        .upsert(personalData, { onConflict: 'cv_id' });
+
+      if (personalError) throw personalError;
+    }
+
+    // Clear existing data and insert new data for arrays
+    const tables = [
+      'education', 'experience', 'skills', 'languages', 'certificates', 
+      'publications', 'user_references', 'hobbies', 'awards', 'evaluations'
+    ];
+
+    for (const table of tables) {
+      const { error: deleteError } = await supabase
+        .from(table)
+        .delete()
+        .eq('cv_id', cvId);
+
+      if (deleteError) throw deleteError;
+    }
+
+    // Insert new data
+    if (data.education?.length) {
+      const educationData = data.education.map(edu => ({
+        cv_id: cvId,
+        institution: edu.institution,
+        degree: edu.degree,
+        field_of_study: edu.fieldOfStudy,
+        start_date: edu.startDate ? convertDateFormat(edu.startDate) : null,
+        end_date: edu.endDate ? convertDateFormat(edu.endDate) : null,
+        current: edu.current,
+        description: edu.description
+      }));
+
+      const { error } = await supabase.from('education').insert(educationData);
+      if (error) throw error;
+    }
+
+    if (data.experience?.length) {
+      const experienceData = data.experience.map(exp => ({
+        cv_id: cvId,
+        title: exp.title,
+        company: exp.company,
+        start_date: exp.startDate ? convertDateFormat(exp.startDate) : null,
+        end_date: exp.endDate ? convertDateFormat(exp.endDate) : null,
+        current: exp.current,
+        description: exp.description,
+        work_duration: exp.workDuration
+      }));
+
+      const { error } = await supabase.from('experience').insert(experienceData);
+      if (error) throw error;
+    }
+
+    if (data.skills?.length) {
+      const skillsData = data.skills.map(skill => ({
+        cv_id: cvId,
+        name: skill.name,
+        level: skill.level,
+        category: skill.category,
+        years_of_experience: skill.yearsOfExperience
+      }));
+
+      const { error } = await supabase.from('skills').insert(skillsData);
+      if (error) throw error;
+    }
+
+    if (data.languages?.length) {
+      const languagesData = data.languages.map(lang => ({
+        cv_id: cvId,
+        name: lang.name,
+        exam_type: lang.examType,
+        certificate_date: lang.certificateDate ? convertDateFormat(lang.certificateDate) : null,
+        exam_score: lang.examScore
+      }));
+
+      const { error } = await supabase.from('languages').insert(languagesData);
+      if (error) throw error;
+    }
+
+    if (data.certificates?.length) {
+      const certificatesData = data.certificates.map(cert => ({
+        cv_id: cvId,
+        name: cert.name,
+        start_date: cert.startDate ? convertDateFormat(cert.startDate) : null,
+        end_date: cert.endDate ? convertDateFormat(cert.endDate) : null,
+        duration: cert.duration
+      }));
+
+      const { error } = await supabase.from('certificates').insert(certificatesData);
+      if (error) throw error;
+    }
+
+    if (data.publications?.length) {
+      const publicationsData = data.publications.map(pub => ({
+        cv_id: cvId,
+        title: pub.title,
+        authors: pub.authors,
+        publish_date: pub.publishDate ? convertDateFormat(pub.publishDate) : null,
+        publisher: pub.publisher,
+        url: pub.url,
+        description: pub.description
+      }));
+
+      const { error } = await supabase.from('publications').insert(publicationsData);
+      if (error) throw error;
+    }
+
+    if (data.references?.length) {
+      const referencesData = data.references.map(ref => ({
+        cv_id: cvId,
+        name: ref.name,
+        company: ref.company,
+        phone: ref.phone,
+        type: ref.type
+      }));
+
+      const { error } = await supabase.from('user_references').insert(referencesData);
+      if (error) throw error;
+    }
+
+    if (data.hobbies?.length) {
+      const hobbiesData = data.hobbies.map(hobby => ({
+        cv_id: cvId,
+        name: hobby
+      }));
+
+      const { error } = await supabase.from('hobbies').insert(hobbiesData);
+      if (error) throw error;
+    }
+
+    if (data.awards?.length) {
+      const awardsData = data.awards.map(award => ({
+        cv_id: cvId,
+        title: award.title,
+        organization: award.organization,
+        date: award.date ? convertDateFormat(award.date) : null,
+        description: award.description
+      }));
+
+      const { error } = await supabase.from('awards').insert(awardsData);
+      if (error) throw error;
+    }
+
+    // Save evaluation
+    if (data.evaluation) {
+      const evaluationData = {
+        cv_id: cvId,
+        work_satisfaction: data.evaluation.workSatisfaction,
+        facilities_satisfaction: data.evaluation.facilitiesSatisfaction,
+        long_term_intent: data.evaluation.longTermIntent,
+        recommendation: data.evaluation.recommendation,
+        application_satisfaction: data.evaluation.applicationSatisfaction
+      };
+
+      const { error } = await supabase.from('evaluations').insert(evaluationData);
+      if (error) throw error;
+    }
+
+    // Return updated CV data
+    return await getCVData(userId) || data;
+  } catch (error) {
+    console.error('CV kaydedilirken hata:', error);
+    throw error;
   }
 };
 
@@ -163,27 +429,52 @@ export const createCV = async (data: CVData): Promise<CVData> => {
     throw new Error('CV oluşturmak için kullanıcı ID gerekli');
   }
   
-  return saveCVData(data.userId, {...data, userId: data.userId});
+  return saveCVData(data.userId, data);
 };
 
 // Get all CVs (admin only)
 export const getAllCVs = async (): Promise<CVData[]> => {
-  // Simulate server delay
-  await new Promise(resolve => setTimeout(resolve, 700));
-  
-  const allCVs: CVData[] = [];
-  
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && key.startsWith('cv_data_')) {
-      const data = localStorage.getItem(key);
-      if (data) {
-        allCVs.push(JSON.parse(data));
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error('Kullanıcı oturumu bulunamadı');
+    }
+
+    // Check if user is admin
+    const { data: userData } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (userData?.role !== 'admin') {
+      throw new Error('Bu işlem için admin yetkisi gerekli');
+    }
+
+    const { data: cvs, error } = await supabase
+      .from('cvs')
+      .select(`
+        *,
+        personal_info(*)
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    const allCVs: CVData[] = [];
+    
+    for (const cv of cvs || []) {
+      const fullCV = await getCVData(cv.user_id);
+      if (fullCV) {
+        allCVs.push(fullCV);
       }
     }
+
+    return allCVs;
+  } catch (error) {
+    console.error('CV\'ler yüklenirken hata:', error);
+    throw error;
   }
-  
-  return allCVs;
 };
 
 // Search CVs by keywords (admin only)
@@ -195,48 +486,42 @@ export const searchCVsByKeywords = async (keywords: string[]): Promise<CVData[]>
   }
   
   return allCVs.filter(cv => {
-    // Her anahtar kelime için eşleşme olup olmadığını kontrol et
     return keywords.every(keyword => {
       const keywordLower = keyword.toLowerCase().trim();
       
-      if (!keywordLower) return true; // Boş anahtar kelimeleri atla
+      // Search in personal info
+      const personalInfo = cv.personalInfo;
+      if (personalInfo) {
+        if (personalInfo.firstName?.toLowerCase().includes(keywordLower) ||
+            personalInfo.lastName?.toLowerCase().includes(keywordLower) ||
+            personalInfo.email?.toLowerCase().includes(keywordLower) ||
+            personalInfo.city?.toLowerCase().includes(keywordLower) ||
+            personalInfo.summary?.toLowerCase().includes(keywordLower)) {
+          return true;
+        }
+      }
       
-      // Kişisel bilgiler içinde arama
-      const personalInfoMatch = cv.personalInfo ? 
-        (cv.personalInfo?.firstName?.toLowerCase() || '').includes(keywordLower) ||
-        (cv.personalInfo?.lastName?.toLowerCase() || '').includes(keywordLower) || 
-        (cv.personalInfo?.summary?.toLowerCase() || '').includes(keywordLower) ||
-        (cv.personalInfo?.city?.toLowerCase() || '').includes(keywordLower) ||
-        (cv.personalInfo?.country?.toLowerCase() || '').includes(keywordLower) : false;
-
-      // Beceriler içinde arama
-      const skillsMatch = cv.skills?.some(skill => 
-        skill.name.toLowerCase().includes(keywordLower)
-      );
+      // Search in skills
+      if (cv.skills?.some(skill => skill.name?.toLowerCase().includes(keywordLower) ||
+                                  skill.category?.toLowerCase().includes(keywordLower))) {
+        return true;
+      }
       
-      // İş deneyimi içinde arama
-      const experienceMatch = cv.experience?.some(exp => 
-        exp.description.toLowerCase().includes(keywordLower) ||
-        exp.title.toLowerCase().includes(keywordLower) ||
-        exp.company.toLowerCase().includes(keywordLower) ||
-        (exp.location?.toLowerCase() || '').includes(keywordLower)
-      );
+      // Search in experience
+      if (cv.experience?.some(exp => exp.title?.toLowerCase().includes(keywordLower) ||
+                                    exp.company?.toLowerCase().includes(keywordLower) ||
+                                    exp.description?.toLowerCase().includes(keywordLower))) {
+        return true;
+      }
       
-      // Eğitim bilgileri içinde arama
-      const educationMatch = cv.education?.some(edu => 
-        edu.degree.toLowerCase().includes(keywordLower) ||
-        edu.fieldOfStudy.toLowerCase().includes(keywordLower) ||
-        edu.institution.toLowerCase().includes(keywordLower) ||
-        (edu.description?.toLowerCase() || '').includes(keywordLower)
-      );
+      // Search in education
+      if (cv.education?.some(edu => edu.institution?.toLowerCase().includes(keywordLower) ||
+                                   edu.degree?.toLowerCase().includes(keywordLower) ||
+                                   edu.fieldOfStudy?.toLowerCase().includes(keywordLower))) {
+        return true;
+      }
       
-      // Dil becerileri içinde arama
-      const languageMatch = cv.languages?.some(lang =>
-        lang.name.toLowerCase().includes(keywordLower)
-      );
-
-      // En az bir alanda eşleşme varsa, bu anahtar kelime için TRUE döner
-      return personalInfoMatch || skillsMatch || experienceMatch || educationMatch || languageMatch;
+      return false;
     });
   });
 };
