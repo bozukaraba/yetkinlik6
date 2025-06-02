@@ -486,37 +486,12 @@ const CVForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!currentUser) {
-      alert('Kullanıcı oturumu bulunamadı. Lütfen tekrar giriş yapın.');
-      return;
-    }
+    console.log('=== CV FORM SUBMIT BAŞLADI ===');
+    console.log('Current user:', currentUser);
+    console.log('Form data:', formData);
 
-    // Double check session before submission
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      console.log('Pre-submit session check:', {
-        hasSession: !!session,
-        hasUser: !!user,
-        sessionUserId: session?.user?.id,
-        userAuthId: user?.id,
-        currentUserId: currentUser.id
-      });
-      
-      if (!session || !user) {
-        alert('Oturum süresi dolmuş. Lütfen tekrar giriş yapın.');
-        logout();
-        return;
-      }
-      
-      if (user.id !== currentUser.id) {
-        alert('Kullanıcı kimliği eşleşmiyor. Lütfen tekrar giriş yapın.');
-        logout();
-        return;
-      }
-    } catch (error) {
-      console.error('Session validation error:', error);
+    if (!currentUser) {
+      console.error('No current user found');
       alert('Oturum doğrulanamadı. Lütfen tekrar giriş yapın.');
       return;
     }
@@ -528,8 +503,11 @@ const CVForm = () => {
         userId: currentUser.id
       };
 
+      console.log('Data to save:', dataToSave);
       console.log('Submitting CV data for user:', currentUser.id);
-      await saveCVData(currentUser.id, dataToSave);
+      
+      const savedCV = await saveCVData(currentUser.id, dataToSave);
+      console.log('CV saved successfully:', savedCV);
       
       alert('CV başarıyla kaydedildi!');
       navigate('/dashboard');

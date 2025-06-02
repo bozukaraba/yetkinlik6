@@ -193,7 +193,15 @@ export const getCVData = async (userId: string): Promise<CVData | null> => {
 // Save CV data to Supabase
 export const saveCVData = async (userId: string, data: CVData): Promise<CVData> => {
   try {
+    console.log('=== saveCVData BAŞLADI ===');
     console.log('saveCVData called for user:', userId);
+    console.log('Data received:', { 
+      hasPersonalInfo: !!data.personalInfo,
+      educationCount: data.education?.length || 0,
+      experienceCount: data.experience?.length || 0,
+      skillsCount: data.skills?.length || 0,
+      hasEvaluation: !!data.evaluation
+    });
     
     // Check authentication in multiple ways
     const { data: { session } } = await supabase.auth.getSession();
@@ -274,11 +282,12 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
         console.error('CV update error:', cvUpdateError);
         throw cvUpdateError;
       }
+      console.log('CV updated successfully');
     }
 
     // Save personal info using upsert
     if (data.personalInfo) {
-      console.log('Saving personal info');
+      console.log('=== PERSONAL INFO KAYDETME BAŞLADI ===');
       const personalData = {
         cv_id: cvId,
         first_name: data.personalInfo.firstName,
@@ -313,6 +322,8 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
         website: data.personalInfo.website
       };
 
+      console.log('Personal data to save:', personalData);
+
       const { error: personalError } = await supabase
         .from('personal_info')
         .upsert(personalData, { onConflict: 'cv_id' });
@@ -321,13 +332,17 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
         console.error('Personal info save error:', personalError);
         throw personalError;
       }
-      console.log('Personal info saved successfully');
+      console.log('=== PERSONAL INFO KAYDEDILDI ===');
     }
 
     // Helper function to safely update array data
     const updateArrayData = async (tableName: string, dataArray: any[] | undefined, mapFunction: (item: any, index: number) => any) => {
+      console.log(`=== ${tableName.toUpperCase()} GÜNCELLEME BAŞLADI ===`);
+      console.log(`${tableName} data count:`, dataArray?.length || 0);
+      
       if (!dataArray || dataArray.length === 0) {
         // If no data, delete existing records
+        console.log(`No ${tableName} data, deleting existing records...`);
         const { error: deleteError } = await supabase
           .from(tableName)
           .delete()
@@ -337,10 +352,12 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
           console.error(`Error deleting ${tableName}:`, deleteError);
           throw deleteError;
         }
+        console.log(`${tableName} existing records deleted`);
         return;
       }
 
       // Get existing records
+      console.log(`Fetching existing ${tableName} records...`);
       const { data: existingData, error: fetchError } = await supabase
         .from(tableName)
         .select('*')
@@ -351,10 +368,14 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
         throw fetchError;
       }
 
+      console.log(`Found ${existingData?.length || 0} existing ${tableName} records`);
+
       // Prepare new data with cv_id
       const newData = dataArray.map((item, index) => mapFunction(item, index));
+      console.log(`Prepared ${newData.length} new ${tableName} records`);
 
       // Delete existing records
+      console.log(`Deleting existing ${tableName} records...`);
       const { error: deleteError } = await supabase
         .from(tableName)
         .delete()
@@ -366,6 +387,7 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
       }
 
       // Insert new data
+      console.log(`Inserting new ${tableName} records...`);
       const { error: insertError } = await supabase
         .from(tableName)
         .insert(newData);
@@ -375,7 +397,7 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
         throw insertError;
       }
 
-      console.log(`${tableName} updated successfully`);
+      console.log(`=== ${tableName.toUpperCase()} BAŞARIYLA GÜNCELLENDİ ===`);
     };
 
     // Update all array data
@@ -458,6 +480,7 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
 
     // Save evaluation using manual check and update
     if (data.evaluation) {
+      console.log('=== EVALUATION KAYDETME BAŞLADI ===');
       const evaluationData = {
         cv_id: cvId,
         work_satisfaction: data.evaluation.workSatisfaction,
@@ -467,7 +490,10 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
         application_satisfaction: data.evaluation.applicationSatisfaction
       };
 
+      console.log('Evaluation data to save:', evaluationData);
+
       // Check if evaluation exists
+      console.log('Checking if evaluation exists...');
       const { data: existingEval, error: checkError } = await supabase
         .from('evaluations')
         .select('id')
@@ -481,6 +507,7 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
 
       if (existingEval) {
         // Update existing evaluation
+        console.log('Updating existing evaluation...');
         const { error: updateError } = await supabase
           .from('evaluations')
           .update(evaluationData)
@@ -490,9 +517,10 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
           console.error('Evaluation update error:', updateError);
           throw updateError;
         }
-        console.log('Evaluation updated successfully');
+        console.log('=== EVALUATION GÜNCELLENDI ===');
       } else {
         // Insert new evaluation
+        console.log('Inserting new evaluation...');
         const { error: insertError } = await supabase
           .from('evaluations')
           .insert(evaluationData);
@@ -501,13 +529,16 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
           console.error('Evaluation insert error:', insertError);
           throw insertError;
         }
-        console.log('Evaluation inserted successfully');
+        console.log('=== EVALUATION EKLENDİ ===');
       }
     }
 
+    console.log('=== CV KAYDETME TAMAMLANDI ===');
     console.log('CV saved successfully, fetching updated data...');
     // Return updated CV data
-    return await getCVData(userId) || data;
+    const updatedCV = await getCVData(userId);
+    console.log('Updated CV fetched:', !!updatedCV);
+    return updatedCV || data;
   } catch (error) {
     console.error('CV kaydedilirken hata:', error);
     throw error;
