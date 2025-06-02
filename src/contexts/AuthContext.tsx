@@ -94,14 +94,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       console.log('Loading user profile for:', user.id);
       
-      // Check if user exists in our users table
-      const { data: userData, error } = await supabase
+      // Add timeout for the query
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout: User profile query took too long')), 10000)
+      );
+      
+      // Check if user exists in our users table with timeout
+      const queryPromise = supabase
         .from('users')
         .select('*')
         .eq('id', user.id)
         .single();
+      
+      const { data: userData, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
 
-      console.log('User data query result:', { userData: !!userData, error: !!error });
+      console.log('User data query result:', { userData: !!userData, error: !!error, errorCode: error?.code });
 
       if (error) {
         console.error('Error loading user profile:', error);
