@@ -67,18 +67,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state change:', event, !!session, session?.user?.id);
+        console.log('Auth state change:', event, !!session, session?.user?.id, session?.user?.email);
         
         if (!mounted) return;
 
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           if (session?.user) {
-            console.log('User signed in or token refreshed:', session.user.id);
-            // Don't reload profile on token refresh if user already exists
+            console.log('User signed in or token refreshed:', session.user.id, session.user.email);
+            
+            // For admin user, be more tolerant of token refresh
+            const isAdminUser = session.user.email === 'yetkinlikxadmin@turksat.com.tr';
+            
+            // Don't reload profile on token refresh if user already exists and is admin
             if (event === 'TOKEN_REFRESHED' && currentUser) {
-              console.log('Token refreshed, maintaining existing session');
-              return;
+              if (isAdminUser && currentUser.role === 'admin') {
+                console.log('Admin token refreshed, maintaining existing session');
+                return;
+              } else if (!isAdminUser) {
+                console.log('Regular user token refreshed, maintaining existing session');
+                return;
+              }
             }
+            
             await loadUserProfile(session.user);
           }
         } else if (event === 'SIGNED_OUT') {
@@ -97,11 +107,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const loadUserProfile = async (user: SupabaseUser) => {
     try {
-      console.log('Loading user profile for:', user.id);
+      console.log('Loading user profile for:', user.id, user.email);
       
-      // Reduce timeout to 5 seconds and add retry logic
+      // Special handling for admin user
+      const isAdminEmail = user.email === 'yetkinlikxadmin@turksat.com.tr';
+      
+      // Reduce timeout to 3 seconds for better UX
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout: User profile query took too long')), 5000)
+        setTimeout(() => reject(new Error('Timeout: User profile query took too long')), 3000)
       );
       
       // Check if user exists in our users table with timeout
@@ -117,15 +130,27 @@ export function AuthProvider({ children }: AuthProviderProps) {
         userData = result.data;
         error = result.error;
       } catch (timeoutError) {
-        console.warn('User profile query timed out, using fallback');
+        console.warn('User profile query timed out, using fallback for:', user.email);
         // Create fallback user object on timeout
         setCurrentUser({
           id: user.id,
           email: user.email || '',
           name: user.user_metadata?.full_name || user.email || '',
-          role: user.email === 'yetkinlikxadmin@turksat.com.tr' ? 'admin' : 'user'
+          role: isAdminEmail ? 'admin' : 'user'
         });
         setLoading(false);
+        
+        // For admin user, try to fix the profile in background
+        if (isAdminEmail) {
+          console.log('Admin user timeout, attempting background fix...');
+          setTimeout(async () => {
+            try {
+              await fixAdminUserProfile(user);
+            } catch (bgError) {
+              console.error('Background admin fix failed:', bgError);
+            }
+          }, 1000);
+        }
         return;
       }
 
@@ -137,50 +162,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         // If user doesn't exist in our table, create one
         if (error.code === 'PGRST116') {
           console.log('User not found in users table, creating...');
-          const nameParts = user.user_metadata?.full_name?.split(' ') || ['', ''];
-          
-          try {
-            const { data: newUser, error: createError } = await supabase
-              .from('users')
-              .insert({
-                id: user.id,
-                email: user.email || '',
-                first_name: nameParts[0] || '',
-                last_name: nameParts.slice(1).join(' ') || '',
-                role: user.email === 'yetkinlikxadmin@turksat.com.tr' ? 'admin' : 'user'
-              })
-              .select()
-              .single();
-
-            if (createError) {
-              console.error('Error creating user profile:', createError);
-              // Create fallback profile without database insert
-              console.log('Creating fallback profile');
-              setCurrentUser({
-                id: user.id,
-                email: user.email || '',
-                name: user.user_metadata?.full_name || user.email || '',
-                role: user.email === 'yetkinlikxadmin@turksat.com.tr' ? 'admin' : 'user'
-              });
-            } else {
-              console.log('User profile created successfully:', newUser);
-              setCurrentUser({
-                id: newUser.id,
-                email: newUser.email,
-                name: `${newUser.first_name} ${newUser.last_name}`.trim(),
-                role: newUser.role as 'user' | 'admin'
-              });
-            }
-          } catch (createError) {
-            console.error('Failed to create user profile:', createError);
-            // Fallback user object
-            setCurrentUser({
-              id: user.id,
-              email: user.email || '',
-              name: user.user_metadata?.full_name || user.email || '',
-              role: user.email === 'yetkinlikxadmin@turksat.com.tr' ? 'admin' : 'user'
-            });
-          }
+          await createUserProfile(user, isAdminEmail);
         } else {
           // Fallback user object for other errors
           console.log('Creating fallback profile for error:', error.code);
@@ -188,7 +170,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             id: user.id,
             email: user.email || '',
             name: user.user_metadata?.full_name || user.email || '',
-            role: user.email === 'yetkinlikxadmin@turksat.com.tr' ? 'admin' : 'user'
+            role: isAdminEmail ? 'admin' : 'user'
           });
         }
       } else {
@@ -204,15 +186,91 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error('Unexpected error loading user profile:', error);
       // Always create fallback user object
       console.log('Creating fallback profile due to unexpected error');
+      const isAdminEmail = user.email === 'yetkinlikxadmin@turksat.com.tr';
       setCurrentUser({
         id: user.id,
         email: user.email || '',
         name: user.user_metadata?.full_name || user.email || '',
-        role: user.email === 'yetkinlikxadmin@turksat.com.tr' ? 'admin' : 'user'
+        role: isAdminEmail ? 'admin' : 'user'
       });
     } finally {
       console.log('Setting loading to false');
       setLoading(false);
+    }
+  };
+
+  const createUserProfile = async (user: SupabaseUser, isAdmin: boolean) => {
+    const nameParts = user.user_metadata?.full_name?.split(' ') || ['', ''];
+    
+    try {
+      const { data: newUser, error: createError } = await supabase
+        .from('users')
+        .insert({
+          id: user.id,
+          email: user.email || '',
+          first_name: nameParts[0] || (isAdmin ? 'Admin' : ''),
+          last_name: nameParts.slice(1).join(' ') || (isAdmin ? 'User' : ''),
+          role: isAdmin ? 'admin' : 'user'
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('Error creating user profile:', createError);
+        // Create fallback profile without database insert
+        console.log('Creating fallback profile');
+        setCurrentUser({
+          id: user.id,
+          email: user.email || '',
+          name: user.user_metadata?.full_name || user.email || '',
+          role: isAdmin ? 'admin' : 'user'
+        });
+      } else {
+        console.log('User profile created successfully:', newUser);
+        setCurrentUser({
+          id: newUser.id,
+          email: newUser.email,
+          name: `${newUser.first_name} ${newUser.last_name}`.trim(),
+          role: newUser.role as 'user' | 'admin'
+        });
+      }
+    } catch (createError) {
+      console.error('Failed to create user profile:', createError);
+      // Fallback user object
+      setCurrentUser({
+        id: user.id,
+        email: user.email || '',
+        name: user.user_metadata?.full_name || user.email || '',
+        role: isAdmin ? 'admin' : 'user'
+      });
+    }
+  };
+
+  const fixAdminUserProfile = async (user: SupabaseUser) => {
+    try {
+      console.log('Attempting to fix admin user profile...');
+      const { data: existingUser, error: checkError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      
+      if (checkError && checkError.code === 'PGRST116') {
+        // User doesn't exist, create it
+        await createUserProfile(user, true);
+      } else if (!checkError && existingUser.role !== 'admin') {
+        // User exists but role is wrong, update it
+        const { error: updateError } = await supabase
+          .from('users')
+          .update({ role: 'admin' })
+          .eq('id', user.id);
+        
+        if (!updateError) {
+          console.log('Admin role fixed successfully');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fix admin user profile:', error);
     }
   };
 
