@@ -39,78 +39,134 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Load user from Supabase on initial render
   useEffect(() => {
-    const getSession = async () => {
+    let mounted = true;
+
+    const initializeAuth = async () => {
       try {
+        console.log('Initializing auth...');
+        
+        // Get initial session
         const { data: { session } } = await supabase.auth.getSession();
-        console.log('Initial session check:', session ? 'User logged in' : 'No session');
-        if (session?.user) {
+        console.log('Initial session:', !!session);
+        
+        if (session?.user && mounted) {
+          console.log('Found existing session for user:', session.user.id);
           await loadUserProfile(session.user);
+        } else {
+          console.log('No existing session found');
+          setLoading(false);
         }
       } catch (error) {
-        console.error('Session yüklenirken hata:', error);
-      } finally {
+        console.error('Auth initialization error:', error);
         setLoading(false);
       }
     };
 
-    getSession();
+    initializeAuth();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session ? 'User logged in' : 'No session');
-      if (session?.user) {
-        await loadUserProfile(session.user);
-      } else {
-        setCurrentUser(null);
-      }
-      setLoading(false);
-    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state change:', event, !!session);
+        
+        if (!mounted) return;
 
-    return () => subscription?.unsubscribe();
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          if (session?.user) {
+            console.log('User signed in:', session.user.id);
+            await loadUserProfile(session.user);
+          }
+        } else if (event === 'SIGNED_OUT') {
+          console.log('User signed out');
+          setCurrentUser(null);
+          setLoading(false);
+        }
+      }
+    );
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const loadUserProfile = async (supabaseUser: SupabaseUser) => {
+  const loadUserProfile = async (user: SupabaseUser) => {
     try {
-      console.log('Loading user profile for:', supabaseUser.id);
+      console.log('Loading user profile for:', user.id);
       
       // Check if user exists in our users table
       const { data: userData, error } = await supabase
         .from('users')
         .select('*')
-        .eq('id', supabaseUser.id)
+        .eq('id', user.id)
         .single();
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 = not found
+      if (error) {
         console.error('Error loading user profile:', error);
-        throw error;
+        
+        // If user doesn't exist in our table, create one
+        if (error.code === 'PGRST116') {
+          console.log('User not found in users table, creating...');
+          const nameParts = user.user_metadata?.full_name?.split(' ') || ['', ''];
+          
+          const { data: newUser, error: createError } = await supabase
+            .from('users')
+            .insert({
+              id: user.id,
+              email: user.email || '',
+              first_name: nameParts[0] || '',
+              last_name: nameParts.slice(1).join(' ') || '',
+              role: 'user'
+            })
+            .select()
+            .single();
+
+          if (createError) {
+            console.error('Error creating user profile:', createError);
+            setCurrentUser({
+              id: user.id,
+              email: user.email || '',
+              name: user.user_metadata?.full_name || user.email || '',
+              role: 'user'
+            });
+          } else {
+            console.log('User profile created successfully:', newUser);
+            setCurrentUser({
+              id: newUser.id,
+              email: newUser.email,
+              name: `${newUser.first_name} ${newUser.last_name}`.trim(),
+              role: newUser.role as 'user' | 'admin'
+            });
+          }
+        } else {
+          // Fallback user object
+          setCurrentUser({
+            id: user.id,
+            email: user.email || '',
+            name: user.user_metadata?.full_name || user.email || '',
+            role: 'user'
+          });
+        }
+      } else {
+        console.log('User profile loaded successfully:', userData);
+        setCurrentUser({
+          id: userData.id,
+          email: userData.email,
+          name: `${userData.first_name} ${userData.last_name}`.trim(),
+          role: userData.role as 'user' | 'admin'
+        });
       }
-
-      if (!userData) {
-        console.log('User not found in users table, creating fallback profile');
-      }
-
-      const user: User = {
-        id: supabaseUser.id,
-        email: supabaseUser.email || '',
-        name: userData?.first_name && userData?.last_name 
-          ? `${userData.first_name} ${userData.last_name}`
-          : supabaseUser.email?.split('@')[0] || '',
-        role: userData?.role || 'user'
-      };
-
-      console.log('User profile loaded:', user);
-      setCurrentUser(user);
     } catch (error) {
-      console.error('Kullanıcı profili yüklenirken hata:', error);
-      // Create fallback user profile
-      const fallbackUser: User = {
-        id: supabaseUser.id,
-        email: supabaseUser.email || '',
-        name: supabaseUser.email?.split('@')[0] || '',
+      console.error('Unexpected error loading user profile:', error);
+      // Fallback user object
+      setCurrentUser({
+        id: user.id,
+        email: user.email || '',
+        name: user.user_metadata?.full_name || user.email || '',
         role: 'user'
-      };
-      console.log('Using fallback user profile:', fallbackUser);
-      setCurrentUser(fallbackUser);
+      });
+    } finally {
+      setLoading(false);
     }
   };
 

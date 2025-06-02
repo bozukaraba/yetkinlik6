@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { createCV, getCVData } from '../services/cvService';
+import { createCV, getCVData, saveCVData } from '../services/cvService';
 import { CVData, PersonalInfo, Education, Experience, Skill, Language, Reference, Certificate, Award, Publication, Evaluation } from '../types/cv';
 import { ChevronLeft, ChevronRight, Save, Trash2, Download } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { supabase } from '../lib/supabase';
 
 const CVForm = () => {
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  const { currentUser, logout } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(true);
   
@@ -485,70 +486,65 @@ const CVForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('handleSubmit çağrıldı', { currentUser, formData });
-    
-    // currentUser kontrolü
     if (!currentUser) {
-      console.error('currentUser bulunamadı');
-      alert('Giriş yapmanız gerekiyor. Lütfen tekrar giriş yapın.');
-      navigate('/login');
+      alert('Kullanıcı oturumu bulunamadı. Lütfen tekrar giriş yapın.');
       return;
     }
-    
-    // Form doğrulama kontrolleri
-    if (!formData.personalInfo?.firstName || !formData.personalInfo?.lastName || !formData.personalInfo?.email) {
-      alert("Lütfen kişisel bilgilerinizi doldurun.");
-      setCurrentStep(1); // Kişisel bilgiler adımına yönlendir
-      return;
-    }
-    
+
+    // Double check session before submission
     try {
-      console.log('CV kaydediliyor...', { 
-        userId: currentUser.id, 
-        personalInfo: formData.personalInfo,
-        dataKeys: Object.keys(formData)
+      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      console.log('Pre-submit session check:', {
+        hasSession: !!session,
+        hasUser: !!user,
+        sessionUserId: session?.user?.id,
+        userAuthId: user?.id,
+        currentUserId: currentUser.id
       });
       
-      const cvData = { ...formData, userId: currentUser.id };
-      const result = await createCV(cvData);
+      if (!session || !user) {
+        alert('Oturum süresi dolmuş. Lütfen tekrar giriş yapın.');
+        logout();
+        return;
+      }
       
-      console.log('CV başarıyla kaydedildi:', result);
-      alert("CV başarıyla kaydedildi!");
+      if (user.id !== currentUser.id) {
+        alert('Kullanıcı kimliği eşleşmiyor. Lütfen tekrar giriş yapın.');
+        logout();
+        return;
+      }
+    } catch (error) {
+      console.error('Session validation error:', error);
+      alert('Oturum doğrulanamadı. Lütfen tekrar giriş yapın.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const dataToSave = {
+        ...formData,
+        userId: currentUser.id
+      };
+
+      console.log('Submitting CV data for user:', currentUser.id);
+      await saveCVData(currentUser.id, dataToSave);
+      
+      alert('CV başarıyla kaydedildi!');
       navigate('/dashboard');
     } catch (error) {
-      console.error('CV oluşturulurken hata:', error);
-      console.error('Hata detayları:', {
-        error: error,
-        message: error instanceof Error ? error.message : 'Bilinmeyen hata',
-        stack: error instanceof Error ? error.stack : undefined,
-        formData: formData,
-        currentUser: currentUser
-      });
+      console.error('CV kaydedilirken hata:', error);
       
-      const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen bir hata oluştu';
-      
-      // Eğer depolama alanı dolu hatası ise, kullanıcıya seçenek sun
-      if (errorMessage.includes('Depolama alanı')) {
-        const userChoice = confirm(`${errorMessage}\n\nTarayıcı verilerini temizleyip tekrar denemek ister misiniz?`);
-        if (userChoice) {
-          // localStorage'ı temizle
-          localStorage.clear();
-          console.log('localStorage temizlendi');
-          
-          // Tekrar dene
-          try {
-            const result = await createCV({ ...formData, userId: currentUser.id });
-            console.log('CV başarıyla kaydedildi (temizlik sonrası):', result);
-            alert("CV başarıyla kaydedildi!");
-            navigate('/dashboard');
-          } catch (retryError) {
-            const retryErrorMessage = retryError instanceof Error ? retryError.message : 'Bilinmeyen bir hata oluştu';
-            alert(`CV kaydedilirken tekrar hata oluştu: ${retryErrorMessage}`);
-          }
-        }
+      // Check if it's an auth error
+      if (error instanceof Error && error.message.includes('oturum')) {
+        alert('Oturum süresi dolmuş. Lütfen tekrar giriş yapın.');
+        logout();
       } else {
-        alert(`CV kaydedilirken bir hata oluştu: ${errorMessage}`);
+        alert('CV kaydedilirken bir hata oluştu. Lütfen tekrar deneyin.');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
