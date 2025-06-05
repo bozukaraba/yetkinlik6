@@ -12,6 +12,7 @@ import EvaluationReport from './pages/EvaluationReport';
 import NotFoundPage from './pages/NotFoundPage';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
+import backgroundImage from './assets/background.jpg';
 // Import RLS tests for development/testing
 
 // Import admin debug script
@@ -95,7 +96,13 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen" style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
+          backgroundRepeat: 'no-repeat'
+        }}>
           <Navbar />
           <main className="flex-grow">
             <AuthAwareRoutes />
