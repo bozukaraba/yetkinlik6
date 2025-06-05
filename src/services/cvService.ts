@@ -62,11 +62,24 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
     // Check authentication
     const currentUser = auth.currentUser;
     if (!currentUser) {
+      console.error('No current user found');
       throw new Error('Kullanıcı oturumu bulunamadı. Lütfen tekrar giriş yapın.');
     }
     
+    console.log('Current user UID:', currentUser.uid);
+    console.log('Target user ID:', userId);
+    
     if (currentUser.uid !== userId) {
+      console.error('User ID mismatch:', { currentUser: currentUser.uid, targetUser: userId });
       throw new Error('Kullanıcı ID eşleşmiyor');
+    }
+
+    // Check if user has valid token
+    const token = await currentUser.getIdToken(true);
+    console.log('User token obtained successfully');
+    
+    if (!token) {
+      throw new Error('Authentication token alınamadı. Lütfen tekrar giriş yapın.');
     }
 
     // Convert dates to Firestore timestamps
@@ -100,8 +113,33 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
 
     console.log('CV data saved successfully');
     return data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error saving CV data:', error);
+    
+    // Firebase specific error handling
+    if (error?.code) {
+      console.error('Firebase error code:', error.code);
+      console.error('Firebase error message:', error.message);
+      
+      switch (error.code) {
+        case 'permission-denied':
+          throw new Error('Yetkisiz erişim. Lütfen tekrar giriş yapın.');
+        case 'unauthenticated':
+          throw new Error('Oturum süresi dolmuş. Lütfen tekrar giriş yapın.');
+        case 'unavailable':
+          throw new Error('Veritabanı hizmeti şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.');
+        case 'deadline-exceeded':
+          throw new Error('İşlem zaman aşımına uğradı. Lütfen tekrar deneyin.');
+        default:
+          throw new Error(`Veritabanı hatası: ${error.message}`);
+      }
+    }
+    
+    // Network or other errors
+    if (error.message?.includes('network') || error.message?.includes('fetch')) {
+      throw new Error('İnternet bağlantısı sorunu. Lütfen bağlantınızı kontrol edin.');
+    }
+    
     throw error;
   }
 };

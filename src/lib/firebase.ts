@@ -26,17 +26,8 @@ console.log('Firebase initialized with config:', {
   authDomain: firebaseConfig.authDomain
 });
 
-// Geliştirme ortamında emulator kullan
-if (import.meta.env.DEV) {
-  try {
-    connectAuthEmulator(auth, 'http://localhost:9099');
-    connectFirestoreEmulator(db, 'localhost', 8080);
-    connectStorageEmulator(storage, 'localhost', 9199);
-    console.log('Firebase emulators connected');
-  } catch (error) {
-    console.log('Firebase emulators already connected or not available');
-  }
-}
+// Emulator bağlantısı sadece local development için
+// Production'da bu kod çalışmayacak
 
 // Helper function to check if user is authenticated
 export const isAuthenticated = () => {
