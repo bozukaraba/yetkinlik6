@@ -30,9 +30,9 @@ const RegisterPage: React.FC = () => {
     try {
       setIsLoading(true);
       await register(email, password, name);
-      navigate('/dashboard');
-    } catch (err) {
-      setError('Hesap oluşturulamadı');
+      // Navigation will be handled automatically by AuthContext
+    } catch (err: any) {
+      setError(err.message || 'Hesap oluşturulamadı');
       console.error(err);
     } finally {
       setIsLoading(false);

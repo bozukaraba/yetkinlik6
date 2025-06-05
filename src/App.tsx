@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import AdminRoute from './components/auth/AdminRoute';
 import LoginPage from './pages/LoginPage';
@@ -17,6 +17,80 @@ import Footer from './components/layout/Footer';
 // Import admin debug script
 import './debug/checkAdmin';
 
+function AuthAwareRoutes() {
+  const { currentUser, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  return (
+    <Routes>
+      <Route 
+        path="/" 
+        element={
+          currentUser ? 
+            <Navigate to="/dashboard" replace /> : 
+            <Navigate to="/login" replace />
+        } 
+      />
+      <Route 
+        path="/login" 
+        element={
+          currentUser ? 
+            <Navigate to="/dashboard" replace /> : 
+            <LoginPage />
+        } 
+      />
+      <Route 
+        path="/register" 
+        element={
+          currentUser ? 
+            <Navigate to="/dashboard" replace /> : 
+            <RegisterPage />
+        } 
+      />
+      <Route 
+        path="/dashboard" 
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/cv-form" 
+        element={
+          <ProtectedRoute>
+            <CVForm />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin" 
+        element={
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
+        } 
+      />
+      <Route 
+        path="/admin/reports" 
+        element={
+          <AdminRoute>
+            <EvaluationReport />
+          </AdminRoute>
+        } 
+      />
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
+}
+
 function App() {
   return (
     <AuthProvider>
@@ -24,44 +98,7 @@ function App() {
         <div className="flex flex-col min-h-screen">
           <Navbar />
           <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Navigate to="/login" replace />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route 
-                path="/dashboard" 
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/cv-form" 
-                element={
-                  <ProtectedRoute>
-                    <CVForm />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/admin" 
-                element={
-                  <AdminRoute>
-                    <AdminDashboard />
-                  </AdminRoute>
-                } 
-              />
-              <Route 
-                path="/admin/reports" 
-                element={
-                  <AdminRoute>
-                    <EvaluationReport />
-                  </AdminRoute>
-                } 
-              />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
+            <AuthAwareRoutes />
           </main>
           <Footer />
         </div>

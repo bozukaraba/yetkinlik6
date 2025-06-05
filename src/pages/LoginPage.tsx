@@ -23,9 +23,9 @@ const LoginPage: React.FC = () => {
     try {
       setIsLoading(true);
       await login(email, password);
-      navigate('/dashboard');
-    } catch (err) {
-      setError('Giriş başarısız. Lütfen bilgilerinizi kontrol edin.');
+      // Navigation will be handled automatically by AuthContext
+    } catch (err: any) {
+      setError(err.message || 'Giriş başarısız. Lütfen bilgilerinizi kontrol edin.');
       console.error(err);
     } finally {
       setIsLoading(false);
