@@ -1,24 +1,60 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getAllCVs, searchCVsByKeywords } from '../services/cvService';
 import { CVData } from '../types/cv';
-import { Search, FileText, User, Calendar, Briefcase, Tag, Download, Star, BarChart3 } from 'lucide-react';
+import { Search, FileText, User, Calendar, Briefcase, Tag, Download, Star, BarChart3, Filter, X } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
+// Debounce hook
+const useDebounce = (value: string, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
+
 const AdminDashboard: React.FC = () => {
   const { currentUser } = useAuth();
+  const [allCVs, setAllCVs] = useState<CVData[]>([]);
   const [cvList, setCVList] = useState<CVData[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [selectedCV, setSelectedCV] = useState<CVData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Gelişmiş filtreleme state'leri
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    minExperienceYears: '',
+    maxExperienceYears: '',
+    minSkillLevel: '',
+    skillCategories: [] as string[],
+    cities: [] as string[],
+    educationLevels: [] as string[]
+  });
+
+  // Debounced search query
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  // Cache için
+  const [searchCache, setSearchCache] = useState<Map<string, CVData[]>>(new Map());
 
   useEffect(() => {
     const loadAllCVs = async () => {
       try {
         const data = await getAllCVs();
+        setAllCVs(data);
         setCVList(data);
       } catch (error) {
         console.error('Error loading CVs:', error);
@@ -30,29 +66,157 @@ const AdminDashboard: React.FC = () => {
     loadAllCVs();
   }, []);
 
+  // Filtreleme seçeneklerini otomatik oluştur
+  const filterOptions = useMemo(() => {
+    const skillCategories = new Set<string>();
+    const cities = new Set<string>();
+    const educationLevels = new Set<string>();
+
+    allCVs.forEach(cv => {
+      cv.skills?.forEach(skill => {
+        if (skill.category) skillCategories.add(skill.category);
+      });
+      if (cv.personalInfo?.city) cities.add(cv.personalInfo.city);
+      cv.education?.forEach(edu => {
+        if (edu.degree) educationLevels.add(edu.degree);
+      });
+    });
+
+    return {
+      skillCategories: Array.from(skillCategories).sort(),
+      cities: Array.from(cities).sort(),
+      educationLevels: Array.from(educationLevels).sort()
+    };
+  }, [allCVs]);
+
+  // Gelişmiş filtreleme fonksiyonu
+  const applyFilters = useCallback((cvs: CVData[]) => {
+    return cvs.filter(cv => {
+      // Deneyim yılı filtresi
+      if (filters.minExperienceYears || filters.maxExperienceYears) {
+        const totalExperience = cv.experience?.reduce((total, exp) => {
+          if (exp.workDuration) {
+            const match = exp.workDuration.match(/(\d+(?:\.\d+)?)/);
+            return total + (match ? parseFloat(match[1]) : 0);
+          }
+          return total;
+        }, 0) || 0;
+
+        if (filters.minExperienceYears && totalExperience < parseFloat(filters.minExperienceYears)) {
+          return false;
+        }
+        if (filters.maxExperienceYears && totalExperience > parseFloat(filters.maxExperienceYears)) {
+          return false;
+        }
+      }
+
+      // Beceri seviyesi filtresi
+      if (filters.minSkillLevel) {
+        const hasRequiredSkillLevel = cv.skills?.some(skill => 
+          (skill.level || 0) >= parseFloat(filters.minSkillLevel)
+        );
+        if (!hasRequiredSkillLevel) return false;
+      }
+
+      // Beceri kategorisi filtresi
+      if (filters.skillCategories.length > 0) {
+        const hasRequiredCategory = cv.skills?.some(skill =>
+          filters.skillCategories.includes(skill.category || '')
+        );
+        if (!hasRequiredCategory) return false;
+      }
+
+      // Şehir filtresi
+      if (filters.cities.length > 0) {
+        if (!cv.personalInfo?.city || !filters.cities.includes(cv.personalInfo.city)) {
+          return false;
+        }
+      }
+
+      // Eğitim seviyesi filtresi
+      if (filters.educationLevels.length > 0) {
+        const hasRequiredEducation = cv.education?.some(edu =>
+          filters.educationLevels.includes(edu.degree || '')
+        );
+        if (!hasRequiredEducation) return false;
+      }
+
+      return true;
+    });
+  }, [filters]);
+
+  // Debounced search effect
+  useEffect(() => {
+    const performSearch = async () => {
+      if (!debouncedSearchQuery.trim()) {
+        const filtered = applyFilters(allCVs);
+        setCVList(filtered);
+        return;
+      }
+
+      setIsSearching(true);
+      try {
+        const cacheKey = `${debouncedSearchQuery}-${JSON.stringify(filters)}`;
+        
+        // Cache'den kontrol et
+        if (searchCache.has(cacheKey)) {
+          setCVList(searchCache.get(cacheKey)!);
+          setSelectedCV(null);
+          setIsSearching(false);
+          return;
+        }
+
+        // Split by comma and trim whitespace
+        const keywords = debouncedSearchQuery
+          .split(',')
+          .map(keyword => keyword.trim())
+          .filter(Boolean);
+
+        const searchResults = await searchCVsByKeywords(keywords);
+        const filteredResults = applyFilters(searchResults);
+        
+        // Cache'e kaydet
+        setSearchCache(prev => new Map(prev.set(cacheKey, filteredResults)));
+        setCVList(filteredResults);
+        setSelectedCV(null);
+      } catch (error) {
+        console.error('Error searching CVs:', error);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    performSearch();
+  }, [debouncedSearchQuery, filters, allCVs, applyFilters, searchCache]);
+
   const handleSearch = async () => {
-    if (!searchQuery.trim()) {
-      const allCVs = await getAllCVs();
-      setCVList(allCVs);
-      return;
-    }
+    // Manuel arama butonu için
+    const performSearch = async () => {
+      if (!searchQuery.trim()) {
+        const filtered = applyFilters(allCVs);
+        setCVList(filtered);
+        return;
+      }
 
-    setIsSearching(true);
-    try {
-      // Split by comma and trim whitespace
-      const keywords = searchQuery
-        .split(',')
-        .map(keyword => keyword.trim())
-        .filter(Boolean);
+      setIsSearching(true);
+      try {
+        const keywords = searchQuery
+          .split(',')
+          .map(keyword => keyword.trim())
+          .filter(Boolean);
 
-      const results = await searchCVsByKeywords(keywords);
-      setCVList(results);
-      setSelectedCV(null);
-    } catch (error) {
-      console.error('Error searching CVs:', error);
-    } finally {
-      setIsSearching(false);
-    }
+        const searchResults = await searchCVsByKeywords(keywords);
+        const filteredResults = applyFilters(searchResults);
+        setCVList(filteredResults);
+        setSelectedCV(null);
+      } catch (error) {
+        console.error('Error searching CVs:', error);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    await performSearch();
   };
 
   const handleViewCV = (cv: CVData) => {
@@ -155,25 +319,261 @@ const AdminDashboard: React.FC = () => {
               Örnek: JavaScript, React, Bilgisayar Mühendisliği
             </p>
           </div>
-          <button
-            onClick={handleSearch}
-            disabled={isSearching}
-            className={`px-4 py-2 rounded-md transition-colors ${
-              isSearching 
-                ? 'bg-gray-400 cursor-not-allowed text-white' 
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
-            }`}
-          >
-            {isSearching ? 'Aranıyor...' : 'Ara'}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`px-4 py-2 rounded-md transition-colors flex items-center ${
+                showFilters
+                  ? 'bg-gray-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              <Filter className="h-4 w-4 mr-2" />
+              Filtreler
+            </button>
+            <button
+              onClick={handleSearch}
+              disabled={isSearching}
+              className={`px-4 py-2 rounded-md transition-colors ${
+                isSearching 
+                  ? 'bg-gray-400 cursor-not-allowed text-white' 
+                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+              }`}
+            >
+              {isSearching ? 'Aranıyor...' : 'Ara'}
+            </button>
+          </div>
         </div>
+
+        {/* Gelişmiş Filtreler */}
+        {showFilters && (
+          <div className="mt-4 bg-white bg-opacity-95 rounded-lg p-4 backdrop-blur-sm border border-gray-200">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium text-gray-900">Gelişmiş Filtreler</h3>
+              <button
+                onClick={() => {
+                  setFilters({
+                    minExperienceYears: '',
+                    maxExperienceYears: '',
+                    minSkillLevel: '',
+                    skillCategories: [],
+                    cities: [],
+                    educationLevels: []
+                  });
+                  setSearchCache(new Map());
+                }}
+                className="text-sm text-blue-600 hover:text-blue-800"
+              >
+                Filtreleri Temizle
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Deneyim Yılı */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Deneyim Yılı
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    value={filters.minExperienceYears}
+                    onChange={(e) => setFilters(prev => ({ ...prev, minExperienceYears: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    min="0"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={filters.maxExperienceYears}
+                    onChange={(e) => setFilters(prev => ({ ...prev, maxExperienceYears: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    min="0"
+                  />
+                </div>
+              </div>
+
+              {/* Minimum Beceri Seviyesi */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Min. Beceri Seviyesi
+                </label>
+                <select
+                  value={filters.minSkillLevel}
+                  onChange={(e) => setFilters(prev => ({ ...prev, minSkillLevel: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="">Tümü</option>
+                  <option value="1">1 - Başlangıç</option>
+                  <option value="2">2 - Temel</option>
+                  <option value="3">3 - Orta</option>
+                  <option value="4">4 - İleri</option>
+                  <option value="5">5 - Uzman</option>
+                </select>
+              </div>
+
+              {/* Şehirler */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Şehir
+                </label>
+                <select
+                  multiple
+                  value={filters.cities}
+                  onChange={(e) => {
+                    const values = Array.from(e.target.selectedOptions, option => option.value);
+                    setFilters(prev => ({ ...prev, cities: values }));
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm h-20"
+                >
+                  {filterOptions.cities.map(city => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">Ctrl+click ile çoklu seçim</p>
+              </div>
+
+              {/* Beceri Kategorileri */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Beceri Kategorisi
+                </label>
+                <select
+                  multiple
+                  value={filters.skillCategories}
+                  onChange={(e) => {
+                    const values = Array.from(e.target.selectedOptions, option => option.value);
+                    setFilters(prev => ({ ...prev, skillCategories: values }));
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm h-20"
+                >
+                  {filterOptions.skillCategories.map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">Ctrl+click ile çoklu seçim</p>
+              </div>
+
+              {/* Eğitim Seviyesi */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Eğitim Seviyesi
+                </label>
+                <select
+                  multiple
+                  value={filters.educationLevels}
+                  onChange={(e) => {
+                    const values = Array.from(e.target.selectedOptions, option => option.value);
+                    setFilters(prev => ({ ...prev, educationLevels: values }));
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm h-20"
+                >
+                  {filterOptions.educationLevels.map(level => (
+                    <option key={level} value={level}>{level}</option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">Ctrl+click ile çoklu seçim</p>
+              </div>
+            </div>
+
+            {/* Aktif Filtreler */}
+            {(filters.minExperienceYears || filters.maxExperienceYears || filters.minSkillLevel || 
+              filters.skillCategories.length > 0 || filters.cities.length > 0 || filters.educationLevels.length > 0) && (
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="flex flex-wrap gap-2">
+                  {filters.minExperienceYears && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      Min deneyim: {filters.minExperienceYears} yıl
+                      <button
+                        onClick={() => setFilters(prev => ({ ...prev, minExperienceYears: '' }))}
+                        className="ml-1 text-blue-600 hover:text-blue-800"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  )}
+                  {filters.maxExperienceYears && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      Max deneyim: {filters.maxExperienceYears} yıl
+                      <button
+                        onClick={() => setFilters(prev => ({ ...prev, maxExperienceYears: '' }))}
+                        className="ml-1 text-blue-600 hover:text-blue-800"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  )}
+                  {filters.minSkillLevel && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Min beceri: {filters.minSkillLevel}
+                      <button
+                        onClick={() => setFilters(prev => ({ ...prev, minSkillLevel: '' }))}
+                        className="ml-1 text-green-600 hover:text-green-800"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  )}
+                  {filters.cities.map(city => (
+                    <span key={city} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                      {city}
+                      <button
+                        onClick={() => setFilters(prev => ({ 
+                          ...prev, 
+                          cities: prev.cities.filter(c => c !== city) 
+                        }))}
+                        className="ml-1 text-purple-600 hover:text-purple-800"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
+                  {filters.skillCategories.map(category => (
+                    <span key={category} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                      {category}
+                      <button
+                        onClick={() => setFilters(prev => ({ 
+                          ...prev, 
+                          skillCategories: prev.skillCategories.filter(c => c !== category) 
+                        }))}
+                        className="ml-1 text-yellow-600 hover:text-yellow-800"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
+                  {filters.educationLevels.map(level => (
+                    <span key={level} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                      {level}
+                      <button
+                        onClick={() => setFilters(prev => ({ 
+                          ...prev, 
+                          educationLevels: prev.educationLevels.filter(l => l !== level) 
+                        }))}
+                        className="ml-1 text-indigo-600 hover:text-indigo-800"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* CV List */}
         <div className="lg:col-span-1">
           <div className="bg-white bg-opacity-95 rounded-lg shadow-md p-4 backdrop-blur-sm">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">CV Listesi</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-800">CV Listesi</h2>
+              <div className="text-sm text-gray-600">
+                {isLoading ? 'Yükleniyor...' : `${cvList.length} sonuç`}
+              </div>
+            </div>
             
             {isLoading ? (
               <div className="flex justify-center items-center h-64">
