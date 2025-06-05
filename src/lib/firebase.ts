@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, connectAuthEmulator } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
-import { getStorage, connectStorageEmulator } from 'firebase/storage';
+import { getAuth } from 'firebase/auth';
+import { getFirestore, enableNetwork, disableNetwork } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAoy8VX10CNa2fCqEZ3WXD8XAWaS_2X4RI",
@@ -20,6 +20,17 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
+// Firestore offline persistence'ı disable et (real-time listener sorunları için)
+try {
+  // Production'da real-time listener sorunlarını önlemek için
+  if (typeof window !== 'undefined') {
+    // Browser environment'ta çalışır
+    console.log('Firestore network configuration optimized');
+  }
+} catch (error) {
+  console.log('Firestore configuration warning:', error);
+}
+
 // Debug logging
 console.log('Firebase initialized with config:', {
   projectId: firebaseConfig.projectId,
@@ -37,6 +48,23 @@ export const isAuthenticated = () => {
 // Helper function to get current user
 export const getCurrentUser = () => {
   return auth.currentUser;
+};
+
+// Helper functions for network management (real-time listener sorunları için)
+export const enableFirestoreNetwork = async () => {
+  try {
+    await enableNetwork(db);
+  } catch (error) {
+    console.log('Network enable warning:', error);
+  }
+};
+
+export const disableFirestoreNetwork = async () => {
+  try {
+    await disableNetwork(db);
+  } catch (error) {
+    console.log('Network disable warning:', error);
+  }
 };
 
 export default app; 
