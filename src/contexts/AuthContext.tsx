@@ -1,6 +1,14 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '../lib/supabase';
-import type { User as SupabaseUser } from '@supabase/supabase-js';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  User as FirebaseUser,
+  updateProfile
+} from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../lib/firebase';
 
 // Define user types
 export interface User {
@@ -12,11 +20,10 @@ export interface User {
 
 interface AuthContextType {
   currentUser: User | null;
-  loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
-  isAdmin: () => boolean;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,380 +44,142 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Load user from Supabase on initial render
+  // Load user from Firebase on initial render
   useEffect(() => {
-    let mounted = true;
-
-    const initializeAuth = async () => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
-        console.log('Initializing auth...');
-        
-        // Get initial session
-        const { data: { session } } = await supabase.auth.getSession();
-        console.log('Initial session:', !!session);
-        
-        if (session?.user && mounted) {
-          console.log('Found existing session for user:', session.user.id);
-          await loadUserProfile(session.user);
+        if (firebaseUser) {
+          console.log('Firebase user found:', firebaseUser.uid);
+          await loadUserProfile(firebaseUser);
         } else {
-          console.log('No existing session found');
-          setLoading(false);
+          console.log('No Firebase user found');
+          setCurrentUser(null);
         }
       } catch (error) {
-        console.error('Auth initialization error:', error);
+        console.error('Auth state change error:', error);
+        setCurrentUser(null);
+      } finally {
         setLoading(false);
       }
-    };
+    });
 
-    initializeAuth();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state change:', event, !!session, session?.user?.id, session?.user?.email);
-        
-        if (!mounted) return;
-
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          if (session?.user) {
-            console.log('User signed in or token refreshed:', session.user.id, session.user.email);
-            
-            // For admin user, be more tolerant of token refresh
-            const isAdminUser = session.user.email === 'yetkinlikxadmin@turksat.com.tr';
-            
-            // Don't reload profile on token refresh if user already exists and is admin
-            if (event === 'TOKEN_REFRESHED' && currentUser) {
-              if (isAdminUser && currentUser.role === 'admin') {
-                console.log('Admin token refreshed, maintaining existing session');
-                return;
-              } else if (!isAdminUser) {
-                console.log('Regular user token refreshed, maintaining existing session');
-                return;
-              }
-            }
-            
-            await loadUserProfile(session.user);
-          }
-        } else if (event === 'SIGNED_OUT') {
-          console.log('User signed out');
-          setCurrentUser(null);
-          setLoading(false);
-        }
-      }
-    );
-
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
+    return unsubscribe;
   }, []);
 
-  const loadUserProfile = async (user: SupabaseUser) => {
+  const loadUserProfile = async (firebaseUser: FirebaseUser) => {
     try {
-      console.log('Loading user profile for:', user.id, user.email);
+      console.log('Loading user profile for:', firebaseUser.uid);
       
-      // Special handling for admin user
-      const isAdminEmail = user.email === 'yetkinlikxadmin@turksat.com.tr';
+      // Check if user is admin
+      const isAdmin = firebaseUser.email === 'yetkinlikxadmin@turksat.com.tr';
       
-      // Reduce timeout to 3 seconds for better UX
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout: User profile query took too long')), 3000)
-      );
+      // Get user data from Firestore
+      const userDocRef = doc(db, 'users', firebaseUser.uid);
+      const userDoc = await getDoc(userDocRef);
       
-      // Check if user exists in our users table with timeout
-      const queryPromise = supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-      
-      let userData, error;
-      try {
-        const result = await Promise.race([queryPromise, timeoutPromise]) as any;
-        userData = result.data;
-        error = result.error;
-      } catch (timeoutError) {
-        console.warn('User profile query timed out, using fallback for:', user.email);
-        // Create fallback user object on timeout
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        console.log('User profile loaded from Firestore:', userData);
         setCurrentUser({
-          id: user.id,
-          email: user.email || '',
-          name: user.user_metadata?.full_name || user.email || '',
-          role: isAdminEmail ? 'admin' : 'user'
+          id: firebaseUser.uid,
+          email: firebaseUser.email || '',
+          name: userData.name || firebaseUser.displayName || '',
+          role: userData.role || (isAdmin ? 'admin' : 'user')
         });
-        setLoading(false);
-        
-        // For admin user, try to fix the profile in background
-        if (isAdminEmail) {
-          console.log('Admin user timeout, attempting background fix...');
-          setTimeout(async () => {
-            try {
-              await fixAdminUserProfile(user);
-            } catch (bgError) {
-              console.error('Background admin fix failed:', bgError);
-            }
-          }, 1000);
-        }
-        return;
-      }
-
-      console.log('User data query result:', { userData: !!userData, error: !!error, errorCode: error?.code });
-
-      if (error) {
-        console.error('Error loading user profile:', error);
-        
-        // If user doesn't exist in our table, create one
-        if (error.code === 'PGRST116') {
-          console.log('User not found in users table, creating...');
-          await createUserProfile(user, isAdminEmail);
-        } else {
-          // Fallback user object for other errors
-          console.log('Creating fallback profile for error:', error.code);
-          setCurrentUser({
-            id: user.id,
-            email: user.email || '',
-            name: user.user_metadata?.full_name || user.email || '',
-            role: isAdminEmail ? 'admin' : 'user'
-          });
-        }
       } else {
-        console.log('User profile loaded successfully:', userData);
-        setCurrentUser({
-          id: userData.id,
-          email: userData.email,
-          name: `${userData.first_name} ${userData.last_name}`.trim(),
-          role: userData.role as 'user' | 'admin'
-        });
+        console.log('User profile not found, creating new profile');
+        await createUserProfile(firebaseUser, isAdmin);
       }
     } catch (error) {
-      console.error('Unexpected error loading user profile:', error);
-      // Always create fallback user object
-      console.log('Creating fallback profile due to unexpected error');
-      const isAdminEmail = user.email === 'yetkinlikxadmin@turksat.com.tr';
+      console.error('Error loading user profile:', error);
+      // Fallback user object
       setCurrentUser({
-        id: user.id,
-        email: user.email || '',
-        name: user.user_metadata?.full_name || user.email || '',
-        role: isAdminEmail ? 'admin' : 'user'
+        id: firebaseUser.uid,
+        email: firebaseUser.email || '',
+        name: firebaseUser.displayName || firebaseUser.email || '',
+        role: firebaseUser.email === 'yetkinlikxadmin@turksat.com.tr' ? 'admin' : 'user'
       });
-    } finally {
-      console.log('Setting loading to false');
-      setLoading(false);
     }
   };
 
-  const createUserProfile = async (user: SupabaseUser, isAdmin: boolean) => {
-    const nameParts = user.user_metadata?.full_name?.split(' ') || ['', ''];
-    
+  const createUserProfile = async (firebaseUser: FirebaseUser, isAdmin: boolean) => {
     try {
-      const { data: newUser, error: createError } = await supabase
-        .from('users')
-        .insert({
-          id: user.id,
-          email: user.email || '',
-          first_name: nameParts[0] || (isAdmin ? 'Admin' : ''),
-          last_name: nameParts.slice(1).join(' ') || (isAdmin ? 'User' : ''),
-          role: isAdmin ? 'admin' : 'user'
-        })
-        .select()
-        .single();
+      const userData = {
+        id: firebaseUser.uid,
+        email: firebaseUser.email || '',
+        name: firebaseUser.displayName || firebaseUser.email || '',
+        role: isAdmin ? 'admin' : 'user',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
 
-      if (createError) {
-        console.error('Error creating user profile:', createError);
-        // Create fallback profile without database insert
-        console.log('Creating fallback profile');
-        setCurrentUser({
-          id: user.id,
-          email: user.email || '',
-          name: user.user_metadata?.full_name || user.email || '',
-          role: isAdmin ? 'admin' : 'user'
-        });
-      } else {
-        console.log('User profile created successfully:', newUser);
-        setCurrentUser({
-          id: newUser.id,
-          email: newUser.email,
-          name: `${newUser.first_name} ${newUser.last_name}`.trim(),
-          role: newUser.role as 'user' | 'admin'
-        });
-      }
-    } catch (createError) {
-      console.error('Failed to create user profile:', createError);
+      const userDocRef = doc(db, 'users', firebaseUser.uid);
+      await setDoc(userDocRef, userData);
+      
+      console.log('User profile created successfully:', userData);
+      setCurrentUser({
+        id: userData.id,
+        email: userData.email,
+        name: userData.name,
+        role: userData.role as 'user' | 'admin'
+      });
+    } catch (error) {
+      console.error('Failed to create user profile:', error);
       // Fallback user object
       setCurrentUser({
-        id: user.id,
-        email: user.email || '',
-        name: user.user_metadata?.full_name || user.email || '',
+        id: firebaseUser.uid,
+        email: firebaseUser.email || '',
+        name: firebaseUser.displayName || firebaseUser.email || '',
         role: isAdmin ? 'admin' : 'user'
       });
     }
   };
 
-  const fixAdminUserProfile = async (user: SupabaseUser) => {
-    try {
-      console.log('Attempting to fix admin user profile...');
-      const { data: existingUser, error: checkError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-      
-      if (checkError && checkError.code === 'PGRST116') {
-        // User doesn't exist, create it
-        await createUserProfile(user, true);
-      } else if (!checkError && existingUser.role !== 'admin') {
-        // User exists but role is wrong, update it
-        const { error: updateError } = await supabase
-          .from('users')
-          .update({ role: 'admin' })
-          .eq('id', user.id);
-        
-        if (!updateError) {
-          console.log('Admin role fixed successfully');
-        }
-      }
-    } catch (error) {
-      console.error('Failed to fix admin user profile:', error);
-    }
-  };
-
   const login = async (email: string, password: string) => {
-    setLoading(true);
     try {
-      console.log('Starting login for:', email);
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      console.log('Login response:', { data: !!data, error: !!error });
-
-      if (error) {
-        console.error('Login error:', error);
-        throw new Error(error.message);
-      }
-
-      if (data.user) {
-        console.log('User found, loading profile:', data.user.id);
-        await loadUserProfile(data.user);
-        console.log('Profile loaded successfully');
-      } else {
-        console.error('No user in login response');
-        throw new Error('Giriş başarısız');
-      }
-    } catch (error) {
-      console.error('Giriş hatası:', error);
-      setLoading(false);
-      throw error;
+      console.log('Attempting login for:', email);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log('Login successful for user:', userCredential.user.uid);
+    } catch (error: any) {
+      console.error('Login error:', error);
+      throw new Error(error.message || 'Giriş yapılırken bir hata oluştu');
     }
   };
 
   const register = async (email: string, password: string, name: string) => {
-    setLoading(true);
     try {
-      console.log('Registering user:', email);
+      console.log('Attempting registration for:', email);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            first_name: name.split(' ')[0] || '',
-            last_name: name.split(' ').slice(1).join(' ') || ''
-          }
-        }
+      // Update display name
+      await updateProfile(userCredential.user, {
+        displayName: name
       });
-
-      if (error) {
-        console.error('Auth signup error:', error);
-        throw new Error(error.message);
-      }
-
-      console.log('Auth signup successful:', data);
-
-      if (data.user) {
-        // Always try to create user profile manually (trigger might not work)
-        const nameParts = name.split(' ');
-        const firstName = nameParts[0] || '';
-        const lastName = nameParts.slice(1).join(' ') || '';
-
-        console.log('Creating user profile manually...');
-        const { data: insertData, error: profileError } = await supabase
-          .from('users')
-          .insert({
-            id: data.user.id,
-            email: data.user.email,
-            first_name: firstName,
-            last_name: lastName,
-            role: 'user'
-          })
-          .select()
-          .single();
-
-        if (profileError) {
-          console.error('Manual user creation error:', profileError);
-          
-          // If it's a unique constraint violation, user might already exist
-          if (profileError.code === '23505') {
-            console.log('User already exists in users table, continuing...');
-          } else {
-            console.error('Failed to create user profile, but continuing with auth user');
-          }
-        } else {
-          console.log('User profile created successfully:', insertData);
-        }
-
-        await loadUserProfile(data.user);
-      }
-    } catch (error) {
-      console.error('Kayıt hatası:', error);
-      throw error;
-    } finally {
-      setLoading(false);
+      
+      console.log('Registration successful for user:', userCredential.user.uid);
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      throw new Error(error.message || 'Kayıt olurken bir hata oluştu');
     }
   };
 
   const logout = async () => {
     try {
-      console.log('Starting logout process...');
-      setLoading(true);
-      
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Supabase logout error:', error);
-        throw error;
-      }
-      
-      console.log('Logout successful, clearing user state');
-      setCurrentUser(null);
-    } catch (error) {
-      console.error('Çıkış hatası:', error);
-      // Even if logout fails, clear the user state
-      setCurrentUser(null);
-      throw error;
-    } finally {
-      setLoading(false);
+      console.log('Logging out user');
+      await signOut(auth);
+      console.log('Logout successful');
+    } catch (error: any) {
+      console.error('Logout error:', error);
+      throw new Error(error.message || 'Çıkış yapılırken bir hata oluştu');
     }
   };
 
-  const isAdmin = () => {
-    console.log('isAdmin check:', { 
-      currentUser: !!currentUser, 
-      role: currentUser?.role, 
-      email: currentUser?.email,
-      isAdmin: currentUser?.role === 'admin' || currentUser?.email === 'yetkinlikxadmin@turksat.com.tr'
-    });
-    return currentUser?.role === 'admin' || currentUser?.email === 'yetkinlikxadmin@turksat.com.tr';
-  };
-
-  const value = {
+  const value: AuthContextType = {
     currentUser,
-    loading,
     login,
     register,
     logout,
-    isAdmin
+    loading
   };
 
   return (
