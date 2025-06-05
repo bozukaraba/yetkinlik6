@@ -3,21 +3,16 @@
 @tailwind utilities;
 
 /* Global background styles */
-html {
-  background: url('/background.jpg') no-repeat center center fixed;
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  /* Light fallback if image fails */
-  background-color: #f8fafc;
-}
-
-body {
+html, body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background: transparent;
+  /* Professional gradient background matching your brand */
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 25%, #6366f1 50%, #8b5cf6 75%, #a855f7 100%);
+  background-attachment: fixed;
 }
+
+/* Body styling moved to above */
 
 /* Ensure root container is transparent */
 #root {
