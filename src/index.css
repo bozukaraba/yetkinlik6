@@ -2,39 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Stronger CSS specificity for background */
-html {
-  background: url('./assets/background.jpg') no-repeat center center fixed !important;
-  background-size: cover !important;
-}
-
-body {
+html, body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background: url('./assets/background.jpg') no-repeat center center fixed !important;
+  background: url('/background.jpg') no-repeat center center fixed !important;
   background-size: cover !important;
 }
 
-/* Force body and html background override */
-html, body, html body {
-  background: url('./assets/background.jpg') no-repeat center center fixed !important;
-  background-size: cover !important;
-  background-color: transparent !important;
-}
-
-/* Ensure root container is transparent */
 #root {
   min-height: 100vh;
   background: transparent !important;
 }
 
-/* Main app container should be transparent */
 #root > div {
   background: transparent !important;
 }
 
-/* Specific override for main content areas */
 main {
   background: transparent !important;
 }
