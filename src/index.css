@@ -7,8 +7,9 @@ html, body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  /* Professional gradient background matching your brand */
-  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 25%, #6366f1 50%, #8b5cf6 75%, #a855f7 100%);
+  background: url('/background.jpg') no-repeat center center fixed;
+  background-size: cover;
+  background-position: center;
   background-attachment: fixed;
 }
 
