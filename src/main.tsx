@@ -6,7 +6,6 @@ import './index.css'
 // Debug fonksiyonlarını import et
 import './debug/checkAdmin.ts'
 import './debug/testSave.ts'
-import './debug/checkRLS.ts'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

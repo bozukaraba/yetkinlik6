@@ -1,10 +1,25 @@
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../lib/firebase';
+import { initializeApp } from 'firebase/app';
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
+
+// Firebase config directly for script
+const firebaseConfig = {
+  apiKey: "AIzaSyAoy8VX10CNa2fCqEZ3WXD8XAWaS_2X4RI",
+  authDomain: "yetkinlik.firebaseapp.com",
+  projectId: "yetkinlik",
+  storageBucket: "yetkinlik.firebasestorage.app",
+  messagingSenderId: "1076325479831",
+  appId: "1:1076325479831:web:9da7586672c369e40e40d2"
+};
+
+// Initialize Firebase for script
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 const createAdminUser = async () => {
   try {
-    console.log('Creating admin user...');
+    console.log('🔄 Admin kullanıcısı oluşturuluyor...');
     
     const adminEmail = 'yetkinlikxadmin@turksat.com.tr';
     const adminPassword = 'TkSat2024!@Admin#CV';
@@ -17,9 +32,9 @@ const createAdminUser = async () => {
       displayName: 'Yetkinlikx Admin'
     });
 
-    console.log('Admin user created in auth:', userCredential.user.uid);
+    console.log('✅ Admin kullanıcısı Authentication\'da oluşturuldu:', userCredential.user.uid);
 
-    // Insert into users collection
+    // Insert into users collection in Firestore
     const userDocRef = doc(db, 'users', userCredential.user.uid);
     await setDoc(userDocRef, {
       id: userCredential.user.uid,
@@ -30,12 +45,16 @@ const createAdminUser = async () => {
       updatedAt: new Date()
     });
 
-    console.log('Admin user created successfully!');
-    console.log('Email:', adminEmail);
-    console.log('Password:', adminPassword);
-    console.log('UID:', userCredential.user.uid);
-  } catch (error) {
-    console.error('Error creating admin user:', error);
+    console.log('✅ Admin kullanıcısı Firestore\'da oluşturuldu!');
+    console.log('📧 Email:', adminEmail);
+    console.log('🔐 Password:', adminPassword);
+    console.log('🆔 UID:', userCredential.user.uid);
+    
+    console.log('\n🎉 Admin hesabı başarıyla oluşturuldu!');
+    process.exit(0);
+  } catch (error: any) {
+    console.error('❌ Admin kullanıcısı oluşturulurken hata:', error.message);
+    process.exit(1);
   }
 };
 

@@ -1,124 +1,100 @@
-import { supabase } from '../lib/supabase';
+import { auth, db } from '../lib/firebase';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 export const checkAdminUser = async () => {
   try {
-    console.log('Checking admin user...');
+    console.log('🔍 Admin kullanıcı kontrol ediliyor...');
     
-    // Check if admin user exists in users table
-    const { data: users, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', 'yetkinlikxadmin@turksat.com.tr');
-    
-    if (error) {
-      console.error('Error fetching admin user:', error);
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      console.log('❌ Oturum açmış kullanıcı bulunamadı');
       return;
     }
+
+    console.log('Current user:', currentUser.email, currentUser.uid);
     
-    console.log('Admin user data:', users);
+    // Check if user exists in Firestore users collection
+    const userDocRef = doc(db, 'users', currentUser.uid);
+    const userDoc = await getDoc(userDocRef);
     
-    if (users && users.length > 0) {
-      const adminUser = users[0];
-      console.log('Admin user found:', {
-        id: adminUser.id,
-        email: adminUser.email,
-        role: adminUser.role,
-        first_name: adminUser.first_name,
-        last_name: adminUser.last_name
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      console.log('✅ Kullanıcı Firestore\'da bulundu:', {
+        id: userData.id,
+        email: userData.email,
+        role: userData.role,
+        name: userData.name
       });
       
-      if (adminUser.role !== 'admin') {
-        console.log('Admin user role is not admin, updating...');
+      if (userData.role !== 'admin' && currentUser.email === 'yetkinlikxadmin@turksat.com.tr') {
+        console.log('🔄 Admin rolü güncelleniyor...');
         
-        const { data: updateData, error: updateError } = await supabase
-          .from('users')
-          .update({ role: 'admin' })
-          .eq('email', 'yetkinlikxadmin@turksat.com.tr')
-          .select();
+        await updateDoc(userDocRef, {
+          role: 'admin',
+          updatedAt: new Date()
+        });
         
-        if (updateError) {
-          console.error('Error updating admin role:', updateError);
-        } else {
-          console.log('Admin role updated successfully:', updateData);
-        }
+        console.log('✅ Admin rolü başarıyla güncellendi');
       }
     } else {
-      console.log('Admin user not found in users table');
+      console.log('❌ Kullanıcı Firestore\'da bulunamadı');
     }
     
   } catch (error) {
-    console.error('Unexpected error:', error);
+    console.error('❌ Admin kontrol hatası:', error);
   }
 };
 
 export const fixAdminUser = async () => {
   try {
-    console.log('Fixing admin user...');
+    console.log('🔧 Admin kullanıcı düzeltiliyor...');
     
-    // Get current auth user
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      console.log('No authenticated user found');
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      console.log('❌ Oturum açmış kullanıcı bulunamadı');
       return;
     }
     
-    console.log('Current auth user:', user.email);
+    console.log('Current auth user:', currentUser.email);
     
-    if (user.email === 'yetkinlikxadmin@turksat.com.tr') {
-      // Check if user exists in users table
-      const { data: existingUser, error: checkError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .single();
+    if (currentUser.email === 'yetkinlikxadmin@turksat.com.tr') {
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      const userDoc = await getDoc(userDocRef);
       
-      if (checkError && checkError.code === 'PGRST116') {
+      if (!userDoc.exists()) {
         // User doesn't exist, create it
-        console.log('Creating admin user in users table...');
-        const { data: newUser, error: createError } = await supabase
-          .from('users')
-          .insert({
-            id: user.id,
-            email: user.email,
-            first_name: 'Admin',
-            last_name: 'User',
-            role: 'admin'
-          })
-          .select()
-          .single();
+        console.log('🔄 Admin kullanıcı oluşturuluyor...');
+        await setDoc(userDocRef, {
+          id: currentUser.uid,
+          email: currentUser.email,
+          name: 'Yetkinlikx Admin',
+          role: 'admin',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
         
-        if (createError) {
-          console.error('Error creating admin user:', createError);
-        } else {
-          console.log('Admin user created successfully:', newUser);
-        }
-      } else if (checkError) {
-        console.error('Error checking admin user:', checkError);
+        console.log('✅ Admin kullanıcı başarıyla oluşturuldu');
       } else {
         // User exists, update role if needed
-        if (existingUser.role !== 'admin') {
-          console.log('Updating admin role...');
-          const { data: updateData, error: updateError } = await supabase
-            .from('users')
-            .update({ role: 'admin' })
-            .eq('id', user.id)
-            .select();
+        const userData = userDoc.data();
+        if (userData.role !== 'admin') {
+          console.log('🔄 Admin rolü güncelleniyor...');
+          await updateDoc(userDocRef, {
+            role: 'admin',
+            updatedAt: new Date()
+          });
           
-          if (updateError) {
-            console.error('Error updating admin role:', updateError);
-          } else {
-            console.log('Admin role updated successfully:', updateData);
-          }
+          console.log('✅ Admin rolü başarıyla güncellendi');
         } else {
-          console.log('Admin user already has correct role');
+          console.log('✅ Admin kullanıcı zaten doğru role sahip');
         }
       }
     } else {
-      console.log('Current user is not admin');
+      console.log('❌ Mevcut kullanıcı admin değil');
     }
     
   } catch (error) {
-    console.error('Error fixing admin user:', error);
+    console.error('❌ Admin düzeltme hatası:', error);
   }
 };
 

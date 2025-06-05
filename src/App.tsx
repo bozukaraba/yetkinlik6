@@ -13,7 +13,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 // Import RLS tests for development/testing
-import './tests/rlsTest';
+
 // Import admin debug script
 import './debug/checkAdmin';
 
