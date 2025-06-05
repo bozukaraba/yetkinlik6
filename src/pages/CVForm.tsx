@@ -533,7 +533,7 @@ const CVForm = () => {
       element.id = 'cv-preview-temp';
       element.style.position = 'absolute';
       element.style.left = '-9999px';
-      element.style.background = 'white';
+      
       element.style.padding = '40px';
       element.style.width = '210mm';
       element.style.minHeight = '297mm';
