@@ -2,22 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Force background image on all elements */
-* {
-  box-sizing: border-box;
-}
-
-html {
-  background: url('/background.jpg') no-repeat center center fixed !important;
-  background-size: cover !important;
-  background-attachment: fixed !important;
-}
-
-body {
+html, body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background: transparent !important;
+  background: url('./assets/background.jpg') no-repeat center center fixed !important;
+  background-size: cover !important;
 }
 
 /* Body styling moved to above */
