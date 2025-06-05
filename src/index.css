@@ -3,33 +3,34 @@
 @tailwind utilities;
 
 /* Global background styles */
-html, body {
+html {
   background: url('/background.jpg') no-repeat center center fixed;
   background-size: cover;
-  min-height: 100vh;
-  /* Fallback gradient if image fails */
-  background-color: #667eea;
+  background-position: center;
+  background-attachment: fixed;
+  /* Light fallback if image fails */
+  background-color: #f8fafc;
 }
 
-/* Ensure all pages inherit the background */
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: transparent;
+}
+
+/* Ensure root container is transparent */
 #root {
   min-height: 100vh;
   background: transparent;
 }
 
-/* Remove any conflicting backgrounds from main containers */
-.main-container {
+/* Main app container should be transparent */
+#root > div {
   background: transparent;
 }
 
-/* Test - will add image later */
-.bg-test {
-  background-image: url('/background.jpg');
-  background-size: cover;
-  background-position: center;
-}
-
-/* Debug: Test background is working */
-html {
-  background-color: #1e40af; /* Blue fallback */
+/* Specific override for main content areas */
+main {
+  background: transparent !important;
 }
