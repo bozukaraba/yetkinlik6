@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { createCV, getCVData, saveCVData } from '../services/cvService';
+import { getCVData, saveCVData } from '../services/cvService';
 import { CVData, PersonalInfo, Education, Experience, Skill, Language, Reference, Certificate, Award, Publication, Evaluation } from '../types/cv';
 import { ChevronLeft, ChevronRight, Save, Trash2, Download } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { supabase } from '../lib/supabase';
 
 const CVForm = () => {
   const navigate = useNavigate();
