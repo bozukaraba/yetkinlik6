@@ -96,13 +96,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="flex flex-col min-h-screen" style={{
-          backgroundImage: 'url(/background.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed',
-          backgroundRepeat: 'no-repeat'
-        }}>
+        <div className="flex flex-col min-h-screen">
           <Navbar />
           <main className="flex-grow">
             <AuthAwareRoutes />
