@@ -269,7 +269,7 @@ export const initializeEmptyCV = async (userId: string): Promise<CVData> => {
 };
 
 // Search CVs by keywords (admin only)
-export const searchCVsByKeywords = async (keywords: string): Promise<CVData[]> => {
+export const searchCVsByKeywords = async (keywords: string[]): Promise<CVData[]> => {
   try {
     const currentUser = auth.currentUser;
     if (!currentUser) {
@@ -286,11 +286,12 @@ export const searchCVsByKeywords = async (keywords: string): Promise<CVData[]> =
 
     const allCVs = await getAllCVs();
     
-    if (!keywords.trim()) {
+    if (!keywords || keywords.length === 0) {
       return allCVs;
     }
 
-    const searchKeywords = keywords.toLowerCase().split(' ').filter(k => k.length > 0);
+    // Convert keywords to lowercase for case-insensitive search
+    const searchKeywords = keywords.map(keyword => keyword.toLowerCase().trim()).filter(Boolean);
     
     return allCVs.filter(cv => {
       const searchableText = [
