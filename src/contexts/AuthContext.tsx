@@ -24,6 +24,7 @@ interface AuthContextType {
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
+  isAdmin: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -73,9 +74,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Check if user is admin
       const isAdmin = firebaseUser.email === 'yetkinlikxadmin@turksat.com.tr';
       
-      // Get user data from Firestore
+      // Get user data from Firestore with retry mechanism
       const userDocRef = doc(db, 'users', firebaseUser.uid);
-      const userDoc = await getDoc(userDocRef);
+      let userDoc = await getDoc(userDocRef);
+      
+      // If user doc doesn't exist, wait a bit and try again (for new registrations)
+      if (!userDoc.exists()) {
+        console.log('User profile not found, waiting and retrying...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        userDoc = await getDoc(userDocRef);
+      }
       
       if (userDoc.exists()) {
         const userData = userDoc.data();
@@ -87,7 +95,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           role: userData.role || (isAdmin ? 'admin' : 'user')
         });
       } else {
-        console.log('User profile not found, creating new profile');
+        console.log('User profile still not found, creating new profile');
         await createUserProfile(firebaseUser, isAdmin);
       }
     } catch (error) {
@@ -157,6 +165,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
       
       console.log('Registration successful for user:', userCredential.user.uid);
+      
+      // Create user profile in Firestore immediately
+      const isAdmin = email === 'yetkinlikxadmin@turksat.com.tr';
+      const userData = {
+        id: userCredential.user.uid,
+        email: email,
+        name: name,
+        role: isAdmin ? 'admin' : 'user',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      const userDocRef = doc(db, 'users', userCredential.user.uid);
+      await setDoc(userDocRef, userData);
+      
+      console.log('User profile created in Firestore:', userData);
+      
     } catch (error: any) {
       console.error('Registration error:', error);
       throw new Error(error.message || 'Kayıt olurken bir hata oluştu');
@@ -174,12 +199,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  const isAdmin = () => {
+    return currentUser?.role === 'admin';
+  };
+
   const value: AuthContextType = {
     currentUser,
     login,
     register,
     logout,
-    loading
+    loading,
+    isAdmin
   };
 
   return (
