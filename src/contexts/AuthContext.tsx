@@ -150,7 +150,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.log('Login successful for user:', userCredential.user.uid);
     } catch (error: any) {
       console.error('Login error:', error);
-      throw new Error(error.message || 'Giriş yapılırken bir hata oluştu');
+      
+      // Handle specific Firebase errors
+      let errorMessage = 'Giriş yapılırken bir hata oluştu';
+      
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = 'Bu e-posta adresi ile kayıtlı kullanıcı bulunamadı. Lütfen önce hesap oluşturun.';
+      } else if (error.code === 'auth/wrong-password') {
+        errorMessage = 'Hatalı şifre. Lütfen şifrenizi kontrol edin.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Geçersiz e-posta adresi. Lütfen doğru bir e-posta adresi girin.';
+      } else if (error.code === 'auth/user-disabled') {
+        errorMessage = 'Bu hesap devre dışı bırakılmış. Lütfen yöneticiye başvurun.';
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Çok fazla başarısız giriş denemesi. Lütfen daha sonra tekrar deneyin.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      throw new Error(errorMessage);
     }
   };
 
@@ -184,7 +202,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
     } catch (error: any) {
       console.error('Registration error:', error);
-      throw new Error(error.message || 'Kayıt olurken bir hata oluştu');
+      
+      // Handle specific Firebase errors
+      let errorMessage = 'Kayıt olurken bir hata oluştu';
+      
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'Bu e-posta adresi zaten kullanımda. Lütfen farklı bir e-posta adresi deneyin veya giriş yapın.';
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'Şifre çok zayıf. Lütfen daha güçlü bir şifre seçin.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Geçersiz e-posta adresi. Lütfen doğru bir e-posta adresi girin.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      throw new Error(errorMessage);
     }
   };
 
