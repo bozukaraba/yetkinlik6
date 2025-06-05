@@ -47,24 +47,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Load user from Firebase on initial render
   useEffect(() => {
+    let isMounted = true;
+    
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
-        if (firebaseUser) {
+        if (firebaseUser && isMounted) {
           console.log('Firebase user found:', firebaseUser.uid);
           await loadUserProfile(firebaseUser);
-        } else {
+        } else if (isMounted) {
           console.log('No Firebase user found');
           setCurrentUser(null);
         }
       } catch (error) {
         console.error('Auth state change error:', error);
-        setCurrentUser(null);
+        if (isMounted) {
+          setCurrentUser(null);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     });
 
-    return unsubscribe;
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
   const loadUserProfile = async (firebaseUser: FirebaseUser) => {
