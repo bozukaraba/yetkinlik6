@@ -1335,99 +1335,6 @@ const CVForm = () => {
               <h3 className="text-xl font-semibold text-gray-900">Deneyim Bilgileri</h3>
               <button
                 type="button"
-                onClick={addCertificate}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-              >
-                Sertifika Ekle
-              </button>
-            </div>
-            
-            {formData.certificates?.length === 0 ? (
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
-                <p className="text-gray-500">Henüz sertifika eklenmemiş.</p>
-                <button
-                  type="button"
-                  onClick={addCertificate}
-                  className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  <span className="mr-1">+</span>
-                  Sertifika Ekle
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {formData.certificates?.map((cert, index) => (
-                  <div key={cert.id} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-gray-700">Sertifika #{index + 1}</h4>
-                      <button
-                        type="button"
-                        onClick={() => removeCertificate(index)}
-                        className="text-red-500 hover:text-red-700"
-                        title="Sil"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Sertifika Adı</label>
-                        <input
-                          type="text"
-                          value={cert.name}
-                          onChange={(e) => updateCertificate(index, 'name', e.target.value)}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Başlangıç Tarihi</label>
-                        <input
-                          type="date"
-                          value={cert.startDate ? cert.startDate.split('-').reverse().join('-') : ''}
-                          onChange={(e) => {
-                            const selectedDate = e.target.value;
-                            const formattedDate = selectedDate ? selectedDate.split('-').reverse().join('-') : '';
-                            updateCertificate(index, 'startDate', formattedDate);
-                          }}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Bitiş Tarihi</label>
-                        <input
-                          type="date"
-                          value={cert.endDate ? cert.endDate.split('-').reverse().join('-') : ''}
-                          onChange={(e) => {
-                            const selectedDate = e.target.value;
-                            const formattedDate = selectedDate ? selectedDate.split('-').reverse().join('-') : '';
-                            updateCertificate(index, 'endDate', formattedDate);
-                          }}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Süre (Saat)</label>
-                        <input
-                          type="text"
-                          value={cert.duration || ''}
-                          onChange={(e) => updateCertificate(index, 'duration', e.target.value)}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      case 4:
-        return (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Yetenek ve Yetkinlik Bilgileri</h3>
-              <button
-                type="button"
                 onClick={addExperience}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
               >
@@ -1450,6 +1357,121 @@ const CVForm = () => {
             ) : (
               <div className="space-y-4">
                 {formData.experience?.map((exp, index) => (
+                  <div key={exp.id} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <h4 className="font-medium text-gray-700">Deneyim #{index + 1}</h4>
+                      <button
+                        type="button"
+                        onClick={() => removeExperience(index)}
+                        className="text-red-500 hover:text-red-700"
+                        title="Sil"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Şirket</label>
+                        <input
+                          type="text"
+                          value={exp.company}
+                          onChange={(e) => updateExperience(index, 'company', e.target.value)}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Pozisyon</label>
+                        <input
+                          type="text"
+                          value={exp.title}
+                          onChange={(e) => updateExperience(index, 'title', e.target.value)}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Çalışma Süresi</label>
+                        <input
+                          type="text"
+                          value={exp.workDuration || ''}
+                          onChange={(e) => updateExperience(index, 'workDuration', e.target.value)}
+                          placeholder="Örn: 2 yıl 6 ay, 1.5 yıl, 18 ay"
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Başlangıç Tarihi</label>
+                        <input
+                          type="date"
+                          value={exp.startDate}
+                          onChange={(e) => updateExperience(index, 'startDate', e.target.value)}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Bitiş Tarihi</label>
+                        <input
+                          type="date"
+                          value={exp.endDate || ''}
+                          onChange={(e) => updateExperience(index, 'endDate', e.target.value)}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                          disabled={exp.current}
+                        />
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={exp.current || false}
+                          onChange={(e) => updateExperience(index, 'current', e.target.checked)}
+                          className="h-5 w-5 text-blue-600 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                        />
+                        <label className="ml-2 block text-sm text-gray-900">Halen çalışıyorum</label>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700">Açıklama</label>
+                      <textarea
+                        value={exp.description}
+                        onChange={(e) => updateExperience(index, 'description', e.target.value)}
+                        rows={3}
+                        className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      case 4:
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-semibold text-gray-900">Yetenek ve Yetkinlik Bilgileri</h3>
+              <button
+                type="button"
+                onClick={addSkill}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+              >
+                Yetenek Ekle
+              </button>
+            </div>
+            <p className="text-sm text-gray-600">(Java, .NET, Excel, Pazarlama, Muhasebe, Satın Alma vb.)</p>
+            
+            {formData.experience?.length === 0 ? (
+              <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
+                <p className="text-gray-500">Henüz deneyim eklenmemiş.</p>
+                <button
+                  type="button"
+                  onClick={addSkill}
+                  className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                >
+                  <span className="mr-1">+</span>
+                  Deneyim Ekle
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {formData.skills?.map((exp, index) => (
                   <div key={exp.id} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start mb-3">
                       <h4 className="font-medium text-gray-700">Deneyim #{index + 1}</h4>
