@@ -676,6 +676,23 @@ const AdminDashboard: React.FC = () => {
                               {selectedCV.personalInfo?.phone}
                             </p>
                           )}
+                          {selectedCV.personalInfo?.gender && (
+                            <p className="flex items-center text-gray-600">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                              </svg>
+                              Cinsiyet: {selectedCV.personalInfo?.gender}
+                            </p>
+                          )}
+                          {(selectedCV.personalInfo?.residenceCity || selectedCV.personalInfo?.residenceDistrict) && (
+                            <p className="flex items-center text-gray-600">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                              </svg>
+                              İkametgah: {selectedCV.personalInfo?.residenceCity || ''}{selectedCV.personalInfo?.residenceCity && selectedCV.personalInfo?.residenceDistrict ? ' / ' : ''}{selectedCV.personalInfo?.residenceDistrict || ''}
+                            </p>
+                          )}
                           {(selectedCV.personalInfo?.linkedIn || selectedCV.personalInfo?.github || selectedCV.personalInfo?.twitter || selectedCV.personalInfo?.website || selectedCV.personalInfo?.instagram || selectedCV.personalInfo?.facebook || selectedCV.personalInfo?.youtube || selectedCV.personalInfo?.tiktok || selectedCV.personalInfo?.discord || selectedCV.personalInfo?.telegram || selectedCV.personalInfo?.whatsapp || selectedCV.personalInfo?.medium || selectedCV.personalInfo?.behance || selectedCV.personalInfo?.dribbble || selectedCV.personalInfo?.stackoverflow) && (
                             <div className="mt-2 space-y-1">
                               {selectedCV.personalInfo?.linkedIn && (
@@ -1122,10 +1139,10 @@ const AdminDashboard: React.FC = () => {
                           <div className="flex items-center">
                             <div className="flex text-yellow-400">
                               {[...Array(5)].map((_, i) => (
-                                <span key={i} className={i < selectedCV.evaluation.workSatisfaction ? 'text-yellow-400' : 'text-gray-300'}>★</span>
+                                <span key={i} className={i < (selectedCV.evaluation?.workSatisfaction || 0) ? 'text-yellow-400' : 'text-gray-300'}>★</span>
                               ))}
                             </div>
-                            <span className="ml-2 text-sm text-gray-600">({selectedCV.evaluation.workSatisfaction}/5)</span>
+                            <span className="ml-2 text-sm text-gray-600">({selectedCV.evaluation?.workSatisfaction || 0}/5)</span>
                           </div>
                         </div>
                       )}
@@ -1136,7 +1153,7 @@ const AdminDashboard: React.FC = () => {
                           <div className="flex items-center">
                             <div className="flex text-yellow-400">
                               {[...Array(5)].map((_, i) => (
-                                <span key={i} className={i < selectedCV.evaluation.facilitiesSatisfaction ? 'text-yellow-400' : 'text-gray-300'}>★</span>
+                                <span key={i} className={i < (selectedCV.evaluation?.facilitiesSatisfaction || 0) ? 'text-yellow-400' : 'text-gray-300'}>★</span>
                               ))}
                             </div>
                             <span className="ml-2 text-sm text-gray-600">({selectedCV.evaluation.facilitiesSatisfaction}/5)</span>

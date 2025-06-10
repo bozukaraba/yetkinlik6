@@ -552,6 +552,8 @@ const CVForm = () => {
             </h1>
             <p style="color: #6b7280; font-size: 16px;">${formData.personalInfo?.email}</p>
             ${formData.personalInfo?.phone ? `<p style="color: #6b7280; font-size: 16px;">${formData.personalInfo.phone}</p>` : ''}
+            ${formData.personalInfo?.gender ? `<p style="color: #6b7280; font-size: 14px;">Cinsiyet: ${formData.personalInfo.gender}</p>` : ''}
+            ${formData.personalInfo?.residenceCity || formData.personalInfo?.residenceDistrict ? `<p style="color: #6b7280; font-size: 14px;">İkametgah: ${formData.personalInfo?.residenceCity || ''}${formData.personalInfo?.residenceCity && formData.personalInfo?.residenceDistrict ? ' / ' : ''}${formData.personalInfo?.residenceDistrict || ''}</p>` : ''}
             ${formData.personalInfo?.linkedIn || formData.personalInfo?.github || formData.personalInfo?.twitter || formData.personalInfo?.website || formData.personalInfo?.instagram || formData.personalInfo?.facebook || formData.personalInfo?.youtube || formData.personalInfo?.tiktok || formData.personalInfo?.discord || formData.personalInfo?.telegram || formData.personalInfo?.whatsapp || formData.personalInfo?.medium || formData.personalInfo?.behance || formData.personalInfo?.dribbble || formData.personalInfo?.stackoverflow ? `
               <div style="margin-top: 10px;">
                 ${formData.personalInfo?.linkedIn ? `<p style="color: #6b7280; font-size: 14px;">LinkedIn: ${formData.personalInfo.linkedIn}</p>` : ''}
@@ -946,6 +948,41 @@ const CVForm = () => {
                   <option value="bekar">Bekar</option>
                   <option value="evli">Evli</option>
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Cinsiyet</label>
+                <select
+                  name="gender"
+                  value={formData.personalInfo?.gender || ''}
+                  onChange={handlePersonalInfoChange}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="">Seçiniz</option>
+                  <option value="Kadın">Kadın</option>
+                  <option value="Erkek">Erkek</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">İkametgah İli</label>
+                <input
+                  type="text"
+                  name="residenceCity"
+                  value={formData.personalInfo?.residenceCity || ''}
+                  onChange={handlePersonalInfoChange}
+                  placeholder="Örn: İstanbul"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">İkametgah İlçesi</label>
+                <input
+                  type="text"
+                  name="residenceDistrict"
+                  value={formData.personalInfo?.residenceDistrict || ''}
+                  onChange={handlePersonalInfoChange}
+                  placeholder="Örn: Kadıköy"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Askerlik Durumu</label>

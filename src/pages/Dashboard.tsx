@@ -93,6 +93,8 @@ const Dashboard: React.FC = () => {
             </h1>
             <p style="color: #6b7280; font-size: 16px;">${cvData.personalInfo?.email}</p>
             ${cvData.personalInfo?.phone ? `<p style="color: #6b7280; font-size: 16px;">${cvData.personalInfo.phone}</p>` : ''}
+            ${cvData.personalInfo?.gender ? `<p style="color: #6b7280; font-size: 14px;">Cinsiyet: ${cvData.personalInfo.gender}</p>` : ''}
+            ${cvData.personalInfo?.residenceCity || cvData.personalInfo?.residenceDistrict ? `<p style="color: #6b7280; font-size: 14px;">İkametgah: ${cvData.personalInfo?.residenceCity || ''}${cvData.personalInfo?.residenceCity && cvData.personalInfo?.residenceDistrict ? ' / ' : ''}${cvData.personalInfo?.residenceDistrict || ''}</p>` : ''}
             ${cvData.personalInfo?.linkedIn || cvData.personalInfo?.github || cvData.personalInfo?.twitter || cvData.personalInfo?.website || cvData.personalInfo?.instagram || cvData.personalInfo?.facebook || cvData.personalInfo?.youtube || cvData.personalInfo?.tiktok || cvData.personalInfo?.discord || cvData.personalInfo?.telegram || cvData.personalInfo?.whatsapp || cvData.personalInfo?.medium || cvData.personalInfo?.behance || cvData.personalInfo?.dribbble || cvData.personalInfo?.stackoverflow ? `
               <div style="margin-top: 10px;">
                 ${cvData.personalInfo?.linkedIn ? `<p style="color: #6b7280; font-size: 14px;">LinkedIn: ${cvData.personalInfo.linkedIn}</p>` : ''}

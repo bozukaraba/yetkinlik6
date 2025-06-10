@@ -11,6 +11,9 @@ export interface PersonalInfo {
   summary?: string;
   profileImage?: string;
   sgkServiceDocument?: string; // SGK Hizmet Dökümü PDF dosyası
+  gender?: 'Kadın' | 'Erkek';
+  residenceCity?: string; // İkametgah ili
+  residenceDistrict?: string; // İkametgah ilçesi
   maritalStatus?: 'bekar' | 'evli';
   militaryStatus?: 'yapıldı' | 'muaf' | 'tecilli' | 'yapılmadı';
   drivingLicense?: string[];
