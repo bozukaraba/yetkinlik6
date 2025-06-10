@@ -1633,7 +1633,7 @@ const CVForm = () => {
                 onClick={addLanguage}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
               >
-                Dil Ekle
+                Yabancı Dil Ekle
               </button>
             </div>
             
@@ -1646,7 +1646,7 @@ const CVForm = () => {
                   className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
                 >
                   <span className="mr-1">+</span>
-                  Dil Ekle
+                  Yabancı Dil Ekle
                 </button>
               </div>
             ) : (
