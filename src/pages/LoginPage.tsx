@@ -34,7 +34,34 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white bg-opacity-95 p-8 rounded-lg shadow-md backdrop-blur-sm">
+      <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        {/* Motivasyon Metni */}
+        <div className="lg:order-1 order-2 bg-gradient-to-br from-blue-50 to-indigo-100 p-6 lg:p-8 rounded-2xl shadow-lg backdrop-blur-sm border border-blue-200">
+          <div className="space-y-6">
+            <h3 className="text-2xl font-bold text-gray-900 text-center mb-6">
+              💼 Bizim için çok değerlisiniz.
+            </h3>
+            <div className="space-y-4 text-gray-700 leading-relaxed">
+              <p className="text-base">
+                Bu özgeçmiş, sizi daha yakından tanımamız ve birlikte daha iyi bir gelecek inşa etmemiz için önemli bir vesile.
+              </p>
+              <p className="text-base">
+                Deneyimleriniz, yetenekleriniz ve hedefleriniz bizim için kıymetli çünkü burada sadece iş değil, birlikte büyüyen bir aileyiz.
+              </p>
+              <p className="text-base font-medium text-blue-800">
+                Sizinle çalışmak bizim için büyük bir mutluluk ve onur. Bu sürecin bir parçası olduğunuz için teşekkür ederiz.
+              </p>
+              <div className="bg-white bg-opacity-70 p-4 rounded-lg border-l-4 border-blue-500">
+                <p className="text-sm text-gray-800 italic">
+                  Lütfen, kendinizi en iyi şekilde ifade edin ve mümkün olduğunca detaylı doldurun. Çünkü her bilgi, sizinle daha güçlü bir bağ kurmamıza ve gelişiminize destek olmamıza yardımcı olacak.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Login Form */}
+        <div className="lg:order-2 order-1 max-w-md w-full mx-auto space-y-8 bg-white bg-opacity-95 p-8 rounded-lg shadow-md backdrop-blur-sm">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Hesabınıza Giriş Yapın
@@ -153,6 +180,7 @@ const LoginPage: React.FC = () => {
             </div>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );
