@@ -1335,10 +1335,10 @@ const CVForm = () => {
               <h3 className="text-xl font-semibold text-gray-900">Deneyim Bilgileri</h3>
               <button
                 type="button"
-                onClick={addCertificate}
+                onClick={addExperience}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
               >
-                Sertifika Ekle
+                Deneyim Ekle
               </button>
             </div>
             
@@ -1539,7 +1539,7 @@ const CVForm = () => {
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Sertifika ve Eğitim Bilgileri</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Yetenek ve Yetkinlikler</h3>
               <button
                 type="button"
                 onClick={addSkill}
@@ -1627,7 +1627,7 @@ const CVForm = () => {
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Yabancı Dil Bilgileri</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Yabancı Dil</h3>
               <button
                 type="button"
                 onClick={addLanguage}
@@ -1730,7 +1730,7 @@ const CVForm = () => {
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Yayın ve Makale Bilgileri</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Ödüller ve Başarılar</h3>
               <button
                 type="button"
                 onClick={addAward}
@@ -1819,7 +1819,7 @@ const CVForm = () => {
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Ödül ve Başarı Bilgileri</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Hobiler</h3>
               <button
                 type="button"
                 onClick={addHobby}
@@ -1875,7 +1875,7 @@ const CVForm = () => {
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Referans Bilgileri</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Yayınlar ve Makaleler</h3>
               <button
                 type="button"
                 onClick={addPublication}
@@ -1964,7 +1964,7 @@ const CVForm = () => {
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Hobi Bilgileri</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Referanslar</h3>
               <button
                 type="button"
                 onClick={addReference}
@@ -2049,7 +2049,7 @@ const CVForm = () => {
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Değerlendirmeler</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Değerlendirmelerim</h3>
               <p className="text-sm text-gray-500">Lütfen her soruyu 1-5 yıldız ile değerlendirin</p>
             </div>
             
@@ -2216,49 +2216,49 @@ const CVForm = () => {
                 onClick={() => setCurrentStep(3)}
                 className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 3 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">3</span>
-                <span className="block mt-1 text-xs">Deneyim Bilgileri</span>
+                <span className="block mt-1 text-xs">Deneyim</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(4)}
                 className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 4 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">4</span>
-                <span className="block mt-1 text-xs">Yetenek ve Yetkinlik</span>
+                <span className="block mt-1 text-xs">Yetenek ve Yetkinlikler</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(5)}
                 className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 5 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">5</span>
-                <span className="block mt-1 text-xs">Sertifika ve Eğitim</span>
+                <span className="block mt-1 text-xs">Sertifika ve Eğitimler</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(6)}
                 className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 6 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">6</span>
-                <span className="block mt-1 text-xs">Yabancı Dil Bilgileri</span>
+                <span className="block mt-1 text-xs">Yabancı Dil</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(7)}
                 className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 7 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">7</span>
-                <span className="block mt-1 text-xs">Yayın ve Makale</span>
+                <span className="block mt-1 text-xs">Yayınlar ve Makaleler</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(8)}
                 className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 8 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">8</span>
-                <span className="block mt-1 text-xs">Ödül ve Başarı</span>
+                <span className="block mt-1 text-xs">Ödül ve Başarılar</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(9)}
                 className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 9 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">9</span>
-                <span className="block mt-1 text-xs">Referans Bilgileri</span>
+                <span className="block mt-1 text-xs">Referans</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(10)}
                 className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 10 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">10</span>
-                <span className="block mt-1 text-xs">Hobi Bilgileri</span>
+                <span className="block mt-1 text-xs">Hobi</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(11)}
