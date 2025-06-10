@@ -1342,99 +1342,6 @@ const CVForm = () => {
               </button>
             </div>
             
-            {formData.certificates?.length === 0 ? (
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
-                <p className="text-gray-500">Henüz sertifika eklenmemiş.</p>
-                <button
-                  type="button"
-                  onClick={addCertificate}
-                  className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  <span className="mr-1">+</span>
-                  Sertifika Ekle
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {formData.certificates?.map((cert, index) => (
-                  <div key={cert.id} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-gray-700">Sertifika #{index + 1}</h4>
-                      <button
-                        type="button"
-                        onClick={() => removeCertificate(index)}
-                        className="text-red-500 hover:text-red-700"
-                        title="Sil"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Sertifika Adı</label>
-                        <input
-                          type="text"
-                          value={cert.name}
-                          onChange={(e) => updateCertificate(index, 'name', e.target.value)}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Başlangıç Tarihi</label>
-                        <input
-                          type="date"
-                          value={cert.startDate ? cert.startDate.split('-').reverse().join('-') : ''}
-                          onChange={(e) => {
-                            const selectedDate = e.target.value;
-                            const formattedDate = selectedDate ? selectedDate.split('-').reverse().join('-') : '';
-                            updateCertificate(index, 'startDate', formattedDate);
-                          }}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Bitiş Tarihi</label>
-                        <input
-                          type="date"
-                          value={cert.endDate ? cert.endDate.split('-').reverse().join('-') : ''}
-                          onChange={(e) => {
-                            const selectedDate = e.target.value;
-                            const formattedDate = selectedDate ? selectedDate.split('-').reverse().join('-') : '';
-                            updateCertificate(index, 'endDate', formattedDate);
-                          }}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Süre (Saat)</label>
-                        <input
-                          type="text"
-                          value={cert.duration || ''}
-                          onChange={(e) => updateCertificate(index, 'duration', e.target.value)}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      case 4:
-        return (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Yetenek ve Yetkinlik Bilgileri</h3>
-              <button
-                type="button"
-                onClick={addExperience}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-              >
-                Deneyim Ekle
-              </button>
-            </div>
-            
             {formData.experience?.length === 0 ? (
               <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
                 <p className="text-gray-500">Henüz deneyim eklenmemiş.</p>
@@ -1535,11 +1442,11 @@ const CVForm = () => {
             )}
           </div>
         );
-      case 5:
+      case 4:
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Yetenek ve Yetkinlikler</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Yetenek ve Yetkinlik Bilgileri</h3>
               <button
                 type="button"
                 onClick={addSkill}
@@ -1613,6 +1520,99 @@ const CVForm = () => {
                           max="50"
                           value={skill.yearsOfExperience || 0}
                           onChange={(e) => updateSkill(index, 'yearsOfExperience', Number(e.target.value))}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      case 5:
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-semibold text-gray-900">Sertifika ve Eğitim Bilgileri</h3>
+              <button
+                type="button"
+                onClick={addCertificate}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+              >
+                Sertifika Ekle
+              </button>
+            </div>
+            
+            {formData.certificates?.length === 0 ? (
+              <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
+                <p className="text-gray-500">Henüz sertifika eklenmemiş.</p>
+                <button
+                  type="button"
+                  onClick={addCertificate}
+                  className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                >
+                  <span className="mr-1">+</span>
+                  Sertifika Ekle
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {formData.certificates?.map((cert, index) => (
+                  <div key={cert.id} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <h4 className="font-medium text-gray-700">Sertifika #{index + 1}</h4>
+                      <button
+                        type="button"
+                        onClick={() => removeCertificate(index)}
+                        className="text-red-500 hover:text-red-700"
+                        title="Sil"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Sertifika Adı</label>
+                        <input
+                          type="text"
+                          value={cert.name}
+                          onChange={(e) => updateCertificate(index, 'name', e.target.value)}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Başlangıç Tarihi</label>
+                        <input
+                          type="date"
+                          value={cert.startDate ? cert.startDate.split('-').reverse().join('-') : ''}
+                          onChange={(e) => {
+                            const selectedDate = e.target.value;
+                            const formattedDate = selectedDate ? selectedDate.split('-').reverse().join('-') : '';
+                            updateCertificate(index, 'startDate', formattedDate);
+                          }}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Bitiş Tarihi</label>
+                        <input
+                          type="date"
+                          value={cert.endDate ? cert.endDate.split('-').reverse().join('-') : ''}
+                          onChange={(e) => {
+                            const selectedDate = e.target.value;
+                            const formattedDate = selectedDate ? selectedDate.split('-').reverse().join('-') : '';
+                            updateCertificate(index, 'endDate', formattedDate);
+                          }}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Süre (Saat)</label>
+                        <input
+                          type="text"
+                          value={cert.duration || ''}
+                          onChange={(e) => updateCertificate(index, 'duration', e.target.value)}
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         />
                       </div>
