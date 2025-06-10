@@ -5,7 +5,8 @@ import {
   signOut,
   onAuthStateChanged,
   User as FirebaseUser,
-  updateProfile
+  updateProfile,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
@@ -23,6 +24,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   loading: boolean;
   isAdmin: () => boolean;
 }
@@ -240,6 +242,31 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  const resetPassword = async (email: string) => {
+    try {
+      console.log('Sending password reset email to:', email);
+      await sendPasswordResetEmail(auth, email);
+      console.log('Password reset email sent successfully');
+    } catch (error: any) {
+      console.error('Password reset error:', error);
+      
+      // Handle specific Firebase errors
+      let errorMessage = 'Şifre sıfırlama e-postası gönderilirken bir hata oluştu';
+      
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = 'Bu e-posta adresi ile kayıtlı kullanıcı bulunamadı.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Geçersiz e-posta adresi. Lütfen doğru bir e-posta adresi girin.';
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Çok fazla istek gönderildi. Lütfen daha sonra tekrar deneyin.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      throw new Error(errorMessage);
+    }
+  };
+
   const isAdmin = () => {
     return currentUser?.role === 'admin';
   };
@@ -249,6 +276,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     login,
     register,
     logout,
+    resetPassword,
     loading,
     isAdmin
   };
