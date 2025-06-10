@@ -890,7 +890,7 @@ const CVForm = () => {
                   name="firstName"
                   value={formData.personalInfo?.firstName || ''}
                   onChange={handlePersonalInfoChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   required
                 />
               </div>
@@ -901,7 +901,7 @@ const CVForm = () => {
                   name="lastName"
                   value={formData.personalInfo?.lastName || ''}
                   onChange={handlePersonalInfoChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   required
                 />
               </div>
@@ -912,7 +912,7 @@ const CVForm = () => {
                   name="email"
                   value={formData.personalInfo?.email || ''}
                   onChange={handlePersonalInfoChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   required
                 />
               </div>
@@ -923,7 +923,7 @@ const CVForm = () => {
                   name="phone"
                   value={formData.personalInfo?.phone || ''}
                   onChange={handlePersonalInfoChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   required
                 />
               </div>
@@ -934,7 +934,7 @@ const CVForm = () => {
                   name="birthDate"
                   value={formData.personalInfo?.birthDate || ''}
                   onChange={handlePersonalInfoChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                 />
               </div>
               <div>
@@ -943,7 +943,7 @@ const CVForm = () => {
                   name="maritalStatus"
                   value={formData.personalInfo?.maritalStatus || 'bekar'}
                   onChange={handlePersonalInfoChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                 >
                   <option value="bekar">Bekar</option>
                   <option value="evli">Evli</option>
@@ -955,7 +955,7 @@ const CVForm = () => {
                   name="gender"
                   value={formData.personalInfo?.gender || ''}
                   onChange={handlePersonalInfoChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                 >
                   <option value="">Seçiniz</option>
                   <option value="Kadın">Kadın</option>
@@ -969,7 +969,7 @@ const CVForm = () => {
                   name="residenceCity"
                   value={formData.personalInfo?.residenceCity || ''}
                   onChange={handlePersonalInfoChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                 />
               </div>
               <div>
@@ -979,7 +979,7 @@ const CVForm = () => {
                   name="residenceDistrict"
                   value={formData.personalInfo?.residenceDistrict || ''}
                   onChange={handlePersonalInfoChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                 />
               </div>
               <div>
@@ -988,7 +988,7 @@ const CVForm = () => {
                   name="militaryStatus"
                   value={formData.personalInfo?.militaryStatus || 'yapılmadı'}
                   onChange={handlePersonalInfoChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                 >
                   <option value="yapılmadı">Yapılmadı</option>
                   <option value="yapıldı">Yapıldı</option>
@@ -1004,7 +1004,7 @@ const CVForm = () => {
                 value={formData.personalInfo?.summary || ''}
                 onChange={handlePersonalInfoChange}
                 rows={4}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
               />
             </div>
             
@@ -1038,7 +1038,7 @@ const CVForm = () => {
                   </div>
                 ) : (
                   <div className="w-full max-w-md">
-                    <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
+                    <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-400 bg-gray-50 rounded-lg hover:border-gray-400 transition-colors">
                       <svg className="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
@@ -1072,7 +1072,7 @@ const CVForm = () => {
                     value={formData.personalInfo?.linkedIn || ''}
                     onChange={handlePersonalInfoChange}
                     placeholder="https://linkedin.com/in/kullanici-adi"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   />
                 </div>
                 <div>
@@ -1083,7 +1083,7 @@ const CVForm = () => {
                     value={formData.personalInfo?.github || ''}
                     onChange={handlePersonalInfoChange}
                     placeholder="https://github.com/kullanici-adi"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   />
                 </div>
                 <div>
@@ -1094,7 +1094,7 @@ const CVForm = () => {
                     value={formData.personalInfo?.twitter || ''}
                     onChange={handlePersonalInfoChange}
                     placeholder="https://twitter.com/kullanici-adi"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   />
                 </div>
                 <div>
@@ -1105,7 +1105,7 @@ const CVForm = () => {
                     value={formData.personalInfo?.instagram || ''}
                     onChange={handlePersonalInfoChange}
                     placeholder="https://instagram.com/kullanici-adi"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   />
                 </div>
                 <div>
@@ -1116,7 +1116,7 @@ const CVForm = () => {
                     value={formData.personalInfo?.facebook || ''}
                     onChange={handlePersonalInfoChange}
                     placeholder="https://facebook.com/kullanici-adi"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   />
                 </div>
                 <div>
@@ -1127,7 +1127,7 @@ const CVForm = () => {
                     value={formData.personalInfo?.youtube || ''}
                     onChange={handlePersonalInfoChange}
                     placeholder="https://youtube.com/@kullanici-adi"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   />
                 </div>
                 <div>
@@ -1138,7 +1138,7 @@ const CVForm = () => {
                     value={formData.personalInfo?.tiktok || ''}
                     onChange={handlePersonalInfoChange}
                     placeholder="https://tiktok.com/@kullanici-adi"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   />
                 </div>
                 <div>
@@ -1149,7 +1149,7 @@ const CVForm = () => {
                     value={formData.personalInfo?.discord || ''}
                     onChange={handlePersonalInfoChange}
                     placeholder="kullanici#1234"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   />
                 </div>
                 <div>
@@ -1160,7 +1160,7 @@ const CVForm = () => {
                     value={formData.personalInfo?.telegram || ''}
                     onChange={handlePersonalInfoChange}
                     placeholder="@kullanici-adi"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   />
                 </div>
                 <div>
@@ -1171,7 +1171,7 @@ const CVForm = () => {
                     value={formData.personalInfo?.whatsapp || ''}
                     onChange={handlePersonalInfoChange}
                     placeholder="+90 555 123 45 67"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   />
                 </div>
                 <div>
@@ -1182,7 +1182,7 @@ const CVForm = () => {
                     value={formData.personalInfo?.medium || ''}
                     onChange={handlePersonalInfoChange}
                     placeholder="https://medium.com/@kullanici-adi"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   />
                 </div>
                 <div>
@@ -1193,7 +1193,7 @@ const CVForm = () => {
                     value={formData.personalInfo?.behance || ''}
                     onChange={handlePersonalInfoChange}
                     placeholder="https://behance.net/kullanici-adi"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   />
                 </div>
                 <div>
@@ -1204,7 +1204,7 @@ const CVForm = () => {
                     value={formData.personalInfo?.dribbble || ''}
                     onChange={handlePersonalInfoChange}
                     placeholder="https://dribbble.com/kullanici-adi"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   />
                 </div>
                 <div>
@@ -1215,7 +1215,7 @@ const CVForm = () => {
                     value={formData.personalInfo?.stackoverflow || ''}
                     onChange={handlePersonalInfoChange}
                     placeholder="https://stackoverflow.com/users/kullanici-id"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   />
                 </div>
                 <div>
@@ -1226,7 +1226,7 @@ const CVForm = () => {
                     value={formData.personalInfo?.website || ''}
                     onChange={handlePersonalInfoChange}
                     placeholder="https://website.com"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                   />
                 </div>
               </div>
@@ -1248,7 +1248,7 @@ const CVForm = () => {
             </div>
             
             {formData.education?.length === 0 ? (
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+              <div className="text-center py-8 border-2 border-dashed border-gray-400 bg-gray-50 rounded-lg">
                 <p className="text-gray-500">Henüz öğrenim eklenmemiş.</p>
                 <button
                   type="button"
@@ -1281,7 +1281,7 @@ const CVForm = () => {
                           type="text"
                           value={edu.institution}
                           onChange={(e) => updateEducation(index, 'institution', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1290,7 +1290,7 @@ const CVForm = () => {
                           type="text"
                           value={edu.degree}
                           onChange={(e) => updateEducation(index, 'degree', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1299,7 +1299,7 @@ const CVForm = () => {
                           type="date"
                           value={edu.endDate || ''}
                           onChange={(e) => updateEducation(index, 'endDate', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                           disabled={edu.current}
                         />
                       </div>
@@ -1308,7 +1308,7 @@ const CVForm = () => {
                           type="checkbox"
                           checked={edu.current || false}
                           onChange={(e) => updateEducation(index, 'current', e.target.checked)}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          className="h-5 w-5 text-blue-600 border-2 border-gray-400 rounded-md focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                         />
                         <label className="ml-2 block text-sm text-gray-900">Devam ediyor</label>
                       </div>
@@ -1319,7 +1319,7 @@ const CVForm = () => {
                         value={edu.description || ''}
                         onChange={(e) => updateEducation(index, 'description', e.target.value)}
                         rows={3}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                       />
                     </div>
                   </div>
@@ -1343,7 +1343,7 @@ const CVForm = () => {
             </div>
             
             {formData.certificates?.length === 0 ? (
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+              <div className="text-center py-8 border-2 border-dashed border-gray-400 bg-gray-50 rounded-lg">
                 <p className="text-gray-500">Henüz sertifika eklenmemiş.</p>
                 <button
                   type="button"
@@ -1376,7 +1376,7 @@ const CVForm = () => {
                           type="text"
                           value={cert.name}
                           onChange={(e) => updateCertificate(index, 'name', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1389,7 +1389,7 @@ const CVForm = () => {
                             const formattedDate = selectedDate ? selectedDate.split('-').reverse().join('-') : '';
                             updateCertificate(index, 'startDate', formattedDate);
                           }}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1402,7 +1402,7 @@ const CVForm = () => {
                             const formattedDate = selectedDate ? selectedDate.split('-').reverse().join('-') : '';
                             updateCertificate(index, 'endDate', formattedDate);
                           }}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1411,7 +1411,7 @@ const CVForm = () => {
                           type="text"
                           value={cert.duration || ''}
                           onChange={(e) => updateCertificate(index, 'duration', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                     </div>
@@ -1436,7 +1436,7 @@ const CVForm = () => {
             </div>
             
             {formData.experience?.length === 0 ? (
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+              <div className="text-center py-8 border-2 border-dashed border-gray-400 bg-gray-50 rounded-lg">
                 <p className="text-gray-500">Henüz deneyim eklenmemiş.</p>
                 <button
                   type="button"
@@ -1469,7 +1469,7 @@ const CVForm = () => {
                           type="text"
                           value={exp.company}
                           onChange={(e) => updateExperience(index, 'company', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1478,7 +1478,7 @@ const CVForm = () => {
                           type="text"
                           value={exp.title}
                           onChange={(e) => updateExperience(index, 'title', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1488,7 +1488,7 @@ const CVForm = () => {
                           value={exp.workDuration || ''}
                           onChange={(e) => updateExperience(index, 'workDuration', e.target.value)}
                           placeholder="Örn: 2 yıl 6 ay, 1.5 yıl, 18 ay"
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1497,7 +1497,7 @@ const CVForm = () => {
                           type="date"
                           value={exp.startDate}
                           onChange={(e) => updateExperience(index, 'startDate', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1506,7 +1506,7 @@ const CVForm = () => {
                           type="date"
                           value={exp.endDate || ''}
                           onChange={(e) => updateExperience(index, 'endDate', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                           disabled={exp.current}
                         />
                       </div>
@@ -1515,7 +1515,7 @@ const CVForm = () => {
                           type="checkbox"
                           checked={exp.current || false}
                           onChange={(e) => updateExperience(index, 'current', e.target.checked)}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          className="h-5 w-5 text-blue-600 border-2 border-gray-400 rounded-md focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                         />
                         <label className="ml-2 block text-sm text-gray-900">Halen çalışıyorum</label>
                       </div>
@@ -1526,7 +1526,7 @@ const CVForm = () => {
                         value={exp.description}
                         onChange={(e) => updateExperience(index, 'description', e.target.value)}
                         rows={3}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                       />
                     </div>
                   </div>
@@ -1551,7 +1551,7 @@ const CVForm = () => {
             <p className="text-sm text-gray-600">(Java, .NET, Excel, Pazarlama, Muhasebe, Satın Alma vb.)</p>
             
             {formData.skills?.length === 0 ? (
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+              <div className="text-center py-8 border-2 border-dashed border-gray-400 bg-gray-50 rounded-lg">
                 <p className="text-gray-500">Henüz yetenek eklenmemiş.</p>
                 <button
                   type="button"
@@ -1584,7 +1584,7 @@ const CVForm = () => {
                           type="text"
                           value={skill.name}
                           onChange={(e) => updateSkill(index, 'name', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1592,7 +1592,7 @@ const CVForm = () => {
                         <select
                           value={skill.level || 1}
                           onChange={(e) => updateSkill(index, 'level', Number(e.target.value))}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         >
                           <option value={1}>1</option>
                           <option value={1.5}>1.5</option>
@@ -1613,7 +1613,7 @@ const CVForm = () => {
                           max="50"
                           value={skill.yearsOfExperience || 0}
                           onChange={(e) => updateSkill(index, 'yearsOfExperience', Number(e.target.value))}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                     </div>
@@ -1638,7 +1638,7 @@ const CVForm = () => {
             </div>
             
             {formData.languages?.length === 0 ? (
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+              <div className="text-center py-8 border-2 border-dashed border-gray-400 bg-gray-50 rounded-lg">
                 <p className="text-gray-500">Henüz dil eklenmemiş.</p>
                 <button
                   type="button"
@@ -1675,7 +1675,7 @@ const CVForm = () => {
                             updatedLanguages[index] = { ...updatedLanguages[index], name: e.target.value };
                             setFormData(prev => ({ ...prev, languages: updatedLanguages }));
                           }}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1688,7 +1688,7 @@ const CVForm = () => {
                             updatedLanguages[index] = { ...updatedLanguages[index], examType: e.target.value };
                             setFormData(prev => ({ ...prev, languages: updatedLanguages }));
                           }}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1703,7 +1703,7 @@ const CVForm = () => {
                             updatedLanguages[index] = { ...updatedLanguages[index], certificateDate: formattedDate };
                             setFormData(prev => ({ ...prev, languages: updatedLanguages }));
                           }}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1716,7 +1716,7 @@ const CVForm = () => {
                             updatedLanguages[index] = { ...updatedLanguages[index], examScore: e.target.value };
                             setFormData(prev => ({ ...prev, languages: updatedLanguages }));
                           }}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                     </div>
@@ -1741,7 +1741,7 @@ const CVForm = () => {
             </div>
             
             {formData.awards?.length === 0 ? (
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+              <div className="text-center py-8 border-2 border-dashed border-gray-400 bg-gray-50 rounded-lg">
                 <p className="text-gray-500">Henüz ödül eklenmemiş.</p>
                 <button
                   type="button"
@@ -1774,7 +1774,7 @@ const CVForm = () => {
                           type="text"
                           value={award.title}
                           onChange={(e) => updateAward(index, 'title', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1783,7 +1783,7 @@ const CVForm = () => {
                           type="text"
                           value={award.organization}
                           onChange={(e) => updateAward(index, 'organization', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1796,7 +1796,7 @@ const CVForm = () => {
                             const formattedDate = selectedDate ? selectedDate.split('-').reverse().join('-') : '';
                             updateAward(index, 'date', formattedDate);
                           }}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1805,7 +1805,7 @@ const CVForm = () => {
                           value={award.description}
                           onChange={(e) => updateAward(index, 'description', e.target.value)}
                           rows={3}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                     </div>
@@ -1830,7 +1830,7 @@ const CVForm = () => {
             </div>
             
             {formData.hobbies?.length === 0 ? (
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+              <div className="text-center py-8 border-2 border-dashed border-gray-400 bg-gray-50 rounded-lg">
                 <p className="text-gray-500">Henüz hobi eklenmemiş.</p>
                 <button
                   type="button"
@@ -1862,7 +1862,7 @@ const CVForm = () => {
                         type="text"
                         value={hobby}
                         onChange={(e) => updateHobby(index, e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                       />
                     </div>
                   </div>
@@ -1886,7 +1886,7 @@ const CVForm = () => {
             </div>
             
             {formData.publications?.length === 0 ? (
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+              <div className="text-center py-8 border-2 border-dashed border-gray-400 bg-gray-50 rounded-lg">
                 <p className="text-gray-500">Henüz yayın eklenmemiş.</p>
                 <button
                   type="button"
@@ -1919,7 +1919,7 @@ const CVForm = () => {
                           type="text"
                           value={pub.title}
                           onChange={(e) => updatePublication(index, 'title', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1932,7 +1932,7 @@ const CVForm = () => {
                             const formattedDate = selectedDate ? selectedDate.split('-').reverse().join('-') : '';
                             updatePublication(index, 'publishDate', formattedDate);
                           }}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1941,7 +1941,7 @@ const CVForm = () => {
                           type="text"
                           value={pub.publisher}
                           onChange={(e) => updatePublication(index, 'publisher', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -1950,7 +1950,7 @@ const CVForm = () => {
                           value={pub.description}
                           onChange={(e) => updatePublication(index, 'description', e.target.value)}
                           rows={3}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                     </div>
@@ -1975,7 +1975,7 @@ const CVForm = () => {
             </div>
             
             {formData.references?.length === 0 ? (
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+              <div className="text-center py-8 border-2 border-dashed border-gray-400 bg-gray-50 rounded-lg">
                 <p className="text-gray-500">Henüz referans eklenmemiş.</p>
                 <button
                   type="button"
@@ -2008,7 +2008,7 @@ const CVForm = () => {
                           type="text"
                           value={ref.name}
                           onChange={(e) => updateReference(index, 'name', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -2017,7 +2017,7 @@ const CVForm = () => {
                           type="text"
                           value={ref.company}
                           onChange={(e) => updateReference(index, 'company', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -2026,7 +2026,7 @@ const CVForm = () => {
                           type="tel"
                           value={ref.phone}
                           onChange={(e) => updateReference(index, 'phone', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                       <div>
@@ -2035,7 +2035,7 @@ const CVForm = () => {
                           type="text"
                           value={ref.type}
                           onChange={(e) => updateReference(index, 'type', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full bg-white border-2 border-gray-400 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-500 transition-all duration-200"
                         />
                       </div>
                     </div>
