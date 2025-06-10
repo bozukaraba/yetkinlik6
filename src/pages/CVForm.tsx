@@ -341,7 +341,7 @@ const CVForm = () => {
     }));
   };
 
-  const updateHobby = (index: number, field: keyof Reference, value: string) => {
+  const updateReference = (index: number, field: keyof Reference, value: string) => {
     setFormData(prev => ({
       ...prev,
       references: prev.references?.map((ref, i) => 
@@ -350,7 +350,7 @@ const CVForm = () => {
     }));
   };
 
-  const removeHobby = (index: number) => {
+  const removeReference = (index: number) => {
     setFormData(prev => ({
       ...prev,
       references: prev.references?.filter((_, i) => i !== index) || []
@@ -394,7 +394,7 @@ const CVForm = () => {
     }));
   };
 
-  const updateAward = (index: number, value: string) => {
+  const updateHobby = (index: number, value: string) => {
     setFormData(prev => ({
       ...prev,
       hobbies: prev.hobbies?.map((hobby, i) => 
@@ -403,7 +403,7 @@ const CVForm = () => {
     }));
   };
 
-  const removeAward = (index: number) => {
+  const removeHobby = (index: number) => {
     setFormData(prev => ({
       ...prev,
       hobbies: prev.hobbies?.filter((_, i) => i !== index) || []
@@ -424,7 +424,7 @@ const CVForm = () => {
     }));
   };
 
-  const updateHobby = (index: number, field: keyof Award, value: string) => {
+  const updateAward = (index: number, field: keyof Award, value: string) => {
     setFormData(prev => ({
       ...prev,
       awards: prev.awards?.map((award, i) => 
@@ -433,7 +433,7 @@ const CVForm = () => {
     }));
   };
 
-  const removeHobby = (index: number) => {
+  const removeAward = (index: number) => {
     setFormData(prev => ({
       ...prev,
       awards: prev.awards?.filter((_, i) => i !== index) || []
@@ -456,7 +456,7 @@ const CVForm = () => {
     }));
   };
 
-  const updateHobby = (index: number, field: keyof Publication, value: string | string[]) => {
+  const updatePublication = (index: number, field: keyof Publication, value: string | string[]) => {
     setFormData(prev => ({
       ...prev,
       publications: prev.publications?.map((pub, i) => 
@@ -465,7 +465,7 @@ const CVForm = () => {
     }));
   };
 
-  const removeHobby = (index: number) => {
+  const removePublication = (index: number) => {
     setFormData(prev => ({
       ...prev,
       publications: prev.publications?.filter((_, i) => i !== index) || []
@@ -676,10 +676,10 @@ const CVForm = () => {
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
               ${formData.awards.map(award => `
                 <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
-                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${hobby.title}</h3>
-                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">${hobby.organization}</p>
-                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">Tarih: ${hobby.date}</p>
-                  ${hobby.description ? `<p style="color: #9ca3af; font-size: 12px;">${hobby.description}</p>` : ''}
+                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${award.title}</h3>
+                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">${award.organization}</p>
+                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">Tarih: ${award.date}</p>
+                  ${award.description ? `<p style="color: #9ca3af; font-size: 12px;">${award.description}</p>` : ''}
                 </div>
               `).join('')}
             </div>
@@ -695,10 +695,10 @@ const CVForm = () => {
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
               ${formData.publications.map(pub => `
                 <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
-                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${hobby.title}</h3>
-                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">Yayınlayıcı: ${hobby.publisher}</p>
-                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">Tarih: ${hobby.publishDate}</p>
-                  ${hobby.description ? `<p style="color: #9ca3af; font-size: 12px;">${hobby.description}</p>` : ''}
+                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${pub.title}</h3>
+                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">Yayınlayıcı: ${pub.publisher}</p>
+                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">Tarih: ${pub.publishDate}</p>
+                  ${pub.description ? `<p style="color: #9ca3af; font-size: 12px;">${pub.description}</p>` : ''}
                 </div>
               `).join('')}
             </div>
@@ -730,10 +730,10 @@ const CVForm = () => {
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
               ${formData.references.map(ref => `
                 <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
-                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${hobby.name}</h3>
-                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">${hobby.company}</p>
-                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">${hobby.phone}</p>
-                  ${hobby.type ? `<p style="color: #9ca3af; font-size: 12px;">${hobby.type}</p>` : ''}
+                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${ref.name}</h3>
+                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">${ref.company}</p>
+                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">${ref.phone}</p>
+                  ${ref.type ? `<p style="color: #9ca3af; font-size: 12px;">${ref.type}</p>` : ''}
                 </div>
               `).join('')}
             </div>
@@ -1342,6 +1342,99 @@ const CVForm = () => {
               </button>
             </div>
             
+            {formData.certificates?.length === 0 ? (
+              <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
+                <p className="text-gray-500">Henüz sertifika eklenmemiş.</p>
+                <button
+                  type="button"
+                  onClick={addCertificate}
+                  className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                >
+                  <span className="mr-1">+</span>
+                  Sertifika Ekle
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {formData.certificates?.map((cert, index) => (
+                  <div key={cert.id} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <h4 className="font-medium text-gray-700">Sertifika #{index + 1}</h4>
+                      <button
+                        type="button"
+                        onClick={() => removeCertificate(index)}
+                        className="text-red-500 hover:text-red-700"
+                        title="Sil"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Sertifika Adı</label>
+                        <input
+                          type="text"
+                          value={cert.name}
+                          onChange={(e) => updateCertificate(index, 'name', e.target.value)}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Başlangıç Tarihi</label>
+                        <input
+                          type="date"
+                          value={cert.startDate ? cert.startDate.split('-').reverse().join('-') : ''}
+                          onChange={(e) => {
+                            const selectedDate = e.target.value;
+                            const formattedDate = selectedDate ? selectedDate.split('-').reverse().join('-') : '';
+                            updateCertificate(index, 'startDate', formattedDate);
+                          }}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Bitiş Tarihi</label>
+                        <input
+                          type="date"
+                          value={cert.endDate ? cert.endDate.split('-').reverse().join('-') : ''}
+                          onChange={(e) => {
+                            const selectedDate = e.target.value;
+                            const formattedDate = selectedDate ? selectedDate.split('-').reverse().join('-') : '';
+                            updateCertificate(index, 'endDate', formattedDate);
+                          }}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Süre (Saat)</label>
+                        <input
+                          type="text"
+                          value={cert.duration || ''}
+                          onChange={(e) => updateCertificate(index, 'duration', e.target.value)}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      case 4:
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-semibold text-gray-900">Yetenek ve Yetkinlik Bilgileri</h3>
+              <button
+                type="button"
+                onClick={addExperience}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+              >
+                Deneyim Ekle
+              </button>
+            </div>
+            
             {formData.experience?.length === 0 ? (
               <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
                 <p className="text-gray-500">Henüz deneyim eklenmemiş.</p>
@@ -1442,11 +1535,11 @@ const CVForm = () => {
             )}
           </div>
         );
-      case 4:
+      case 5:
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Yetenek ve Yetkinlik Bilgileri</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Yetenek ve Yetkinlikler</h3>
               <button
                 type="button"
                 onClick={addSkill}
@@ -1459,22 +1552,22 @@ const CVForm = () => {
             
             {formData.skills?.length === 0 ? (
               <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
-                <p className="text-gray-500">Henüz deneyim eklenmemiş.</p>
+                <p className="text-gray-500">Henüz yetenek eklenmemiş.</p>
                 <button
                   type="button"
                   onClick={addSkill}
                   className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
                 >
                   <span className="mr-1">+</span>
-                  Deneyim Ekle
+                  Yetenek Ekle
                 </button>
               </div>
             ) : (
               <div className="space-y-4">
-                {formData.skills?.map((exp, index) => (
+                {formData.skills?.map((skill, index) => (
                   <div key={skill.id} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-gray-700">Deneyim #{index + 1}</h4>
+                      <h4 className="font-medium text-gray-700">Yetenek #{index + 1}</h4>
                       <button
                         type="button"
                         onClick={() => removeSkill(index)}
@@ -1484,136 +1577,21 @@ const CVForm = () => {
                         <Trash2 className="h-5 w-5" />
                       </button>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Şirket</label>
-                        <input
-                          type="text"
-                          value={skill.company}
-                          onChange={(e) => updateSkill(index, 'company', e.target.value)}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Pozisyon</label>
-                        <input
-                          type="text"
-                          value={skill.title}
-                          onChange={(e) => updateSkill(index, 'title', e.target.value)}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Çalışma Süresi</label>
-                        <input
-                          type="text"
-                          value={skill.workDuration || ''}
-                          onChange={(e) => updateSkill(index, 'workDuration', e.target.value)}
-                          placeholder="Örn: 2 yıl 6 ay, 1.5 yıl, 18 ay"
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Başlangıç Tarihi</label>
-                        <input
-                          type="date"
-                          value={skill.startDate}
-                          onChange={(e) => updateSkill(index, 'startDate', e.target.value)}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Bitiş Tarihi</label>
-                        <input
-                          type="date"
-                          value={skill.endDate || ''}
-                          onChange={(e) => updateSkill(index, 'endDate', e.target.value)}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                          disabled={skill.current}
-                        />
-                      </div>
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={skill.current || false}
-                          onChange={(e) => updateSkill(index, 'current', e.target.checked)}
-                          className="h-5 w-5 text-blue-600 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                        />
-                        <label className="ml-2 block text-sm text-gray-900">Halen çalışıyorum</label>
-                      </div>
-                    </div>
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700">Açıklama</label>
-                      <textarea
-                        value={skill.description}
-                        onChange={(e) => updateSkill(index, 'description', e.target.value)}
-                        rows={3}
-                        className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      case 5:
-        return (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Sertifika ve Eğitim Bilgileri</h3>
-              <button
-                type="button"
-                onClick={addCertificate}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-              >
-                Sertifika Ekle
-              </button>
-            </div>
-            <p className="text-sm text-gray-600">(Java, .NET, Excel, Pazarlama, Muhasebe, Satın Alma vb.)</p>
-            
-            {formData.certificates?.length === 0 ? (
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
-                <p className="text-gray-500">Henüz sertifika eklenmemiş.</p>
-                <button
-                  type="button"
-                  onClick={addCertificate}
-                  className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  <span className="mr-1">+</span>
-                  Sertifika Ekle
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {formData.certificates?.map((skill, index) => (
-                  <div key={cert.id} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-gray-700">Sertifika #{index + 1}</h4>
-                      <button
-                        type="button"
-                        onClick={() => removeCertificate(index)}
-                        className="text-red-500 hover:text-red-700"
-                        title="Sil"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Sertifika Adı</label>
+                        <label className="block text-sm font-medium text-gray-700">Yetenek Adı</label>
                         <input
                           type="text"
-                          value={cert.name}
-                          onChange={(e) => updateCertificate(index, 'name', e.target.value)}
+                          value={skill.name}
+                          onChange={(e) => updateSkill(index, 'name', e.target.value)}
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Seviye (1-5)</label>
                         <select
-                          value={cert.level || 1}
-                          onChange={(e) => updateCertificate(index, 'level', Number(e.target.value))}
+                          value={skill.level || 1}
+                          onChange={(e) => updateSkill(index, 'level', Number(e.target.value))}
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         >
                           <option value={1}>1</option>
@@ -1633,8 +1611,8 @@ const CVForm = () => {
                           type="number"
                           min="0"
                           max="50"
-                          value={cert.yearsOfExperience || 0}
-                          onChange={(e) => updateCertificate(index, 'yearsOfExperience', Number(e.target.value))}
+                          value={skill.yearsOfExperience || 0}
+                          onChange={(e) => updateSkill(index, 'yearsOfExperience', Number(e.target.value))}
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         />
                       </div>
@@ -1649,7 +1627,7 @@ const CVForm = () => {
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Yabancı Dil Bilgileri</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Yabancı Dil</h3>
               <button
                 type="button"
                 onClick={addLanguage}
@@ -1752,37 +1730,37 @@ const CVForm = () => {
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Yayın ve Makale Bilgileri</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Ödüller ve Başarılar</h3>
               <button
                 type="button"
-                onClick={addPublication}
+                onClick={addAward}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
               >
-                Yayın Ekle
+                Ödül Ekle
               </button>
             </div>
             
-            {formData.publications?.length === 0 ? (
+            {formData.awards?.length === 0 ? (
               <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
                 <p className="text-gray-500">Henüz ödül eklenmemiş.</p>
                 <button
                   type="button"
-                  onClick={addPublication}
+                  onClick={addAward}
                   className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
                 >
                   <span className="mr-1">+</span>
-                  Yayın Ekle
+                  Ödül Ekle
                 </button>
               </div>
             ) : (
               <div className="space-y-4">
-                {formData.publications?.map((award, index) => (
-                  <div key={hobby.id} className="border rounded-lg p-4">
+                {formData.awards?.map((award, index) => (
+                  <div key={award.id} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-gray-700">Yayın #{index + 1}</h4>
+                      <h4 className="font-medium text-gray-700">Ödül #{index + 1}</h4>
                       <button
                         type="button"
-                        onClick={() => removeHobby(index)}
+                        onClick={() => removeAward(index)}
                         className="text-red-500 hover:text-red-700"
                         title="Sil"
                       >
@@ -1791,11 +1769,11 @@ const CVForm = () => {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Yayın Adı</label>
+                        <label className="block text-sm font-medium text-gray-700">Ödül Adı</label>
                         <input
                           type="text"
-                          value={hobby.title}
-                          onChange={(e) => updateHobby(index, 'title', e.target.value)}
+                          value={award.title}
+                          onChange={(e) => updateAward(index, 'title', e.target.value)}
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         />
                       </div>
@@ -1803,8 +1781,8 @@ const CVForm = () => {
                         <label className="block text-sm font-medium text-gray-700">Kurum</label>
                         <input
                           type="text"
-                          value={hobby.organization}
-                          onChange={(e) => updateHobby(index, 'organization', e.target.value)}
+                          value={award.organization}
+                          onChange={(e) => updateAward(index, 'organization', e.target.value)}
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         />
                       </div>
@@ -1812,11 +1790,11 @@ const CVForm = () => {
                         <label className="block text-sm font-medium text-gray-700">Tarih</label>
                         <input
                           type="date"
-                          value={hobby.date ? hobby.date.split('-').reverse().join('-') : ''}
+                          value={award.date ? award.date.split('-').reverse().join('-') : ''}
                           onChange={(e) => {
                             const selectedDate = e.target.value;
                             const formattedDate = selectedDate ? selectedDate.split('-').reverse().join('-') : '';
-                            updateHobby(index, 'date', formattedDate);
+                            updateAward(index, 'date', formattedDate);
                           }}
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         />
@@ -1824,8 +1802,8 @@ const CVForm = () => {
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Açıklama</label>
                         <textarea
-                          value={hobby.description}
-                          onChange={(e) => updateHobby(index, 'description', e.target.value)}
+                          value={award.description}
+                          onChange={(e) => updateAward(index, 'description', e.target.value)}
                           rows={3}
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         />
@@ -1841,37 +1819,37 @@ const CVForm = () => {
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Yayın ve Başarı Bilgileri</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Hobiler</h3>
               <button
                 type="button"
-                onClick={addAward}
+                onClick={addHobby}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
               >
-                Ödül Ekle
+                Hobi Ekle
               </button>
             </div>
             
-            {formData.awards?.length === 0 ? (
+            {formData.hobbies?.length === 0 ? (
               <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
                 <p className="text-gray-500">Henüz hobi eklenmemiş.</p>
                 <button
                   type="button"
-                  onClick={addAward}
+                  onClick={addHobby}
                   className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
                 >
                   <span className="mr-1">+</span>
-                  Ödül Ekle
+                  Hobi Ekle
                 </button>
               </div>
             ) : (
               <div className="space-y-4">
-                {formData.awards?.map((hobby, index) => (
+                {formData.hobbies?.map((hobby, index) => (
                   <div key={index} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-gray-700">Ödül #{index + 1}</h4>
+                      <h4 className="font-medium text-gray-700">Hobi #{index + 1}</h4>
                       <button
                         type="button"
-                        onClick={() => removeAward(index)}
+                        onClick={() => removeHobby(index)}
                         className="text-red-500 hover:text-red-700"
                         title="Sil"
                       >
@@ -1879,11 +1857,11 @@ const CVForm = () => {
                       </button>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Ödül</label>
+                      <label className="block text-sm font-medium text-gray-700">Hobi</label>
                       <input
                         type="text"
                         value={hobby}
-                        onChange={(e) => updateAward(index, e.target.value)}
+                        onChange={(e) => updateHobby(index, e.target.value)}
                         className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                       />
                     </div>
@@ -1897,22 +1875,22 @@ const CVForm = () => {
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Referans Bilgileri</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Yayınlar ve Makaleler</h3>
               <button
                 type="button"
-                onClick={addReference}
+                onClick={addPublication}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
               >
                 Yayın Ekle
               </button>
             </div>
             
-            {formData.references?.length === 0 ? (
+            {formData.publications?.length === 0 ? (
               <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
                 <p className="text-gray-500">Henüz yayın eklenmemiş.</p>
                 <button
                   type="button"
-                  onClick={addReference}
+                  onClick={addPublication}
                   className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
                 >
                   <span className="mr-1">+</span>
@@ -1921,13 +1899,13 @@ const CVForm = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                {formData.references?.map((pub, index) => (
-                  <div key={hobby.id} className="border rounded-lg p-4">
+                {formData.publications?.map((pub, index) => (
+                  <div key={pub.id} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start mb-3">
                       <h4 className="font-medium text-gray-700">Yayın #{index + 1}</h4>
                       <button
                         type="button"
-                        onClick={() => removeHobby(index)}
+                        onClick={() => removePublication(index)}
                         className="text-red-500 hover:text-red-700"
                         title="Sil"
                       >
@@ -1939,8 +1917,8 @@ const CVForm = () => {
                         <label className="block text-sm font-medium text-gray-700">Başlık</label>
                         <input
                           type="text"
-                          value={hobby.title}
-                          onChange={(e) => updateHobby(index, 'title', e.target.value)}
+                          value={pub.title}
+                          onChange={(e) => updatePublication(index, 'title', e.target.value)}
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         />
                       </div>
@@ -1948,11 +1926,11 @@ const CVForm = () => {
                         <label className="block text-sm font-medium text-gray-700">Yayın Tarihi</label>
                         <input
                           type="date"
-                          value={hobby.publishDate ? hobby.publishDate.split('-').reverse().join('-') : ''}
+                          value={pub.publishDate ? pub.publishDate.split('-').reverse().join('-') : ''}
                           onChange={(e) => {
                             const selectedDate = e.target.value;
                             const formattedDate = selectedDate ? selectedDate.split('-').reverse().join('-') : '';
-                            updateHobby(index, 'publishDate', formattedDate);
+                            updatePublication(index, 'publishDate', formattedDate);
                           }}
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         />
@@ -1961,16 +1939,16 @@ const CVForm = () => {
                         <label className="block text-sm font-medium text-gray-700">Yayınlayıcı</label>
                         <input
                           type="text"
-                          value={hobby.publisher}
-                          onChange={(e) => updateHobby(index, 'publisher', e.target.value)}
+                          value={pub.publisher}
+                          onChange={(e) => updatePublication(index, 'publisher', e.target.value)}
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Açıklama</label>
                         <textarea
-                          value={hobby.description}
-                          onChange={(e) => updateHobby(index, 'description', e.target.value)}
+                          value={pub.description}
+                          onChange={(e) => updatePublication(index, 'description', e.target.value)}
                           rows={3}
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         />
@@ -1986,37 +1964,37 @@ const CVForm = () => {
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Hobi Bilgileri</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Referanslar</h3>
               <button
                 type="button"
-                onClick={addHobby}
+                onClick={addReference}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
               >
-                Hobi Ekle
+                Referans Ekle
               </button>
             </div>
             
-            {formData.hobbies?.length === 0 ? (
+            {formData.references?.length === 0 ? (
               <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
                 <p className="text-gray-500">Henüz referans eklenmemiş.</p>
                 <button
                   type="button"
-                  onClick={addHobby}
+                  onClick={addReference}
                   className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
                 >
                   <span className="mr-1">+</span>
-                  Hobi Ekle
+                  Referans Ekle
                 </button>
               </div>
             ) : (
               <div className="space-y-4">
-                {formData.hobbies?.map((ref, index) => (
-                  <div key={hobby.id} className="border rounded-lg p-4">
+                {formData.references?.map((ref, index) => (
+                  <div key={ref.id} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-gray-700">Hobi #{index + 1}</h4>
+                      <h4 className="font-medium text-gray-700">Referans #{index + 1}</h4>
                       <button
                         type="button"
-                        onClick={() => removeHobby(index)}
+                        onClick={() => removeReference(index)}
                         className="text-red-500 hover:text-red-700"
                         title="Sil"
                       >
@@ -2028,8 +2006,8 @@ const CVForm = () => {
                         <label className="block text-sm font-medium text-gray-700">Adı Soyadı</label>
                         <input
                           type="text"
-                          value={hobby.name}
-                          onChange={(e) => updateHobby(index, 'name', e.target.value)}
+                          value={ref.name}
+                          onChange={(e) => updateReference(index, 'name', e.target.value)}
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         />
                       </div>
@@ -2037,8 +2015,8 @@ const CVForm = () => {
                         <label className="block text-sm font-medium text-gray-700">Şirket</label>
                         <input
                           type="text"
-                          value={hobby.company}
-                          onChange={(e) => updateHobby(index, 'company', e.target.value)}
+                          value={ref.company}
+                          onChange={(e) => updateReference(index, 'company', e.target.value)}
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         />
                       </div>
@@ -2046,8 +2024,8 @@ const CVForm = () => {
                         <label className="block text-sm font-medium text-gray-700">Telefon</label>
                         <input
                           type="tel"
-                          value={hobby.phone}
-                          onChange={(e) => updateHobby(index, 'phone', e.target.value)}
+                          value={ref.phone}
+                          onChange={(e) => updateReference(index, 'phone', e.target.value)}
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         />
                       </div>
@@ -2055,8 +2033,8 @@ const CVForm = () => {
                         <label className="block text-sm font-medium text-gray-700">Profesyonel/Kişisel</label>
                         <input
                           type="text"
-                          value={hobby.type}
-                          onChange={(e) => updateHobby(index, 'type', e.target.value)}
+                          value={ref.type}
+                          onChange={(e) => updateReference(index, 'type', e.target.value)}
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         />
                       </div>
@@ -2071,7 +2049,7 @@ const CVForm = () => {
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Değerlendirmeler</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Değerlendirmelerim</h3>
               <p className="text-sm text-gray-500">Lütfen her soruyu 1-5 yıldız ile değerlendirin</p>
             </div>
             
@@ -2238,49 +2216,49 @@ const CVForm = () => {
                 onClick={() => setCurrentStep(3)}
                 className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 3 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">3</span>
-                <span className="block mt-1 text-xs">Deneyim Bilgileri</span>
+                <span className="block mt-1 text-xs">Deneyim</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(4)}
                 className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 4 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">4</span>
-                <span className="block mt-1 text-xs">Yetenek ve Yetkinlik</span>
+                <span className="block mt-1 text-xs">Yetenek ve Yetkinlikler</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(5)}
                 className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 5 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">5</span>
-                <span className="block mt-1 text-xs">Sertifika ve Eğitim</span>
+                <span className="block mt-1 text-xs">Sertifika ve Eğitimler</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(6)}
                 className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 6 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">6</span>
-                <span className="block mt-1 text-xs">Yabancı Dil Bilgileri</span>
+                <span className="block mt-1 text-xs">Yabancı Dil</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(7)}
                 className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 7 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">7</span>
-                <span className="block mt-1 text-xs">Yayın ve Makale</span>
+                <span className="block mt-1 text-xs">Yayınlar ve Makaleler</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(8)}
                 className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 8 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">8</span>
-                <span className="block mt-1 text-xs">Ödül ve Başarı</span>
+                <span className="block mt-1 text-xs">Ödül ve Başarılar</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(9)}
                 className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 9 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">9</span>
-                <span className="block mt-1 text-xs">Referans Bilgileri</span>
+                <span className="block mt-1 text-xs">Referans</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(10)}
                 className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 10 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">10</span>
-                <span className="block mt-1 text-xs">Hobi Bilgileri</span>
+                <span className="block mt-1 text-xs">Hobi</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(11)}
