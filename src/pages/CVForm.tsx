@@ -969,7 +969,6 @@ const CVForm = () => {
                   name="residenceCity"
                   value={formData.personalInfo?.residenceCity || ''}
                   onChange={handlePersonalInfoChange}
-                  placeholder="Örn: İstanbul"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
@@ -980,7 +979,6 @@ const CVForm = () => {
                   name="residenceDistrict"
                   value={formData.personalInfo?.residenceDistrict || ''}
                   onChange={handlePersonalInfoChange}
-                  placeholder="Örn: Kadıköy"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
