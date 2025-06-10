@@ -2165,47 +2165,69 @@ const CVForm = () => {
           {/* Progress bar */}
           <div className="mb-8">
             <div className="grid grid-cols-11 gap-1 text-xs font-medium text-gray-600 mb-4">
-              <div className={`text-center p-3 rounded ${currentStep === 1 ? 'bg-blue-100 text-blue-800' : ''}`}>
+              <div 
+                onClick={() => setCurrentStep(1)}
+                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 1 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">1</span>
                 <span className="block mt-1 text-xs">Kişisel</span>
               </div>
-              <div className={`text-center p-3 rounded ${currentStep === 2 ? 'bg-blue-100 text-blue-800' : ''}`}>
+              <div 
+                onClick={() => setCurrentStep(2)}
+                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 2 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">2</span>
                 <span className="block mt-1 text-xs">Öğrenim</span>
               </div>
-              <div className={`text-center p-3 rounded ${currentStep === 3 ? 'bg-blue-100 text-blue-800' : ''}`}>
+              <div 
+                onClick={() => setCurrentStep(3)}
+                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 3 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">3</span>
                 <span className="block mt-1 text-xs">Sertifika ve Eğitimler</span>
               </div>
-              <div className={`text-center p-3 rounded ${currentStep === 4 ? 'bg-blue-100 text-blue-800' : ''}`}>
+              <div 
+                onClick={() => setCurrentStep(4)}
+                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 4 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">4</span>
                 <span className="block mt-1 text-xs">Deneyim</span>
               </div>
-              <div className={`text-center p-3 rounded ${currentStep === 5 ? 'bg-blue-100 text-blue-800' : ''}`}>
+              <div 
+                onClick={() => setCurrentStep(5)}
+                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 5 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">5</span>
                 <span className="block mt-1 text-xs">Yetenek ve Yetkinlikler</span>
               </div>
-              <div className={`text-center p-3 rounded ${currentStep === 6 ? 'bg-blue-100 text-blue-800' : ''}`}>
+              <div 
+                onClick={() => setCurrentStep(6)}
+                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 6 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">6</span>
                 <span className="block mt-1 text-xs">Yabancı Dil</span>
               </div>
-              <div className={`text-center p-3 rounded ${currentStep === 7 ? 'bg-blue-100 text-blue-800' : ''}`}>
+              <div 
+                onClick={() => setCurrentStep(7)}
+                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 7 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">7</span>
                 <span className="block mt-1 text-xs">Ödül ve Başarılar</span>
               </div>
-              <div className={`text-center p-3 rounded ${currentStep === 8 ? 'bg-blue-100 text-blue-800' : ''}`}>
+              <div 
+                onClick={() => setCurrentStep(8)}
+                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 8 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">8</span>
                 <span className="block mt-1 text-xs">Hobi</span>
               </div>
-              <div className={`text-center p-3 rounded ${currentStep === 9 ? 'bg-blue-100 text-blue-800' : ''}`}>
+              <div 
+                onClick={() => setCurrentStep(9)}
+                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 9 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">9</span>
                 <span className="block mt-1 text-xs">Yayınlar ve Makaleler</span>
               </div>
-              <div className={`text-center p-3 rounded ${currentStep === 10 ? 'bg-blue-100 text-blue-800' : ''}`}>
+              <div 
+                onClick={() => setCurrentStep(10)}
+                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 10 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">10</span>
                 <span className="block mt-1 text-xs">Referans</span>
               </div>
-              <div className={`text-center p-3 rounded ${currentStep === 11 ? 'bg-blue-100 text-blue-800' : ''}`}>
+              <div 
+                onClick={() => setCurrentStep(11)}
+                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 11 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">11</span>
                 <span className="block mt-1 text-xs">Değerlendirme</span>
               </div>
