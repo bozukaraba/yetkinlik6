@@ -166,14 +166,6 @@ const LoginPage: React.FC = () => {
               )}
             </button>
           </div>
-          
-          <div className="bg-blue-50 p-4 rounded-md">
-            <p className="text-sm text-gray-700 font-medium">Demo Hesapları:</p>
-            <div className="mt-2 text-sm text-gray-600">
-              <p>Normal kullanıcı: <span className="font-mono bg-gray-100 p-1 rounded">user@example.com</span> / herhangi bir şifre</p>
-              <p>Admin kullanıcı: <span className="font-mono bg-gray-100 p-1 rounded">admin@example.com</span> / herhangi bir şifre</p>
-            </div>
-          </div>
         </form>
         </div>
       </div>
