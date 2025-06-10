@@ -118,19 +118,22 @@ const Dashboard: React.FC = () => {
             ${cvData.personalInfo?.sgkServiceDocument ? `<p style="margin-top: 10px; color: #059669; font-size: 14px; font-weight: 500;">✓ SGK Hizmet Dökümü: Yüklendi</p>` : ''}
           </div>
           
-          <!-- Skills -->
-          ${cvData.skills && cvData.skills.length > 0 ? `
+          <!-- Education -->
+          ${cvData.education && cvData.education.length > 0 ? `
           <div style="margin-bottom: 25px;">
             <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
-              Yetenek ve Yetkinlikler
+              Öğrenim
             </h2>
-            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-              ${cvData.skills.map(skill => `
-                <span style="background: #dbeafe; color: #1e40af; padding: 6px 12px; border-radius: 6px; font-size: 14px;">
-                  ${skill.name}${skill.level ? ` (${skill.level}/5)` : ''}${skill.yearsOfExperience ? ` - ${skill.yearsOfExperience} yıl` : ''}
-                </span>
-              `).join('')}
-            </div>
+            ${cvData.education.map(edu => `
+              <div style="margin-bottom: 20px; padding-left: 20px; border-left: 3px solid #e5e7eb;">
+                <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${edu.degree}</h3>
+                <p style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">${edu.fieldOfStudy} - ${edu.institution}</p>
+                <p style="color: #9ca3af; font-size: 14px; margin-bottom: 10px;">
+                  ${edu.current ? 'Devam ediyor' : edu.endDate ? `Mezun: ${new Date(edu.endDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' })}` : 'Mezuniyet tarihi belirtilmemiş'}
+                </p>
+                ${edu.description ? `<p style="color: #374151; line-height: 1.6;">${edu.description}</p>` : ''}
+              </div>
+            `).join('')}
           </div>
           ` : ''}
           
@@ -155,35 +158,16 @@ const Dashboard: React.FC = () => {
           </div>
           ` : ''}
           
-          <!-- Education -->
-          ${cvData.education && cvData.education.length > 0 ? `
+          <!-- Skills -->
+          ${cvData.skills && cvData.skills.length > 0 ? `
           <div style="margin-bottom: 25px;">
             <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
-              Öğrenim
-            </h2>
-            ${cvData.education.map(edu => `
-              <div style="margin-bottom: 20px; padding-left: 20px; border-left: 3px solid #e5e7eb;">
-                <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${edu.degree}</h3>
-                <p style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">${edu.fieldOfStudy} - ${edu.institution}</p>
-                <p style="color: #9ca3af; font-size: 14px; margin-bottom: 10px;">
-                  ${edu.current ? 'Devam ediyor' : edu.endDate ? `Mezun: ${new Date(edu.endDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' })}` : 'Mezuniyet tarihi belirtilmemiş'}
-                </p>
-                ${edu.description ? `<p style="color: #374151; line-height: 1.6;">${edu.description}</p>` : ''}
-              </div>
-            `).join('')}
-          </div>
-          ` : ''}
-          
-          <!-- Languages -->
-          ${cvData.languages && cvData.languages.length > 0 ? `
-          <div style="margin-bottom: 25px;">
-            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
-              Yabancı Dil
+              Yetenek ve Yetkinlikler
             </h2>
             <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-              ${cvData.languages.map(lang => `
-                <span style="background: #f3f4f6; color: #374151; padding: 6px 12px; border-radius: 6px; font-size: 14px;">
-                  ${lang.name}${lang.examType ? ` - ${lang.examType}` : ''}${lang.examScore ? ` (${lang.examScore})` : ''}${lang.certificateDate ? ` - ${lang.certificateDate}` : ''}
+              ${cvData.skills.map(skill => `
+                <span style="background: #dbeafe; color: #1e40af; padding: 6px 12px; border-radius: 6px; font-size: 14px;">
+                  ${skill.name}${skill.level ? ` (${skill.level}/5)` : ''}${skill.yearsOfExperience ? ` - ${skill.yearsOfExperience} yıl` : ''}
                 </span>
               `).join('')}
             </div>
@@ -209,20 +193,17 @@ const Dashboard: React.FC = () => {
           </div>
           ` : ''}
           
-          <!-- Awards -->
-          ${cvData.awards && cvData.awards.length > 0 ? `
+          <!-- Languages -->
+          ${cvData.languages && cvData.languages.length > 0 ? `
           <div style="margin-bottom: 25px;">
             <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
-              Ödüller ve Başarılar
+              Yabancı Dil
             </h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-              ${cvData.awards.map(award => `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
-                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${award.title}</h3>
-                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">${award.organization}</p>
-                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">Tarih: ${award.date}</p>
-                  ${award.description ? `<p style="color: #9ca3af; font-size: 12px;">${award.description}</p>` : ''}
-                </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              ${cvData.languages.map(lang => `
+                <span style="background: #f3f4f6; color: #374151; padding: 6px 12px; border-radius: 6px; font-size: 14px;">
+                  ${lang.name}${lang.examType ? ` - ${lang.examType}` : ''}${lang.examScore ? ` (${lang.examScore})` : ''}${lang.certificateDate ? ` - ${lang.certificateDate}` : ''}
+                </span>
               `).join('')}
             </div>
           </div>
@@ -247,17 +228,20 @@ const Dashboard: React.FC = () => {
           </div>
           ` : ''}
           
-          <!-- Hobbies -->
-          ${cvData.hobbies && cvData.hobbies.length > 0 ? `
+          <!-- Awards -->
+          ${cvData.awards && cvData.awards.length > 0 ? `
           <div style="margin-bottom: 25px;">
             <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
-              Hobiler
+              Ödüller ve Başarılar
             </h2>
-            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-              ${cvData.hobbies.map(hobby => `
-                <span style="background: #f3f4f6; color: #374151; padding: 6px 12px; border-radius: 6px; font-size: 14px;">
-                  ${hobby}
-                </span>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+              ${cvData.awards.map(award => `
+                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
+                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${award.title}</h3>
+                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">${award.organization}</p>
+                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">Tarih: ${award.date}</p>
+                  ${award.description ? `<p style="color: #9ca3af; font-size: 12px;">${award.description}</p>` : ''}
+                </div>
               `).join('')}
             </div>
           </div>
@@ -277,6 +261,22 @@ const Dashboard: React.FC = () => {
                   <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">${ref.phone}</p>
                   ${ref.type ? `<p style="color: #9ca3af; font-size: 12px;">${ref.type}</p>` : ''}
                 </div>
+              `).join('')}
+            </div>
+          </div>
+          ` : ''}
+          
+          <!-- Hobbies -->
+          ${cvData.hobbies && cvData.hobbies.length > 0 ? `
+          <div style="margin-bottom: 25px;">
+            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
+              Hobiler
+            </h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              ${cvData.hobbies.map(hobby => `
+                <span style="background: #f3f4f6; color: #374151; padding: 6px 12px; border-radius: 6px; font-size: 14px;">
+                  ${hobby}
+                </span>
               `).join('')}
             </div>
           </div>

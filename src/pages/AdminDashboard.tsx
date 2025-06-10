@@ -866,36 +866,40 @@ const AdminDashboard: React.FC = () => {
                   )}
                 </div>
                 
-                {/* Skills */}
+                {/* Education */}
                 <div className="mb-6">
                   <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                    <Tag className="h-5 w-5 mr-2 text-blue-500" />
-                    Yetenek ve Yetkinlikler
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                      <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+                    </svg>
+                    Öğrenim
                   </h2>
                   
-                  {selectedCV.skills && selectedCV.skills.length > 0 ? (
-                    <div className="flex flex-wrap gap-2">
-                      {selectedCV.skills.map(skill => (
-                        <span 
-                          key={skill.id} 
-                          className="px-3 py-1 bg-blue-100 text-blue-800 rounded"
-                        >
-                          {skill.name} 
-                          {skill.level && (
-                            <span className="ml-1 text-blue-600">
-                              ({skill.level}/5)
-                            </span>
+                  {selectedCV.education && selectedCV.education.length > 0 ? (
+                    <div className="space-y-4">
+                      {selectedCV.education.map(edu => (
+                        <div key={edu.id} className="border-l-2 border-gray-200 pl-4">
+                          <h3 className="font-medium text-gray-900">{edu.degree}</h3>
+                          <p className="text-sm text-gray-600">{edu.fieldOfStudy} - {edu.institution}</p>
+                          <p className="text-sm text-gray-500">
+                            {edu.current 
+                              ? 'Devam ediyor' 
+                              : edu.endDate 
+                                ? (edu.endDate.includes('-') && edu.endDate.split('-').length === 3 ? 
+                                   `Mezun: ${edu.endDate}` : 'Mezuniyet tarihi belirtilmemiş')
+                                : 'Mezuniyet tarihi belirtilmemiş'
+                            }
+                          </p>
+                          {edu.description && (
+                            <p className="mt-2 text-gray-700">{edu.description}</p>
                           )}
-                          {skill.yearsOfExperience && (
-                            <span className="ml-1 text-blue-600">
-                              - {skill.yearsOfExperience} yıl
-                            </span>
-                          )}
-                        </span>
+                        </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-gray-500 italic">Beceri listelenmemiş</p>
+                    <p className="text-gray-500 italic">Öğrenim bilgisi listelenmemiş</p>
                   )}
                 </div>
                 
@@ -935,42 +939,63 @@ const AdminDashboard: React.FC = () => {
                   )}
                 </div>
                 
-                {/* Education */}
+                {/* Skills */}
                 <div className="mb-6">
                   <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path d="M12 14l9-5-9-5-9 5 9 5z" />
-                      <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
-                    </svg>
-                    Öğrenim
+                    <Tag className="h-5 w-5 mr-2 text-blue-500" />
+                    Yetenek ve Yetkinlikler
                   </h2>
                   
-                  {selectedCV.education && selectedCV.education.length > 0 ? (
-                    <div className="space-y-4">
-                      {selectedCV.education.map(edu => (
-                        <div key={edu.id} className="border-l-2 border-gray-200 pl-4">
-                          <h3 className="font-medium text-gray-900">{edu.degree}</h3>
-                          <p className="text-sm text-gray-600">{edu.fieldOfStudy} - {edu.institution}</p>
-                          <p className="text-sm text-gray-500">
-                            {edu.current 
-                              ? 'Devam ediyor' 
-                              : edu.endDate 
-                                ? (edu.endDate.includes('-') && edu.endDate.split('-').length === 3 ? 
-                                   `Mezun: ${edu.endDate}` : 'Mezuniyet tarihi belirtilmemiş')
-                                : 'Mezuniyet tarihi belirtilmemiş'
-                            }
-                          </p>
-                          {edu.description && (
-                            <p className="mt-2 text-gray-700">{edu.description}</p>
+                  {selectedCV.skills && selectedCV.skills.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {selectedCV.skills.map(skill => (
+                        <span 
+                          key={skill.id} 
+                          className="px-3 py-1 bg-blue-100 text-blue-800 rounded"
+                        >
+                          {skill.name} 
+                          {skill.level && (
+                            <span className="ml-1 text-blue-600">
+                              ({skill.level}/5)
+                            </span>
+                          )}
+                          {skill.yearsOfExperience && (
+                            <span className="ml-1 text-blue-600">
+                              - {skill.yearsOfExperience} yıl
+                            </span>
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 italic">Beceri listelenmemiş</p>
+                  )}
+                </div>
+                
+                {/* Certificates */}
+                {selectedCV.certificates && selectedCV.certificates.length > 0 && (
+                  <div className="mb-6">
+                    <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                      </svg>
+                      Sertifikalar
+                    </h2>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {selectedCV.certificates.map(cert => (
+                        <div key={cert.id} className="border border-gray-200 rounded-lg p-4">
+                          <h3 className="font-medium text-gray-900">{cert.name}</h3>
+                          <p className="text-sm text-gray-600">Başlangıç: {cert.startDate}</p>
+                          <p className="text-sm text-gray-600">Bitiş: {cert.endDate}</p>
+                          {cert.duration && (
+                            <p className="text-sm text-gray-500">Süre: {cert.duration} saat</p>
                           )}
                         </div>
                       ))}
                     </div>
-                  ) : (
-                    <p className="text-gray-500 italic">Öğrenim bilgisi listelenmemiş</p>
-                  )}
-                </div>
+                  </div>
+                )}
                 
                 {/* Languages */}
                 {selectedCV.languages && selectedCV.languages.length > 0 && (
@@ -1001,24 +1026,49 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 )}
                 
-                {/* Certificates */}
-                {selectedCV.certificates && selectedCV.certificates.length > 0 && (
+                {/* Publications */}
+                {selectedCV.publications && selectedCV.publications.length > 0 && (
+                  <div className="mb-6">
+                    <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                      Yayınlar ve Makaleler
+                    </h2>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {selectedCV.publications.map(pub => (
+                        <div key={pub.id} className="border border-gray-200 rounded-lg p-4">
+                          <h3 className="font-medium text-gray-900">{pub.title}</h3>
+                          <p className="text-sm text-gray-600">Yayınlayıcı: {pub.publisher}</p>
+                          <p className="text-sm text-gray-600">Tarih: {pub.publishDate}</p>
+                          {pub.description && (
+                            <p className="text-sm text-gray-500 mt-2">{pub.description}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Awards */}
+                {selectedCV.awards && selectedCV.awards.length > 0 && (
                   <div className="mb-6">
                     <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                       </svg>
-                      Sertifikalar
+                      Ödüller ve Başarılar
                     </h2>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {selectedCV.certificates.map(cert => (
-                        <div key={cert.id} className="border border-gray-200 rounded-lg p-4">
-                          <h3 className="font-medium text-gray-900">{cert.name}</h3>
-                          <p className="text-sm text-gray-600">Başlangıç: {cert.startDate}</p>
-                          <p className="text-sm text-gray-600">Bitiş: {cert.endDate}</p>
-                          {cert.duration && (
-                            <p className="text-sm text-gray-500">Süre: {cert.duration} saat</p>
+                      {selectedCV.awards.map(award => (
+                        <div key={award.id} className="border border-gray-200 rounded-lg p-4">
+                          <h3 className="font-medium text-gray-900">{award.title}</h3>
+                          <p className="text-sm text-gray-600">{award.organization}</p>
+                          <p className="text-sm text-gray-600">Tarih: {award.date}</p>
+                          {award.description && (
+                            <p className="text-sm text-gray-500 mt-2">{award.description}</p>
                           )}
                         </div>
                       ))}
@@ -1142,7 +1192,7 @@ const AdminDashboard: React.FC = () => {
                                 <span key={i} className={i < (selectedCV.evaluation?.workSatisfaction || 0) ? 'text-yellow-400' : 'text-gray-300'}>★</span>
                               ))}
                             </div>
-                            <span className="ml-2 text-sm text-gray-600">({selectedCV.evaluation?.workSatisfaction || 0}/5)</span>
+                            <span className="ml-2 text-sm text-gray-600">({selectedCV.evaluation.workSatisfaction}/5)</span>
                           </div>
                         </div>
                       )}
