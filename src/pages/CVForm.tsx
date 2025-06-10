@@ -1730,7 +1730,237 @@ const CVForm = () => {
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Ödüller ve Başarılar</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Yayın ve Makale Bilgileri</h3>
+              <button
+                type="button"
+                onClick={addReference}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+              >
+                Referans Ekle
+              </button>
+            </div>
+            
+            {formData.references?.length === 0 ? (
+              <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
+                <p className="text-gray-500">Henüz referans eklenmemiş.</p>
+                <button
+                  type="button"
+                  onClick={addReference}
+                  className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                >
+                  <span className="mr-1">+</span>
+                  Referans Ekle
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {formData.references?.map((ref, index) => (
+                  <div key={ref.id} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <h4 className="font-medium text-gray-700">Referans #{index + 1}</h4>
+                      <button
+                        type="button"
+                        onClick={() => removeReference(index)}
+                        className="text-red-500 hover:text-red-700"
+                        title="Sil"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">İsim</label>
+                        <input
+                          type="text"
+                          value={ref.name}
+                          onChange={(e) => updateReference(index, 'name', e.target.value)}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Şirket</label>
+                        <input
+                          type="text"
+                          value={ref.company}
+                          onChange={(e) => updateReference(index, 'company', e.target.value)}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Telefon</label>
+                        <input
+                          type="tel"
+                          value={ref.phone}
+                          onChange={(e) => updateReference(index, 'phone', e.target.value)}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Yakınlık Türü</label>
+                        <input
+                          type="text"
+                          value={ref.type}
+                          onChange={(e) => updateReference(index, 'type', e.target.value)}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      case 8:
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-semibold text-gray-900">Ödül ve Başarı Bilgileri</h3>
+              <button
+                type="button"
+                onClick={addPublication}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+              >
+                Yayın Ekle
+              </button>
+            </div>
+            
+            {formData.publications?.length === 0 ? (
+              <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
+                <p className="text-gray-500">Henüz yayın eklenmemiş.</p>
+                <button
+                  type="button"
+                  onClick={addPublication}
+                  className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                >
+                  <span className="mr-1">+</span>
+                  Yayın Ekle
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {formData.publications?.map((pub, index) => (
+                  <div key={pub.id} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <h4 className="font-medium text-gray-700">Yayın #{index + 1}</h4>
+                      <button
+                        type="button"
+                        onClick={() => removePublication(index)}
+                        className="text-red-500 hover:text-red-700"
+                        title="Sil"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Yayın Adı</label>
+                        <input
+                          type="text"
+                          value={pub.title}
+                          onChange={(e) => updatePublication(index, 'title', e.target.value)}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Yayın Tarihi</label>
+                        <input
+                          type="date"
+                          value={pub.publishDate ? pub.publishDate.split('-').reverse().join('-') : ''}
+                          onChange={(e) => {
+                            const selectedDate = e.target.value;
+                            const formattedDate = selectedDate ? selectedDate.split('-').reverse().join('-') : '';
+                            updatePublication(index, 'publishDate', formattedDate);
+                          }}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Yayınlayıcı</label>
+                        <input
+                          type="text"
+                          value={pub.publisher}
+                          onChange={(e) => updatePublication(index, 'publisher', e.target.value)}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700">Açıklama</label>
+                      <textarea
+                        value={pub.description}
+                        onChange={(e) => updatePublication(index, 'description', e.target.value)}
+                        rows={3}
+                        className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      case 9:
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-semibold text-gray-900">Referans Bilgileri</h3>
+              <button
+                type="button"
+                onClick={addHobby}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+              >
+                Hobi Ekle
+              </button>
+            </div>
+            
+            {formData.hobbies?.length === 0 ? (
+              <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
+                <p className="text-gray-500">Henüz hobi eklenmemiş.</p>
+                <button
+                  type="button"
+                  onClick={addHobby}
+                  className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                >
+                  <span className="mr-1">+</span>
+                  Hobi Ekle
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {formData.hobbies?.map((hobby, index) => (
+                  <div key={index} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <h4 className="font-medium text-gray-700">Hobi #{index + 1}</h4>
+                      <button
+                        type="button"
+                        onClick={() => removeHobby(index)}
+                        className="text-red-500 hover:text-red-700"
+                        title="Sil"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Hobi</label>
+                      <input
+                        type="text"
+                        value={hobby}
+                        onChange={(e) => updateHobby(index, e.target.value)}
+                        className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      case 10:
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-semibold text-gray-900">Hobi Bilgileri</h3>
               <button
                 type="button"
                 onClick={addAward}
@@ -1805,236 +2035,6 @@ const CVForm = () => {
                           value={award.description}
                           onChange={(e) => updateAward(index, 'description', e.target.value)}
                           rows={3}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      case 8:
-        return (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Hobiler</h3>
-              <button
-                type="button"
-                onClick={addHobby}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-              >
-                Hobi Ekle
-              </button>
-            </div>
-            
-            {formData.hobbies?.length === 0 ? (
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
-                <p className="text-gray-500">Henüz hobi eklenmemiş.</p>
-                <button
-                  type="button"
-                  onClick={addHobby}
-                  className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  <span className="mr-1">+</span>
-                  Hobi Ekle
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {formData.hobbies?.map((hobby, index) => (
-                  <div key={index} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-gray-700">Hobi #{index + 1}</h4>
-                      <button
-                        type="button"
-                        onClick={() => removeHobby(index)}
-                        className="text-red-500 hover:text-red-700"
-                        title="Sil"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Hobi</label>
-                      <input
-                        type="text"
-                        value={hobby}
-                        onChange={(e) => updateHobby(index, e.target.value)}
-                        className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      case 9:
-        return (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Yayınlar ve Makaleler</h3>
-              <button
-                type="button"
-                onClick={addPublication}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-              >
-                Yayın Ekle
-              </button>
-            </div>
-            
-            {formData.publications?.length === 0 ? (
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
-                <p className="text-gray-500">Henüz yayın eklenmemiş.</p>
-                <button
-                  type="button"
-                  onClick={addPublication}
-                  className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  <span className="mr-1">+</span>
-                  Yayın Ekle
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {formData.publications?.map((pub, index) => (
-                  <div key={pub.id} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-gray-700">Yayın #{index + 1}</h4>
-                      <button
-                        type="button"
-                        onClick={() => removePublication(index)}
-                        className="text-red-500 hover:text-red-700"
-                        title="Sil"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Başlık</label>
-                        <input
-                          type="text"
-                          value={pub.title}
-                          onChange={(e) => updatePublication(index, 'title', e.target.value)}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Yayın Tarihi</label>
-                        <input
-                          type="date"
-                          value={pub.publishDate ? pub.publishDate.split('-').reverse().join('-') : ''}
-                          onChange={(e) => {
-                            const selectedDate = e.target.value;
-                            const formattedDate = selectedDate ? selectedDate.split('-').reverse().join('-') : '';
-                            updatePublication(index, 'publishDate', formattedDate);
-                          }}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Yayınlayıcı</label>
-                        <input
-                          type="text"
-                          value={pub.publisher}
-                          onChange={(e) => updatePublication(index, 'publisher', e.target.value)}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Açıklama</label>
-                        <textarea
-                          value={pub.description}
-                          onChange={(e) => updatePublication(index, 'description', e.target.value)}
-                          rows={3}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      case 10:
-        return (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Referanslar</h3>
-              <button
-                type="button"
-                onClick={addReference}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-              >
-                Referans Ekle
-              </button>
-            </div>
-            
-            {formData.references?.length === 0 ? (
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
-                <p className="text-gray-500">Henüz referans eklenmemiş.</p>
-                <button
-                  type="button"
-                  onClick={addReference}
-                  className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  <span className="mr-1">+</span>
-                  Referans Ekle
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {formData.references?.map((ref, index) => (
-                  <div key={ref.id} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-gray-700">Referans #{index + 1}</h4>
-                      <button
-                        type="button"
-                        onClick={() => removeReference(index)}
-                        className="text-red-500 hover:text-red-700"
-                        title="Sil"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Adı Soyadı</label>
-                        <input
-                          type="text"
-                          value={ref.name}
-                          onChange={(e) => updateReference(index, 'name', e.target.value)}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Şirket</label>
-                        <input
-                          type="text"
-                          value={ref.company}
-                          onChange={(e) => updateReference(index, 'company', e.target.value)}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Telefon</label>
-                        <input
-                          type="tel"
-                          value={ref.phone}
-                          onChange={(e) => updateReference(index, 'phone', e.target.value)}
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Profesyonel/Kişisel</label>
-                        <input
-                          type="text"
-                          value={ref.type}
-                          onChange={(e) => updateReference(index, 'type', e.target.value)}
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         />
                       </div>
