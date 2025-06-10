@@ -41,14 +41,14 @@ const LoginPage: React.FC = () => {
             <h3 className="text-2xl font-bold text-gray-900 text-center mb-6">
               Bizim için çok değerlisiniz.
             </h3>
-            <div className="space-y-4 text-black leading-relaxed">
-              <p className="text-base">
+            <div className="space-y-4 leading-relaxed">
+              <p className="text-base text-black">
                 Bu özgeçmiş, sizi daha yakından tanımamız ve birlikte daha iyi bir gelecek inşa etmemiz için önemli bir vesile.
               </p>
-              <p className="text-base">
+              <p className="text-base text-black">
                 Deneyimleriniz, yetenekleriniz ve hedefleriniz bizim için kıymetli çünkü burada sadece iş değil, birlikte büyüyen bir aileyiz.
               </p>
-              <p className="text-base font-medium text-blue-800">
+              <p className="text-base font-medium text-black">
                 Sizinle çalışmak bizim için büyük bir mutluluk ve onur. Bu sürecin bir parçası olduğunuz için teşekkür ederiz. Lütfen, kendinizi en iyi şekilde ifade edin ve mümkün olduğunca detaylı doldurun. Çünkü her bilgi, sizinle daha güçlü bir bağ kurmamıza ve gelişiminize destek olmamıza yardımcı olacak.
               </p>
             </div>
