@@ -39,7 +39,7 @@ const LoginPage: React.FC = () => {
         <div className="lg:order-1 order-2 bg-gradient-to-br from-blue-50 to-indigo-100 p-6 lg:p-8 rounded-2xl shadow-lg backdrop-blur-sm border border-blue-200">
           <div className="space-y-6">
             <h3 className="text-2xl font-bold text-gray-900 text-center mb-6">
-              💼 Bizim için çok değerlisiniz.
+              Bizim için çok değerlisiniz.
             </h3>
             <div className="space-y-4 text-gray-700 leading-relaxed">
               <p className="text-base">
@@ -49,13 +49,8 @@ const LoginPage: React.FC = () => {
                 Deneyimleriniz, yetenekleriniz ve hedefleriniz bizim için kıymetli çünkü burada sadece iş değil, birlikte büyüyen bir aileyiz.
               </p>
               <p className="text-base font-medium text-blue-800">
-                Sizinle çalışmak bizim için büyük bir mutluluk ve onur. Bu sürecin bir parçası olduğunuz için teşekkür ederiz.
+                Sizinle çalışmak bizim için büyük bir mutluluk ve onur. Bu sürecin bir parçası olduğunuz için teşekkür ederiz. Lütfen, kendinizi en iyi şekilde ifade edin ve mümkün olduğunca detaylı doldurun. Çünkü her bilgi, sizinle daha güçlü bir bağ kurmamıza ve gelişiminize destek olmamıza yardımcı olacak.
               </p>
-              <div className="bg-white bg-opacity-70 p-4 rounded-lg border-l-4 border-blue-500">
-                <p className="text-sm text-gray-800 italic">
-                  Lütfen, kendinizi en iyi şekilde ifade edin ve mümkün olduğunca detaylı doldurun. Çünkü her bilgi, sizinle daha güçlü bir bağ kurmamıza ve gelişiminize destek olmamıza yardımcı olacak.
-                </p>
-              </div>
             </div>
           </div>
         </div>
