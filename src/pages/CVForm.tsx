@@ -1564,32 +1564,32 @@ const CVForm = () => {
               <h3 className="text-xl font-semibold text-gray-900">Sertifika ve Eğitim Bilgileri</h3>
               <button
                 type="button"
-                onClick={addSkill}
+                onClick={addCertificate}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
               >
-                Yetenek Ekle
+                Sertifika Ekle
               </button>
             </div>
             <p className="text-sm text-gray-600">(Java, .NET, Excel, Pazarlama, Muhasebe, Satın Alma vb.)</p>
             
-            {formData.skills?.length === 0 ? (
+            {formData.certificates?.length === 0 ? (
               <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
                 <p className="text-gray-500">Henüz yetenek eklenmemiş.</p>
                 <button
                   type="button"
-                  onClick={addSkill}
+                  onClick={addCertificate}
                   className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
                 >
                   <span className="mr-1">+</span>
-                  Yetenek Ekle
+                  Sertifika Ekle
                 </button>
               </div>
             ) : (
               <div className="space-y-4">
-                {formData.skills?.map((skill, index) => (
+                {formData.certificates?.map((skill, index) => (
                   <div key={skill.id} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-gray-700">Yetenek #{index + 1}</h4>
+                      <h4 className="font-medium text-gray-700">Sertifika #{index + 1}</h4>
                       <button
                         type="button"
                         onClick={() => removeSkill(index)}
@@ -1601,7 +1601,7 @@ const CVForm = () => {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Yetenek Adı</label>
+                        <label className="block text-sm font-medium text-gray-700">Sertifika Adı</label>
                         <input
                           type="text"
                           value={skill.name}
