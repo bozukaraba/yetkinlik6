@@ -5,7 +5,6 @@ import { FileEdit, Clock, CheckCircle2, AlertCircle, Settings, Users } from 'luc
 import { getCVData, getAllCVs } from '../services/cvService';
 import { CVData } from '../types/cv';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 const Dashboard: React.FC = () => {
   const { currentUser, isAdmin } = useAuth();
@@ -68,81 +67,136 @@ const Dashboard: React.FC = () => {
     }
 
     try {
-      // CV önizleme elementini oluştur
-      const element = document.createElement('div');
-      element.id = 'cv-preview-temp';
-      element.style.position = 'absolute';
-      element.style.left = '-9999px';
+      // PDF oluştur - Text based
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      let yPosition = 20;
+      const pageWidth = 210;
+      const margin = 20;
+      const lineHeight = 6;
+      const sectionSpacing = 15;
+
+      // Helper functions
+      const checkNewPage = (currentY: number, additionalHeight = 20) => {
+        if (currentY + additionalHeight > 280) {
+          pdf.addPage();
+          return 20;
+        }
+        return currentY;
+      };
+
+      const addSection = (title: string, yPos: number) => {
+        pdf.setFontSize(16);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(title, margin, yPos);
+        pdf.setDrawColor(0, 102, 204);
+        pdf.setLineWidth(0.5);
+        pdf.line(margin, yPos + 3, pageWidth - margin, yPos + 3);
+        return yPos + 12;
+      };
+
+      const wrapText = (text: string, maxWidth: number): string[] => {
+        const words = text.split(' ');
+        const lines = [];
+        let currentLine = '';
+        
+        for (const word of words) {
+          const testLine = currentLine + (currentLine ? ' ' : '') + word;
+          const textWidth = pdf.getTextWidth(testLine);
+          
+          if (textWidth > maxWidth && currentLine) {
+            lines.push(currentLine);
+            currentLine = word;
+          } else {
+            currentLine = testLine;
+          }
+        }
+        
+        if (currentLine) {
+          lines.push(currentLine);
+        }
+        
+        return lines;
+      };
+
+      // Header
+      pdf.setFontSize(24);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(0, 102, 204);
+      pdf.text(`${cvData.personalInfo?.firstName || ''} ${cvData.personalInfo?.lastName || ''}`, margin, yPosition);
+      yPosition += 10;
+
+      // İletişim Bilgileri
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(0, 0, 0);
+      if (cvData.personalInfo?.email) {
+        pdf.text(`E-posta: ${cvData.personalInfo.email}`, margin, yPosition);
+        yPosition += lineHeight;
+      }
+      if (cvData.personalInfo?.phone) {
+        pdf.text(`Telefon: ${cvData.personalInfo.phone}`, margin, yPosition);
+        yPosition += lineHeight;
+      }
+      if (cvData.personalInfo?.residenceCity) {
+        pdf.text(`Şehir: ${cvData.personalInfo.residenceCity}${cvData.personalInfo?.residenceDistrict ? ' / ' + cvData.personalInfo.residenceDistrict : ''}`, margin, yPosition);
+        yPosition += lineHeight;
+      }
       
-      element.style.padding = '40px';
-      element.style.width = '210mm';
-      element.style.minHeight = '297mm';
-      element.style.fontFamily = 'Arial, sans-serif';
+      yPosition += sectionSpacing;
       
       // CV içeriğini oluştur
       element.innerHTML = `
-        <div style="max-width: 800px; margin: 0 auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #2d3748;">
-          <!-- Header Section with Modern Design -->
-          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 30px; border-radius: 0; margin: -40px -40px 30px -40px; position: relative;">
-            <div style="display: flex; align-items: center; gap: 30px;">
-              <div style="flex-shrink: 0;">
-                ${cvData.personalInfo?.profileImage ? 
-                  `<div style="width: 150px; height: 150px; border-radius: 50%; border: 6px solid rgba(255,255,255,0.3); padding: 4px; background: white;">
-                    <img src="${cvData.personalInfo.profileImage}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
-                  </div>` 
-                  : `<div style="width: 150px; height: 150px; border-radius: 50%; border: 6px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: bold;">
-                    ${cvData.personalInfo?.firstName?.charAt(0) || ''}${cvData.personalInfo?.lastName?.charAt(0) || ''}
-                  </div>`
-                }
-              </div>
-              <div style="flex: 1;">
-                <h1 style="font-size: 42px; font-weight: 300; margin: 0 0 10px 0; letter-spacing: -1px;">
-                  ${cvData.personalInfo?.firstName} <span style="font-weight: 700;">${cvData.personalInfo?.lastName}</span>
-                </h1>
-                <div style="font-size: 18px; opacity: 0.9; margin-bottom: 20px;">
-                  ${cvData.personalInfo?.email}
-                </div>
-                <div style="display: flex; flex-wrap: wrap; gap: 20px; font-size: 14px;">
-                  ${cvData.personalInfo?.phone ? `<div style="display: flex; align-items: center; gap: 8px;"><span style="background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 4px;">📞</span> ${cvData.personalInfo.phone}</div>` : ''}
-                  ${cvData.personalInfo?.residenceCity ? `<div style="display: flex; align-items: center; gap: 8px;"><span style="background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 4px;">📍</span> ${cvData.personalInfo.residenceCity}${cvData.personalInfo?.residenceDistrict ? ' / ' + cvData.personalInfo.residenceDistrict : ''}</div>` : ''}
-                  ${cvData.personalInfo?.gender ? `<div style="display: flex; align-items: center; gap: 8px;"><span style="background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 4px;">👤</span> ${cvData.personalInfo.gender}</div>` : ''}
-                </div>
-              </div>
-            </div>
-            ${cvData.personalInfo?.summary ? `
-              <div style="margin-top: 25px; padding: 20px; background: rgba(255,255,255,0.15); border-radius: 8px; backdrop-filter: blur(10px);">
-                <h3 style="font-size: 16px; font-weight: 600; margin: 0 0 10px 0; opacity: 0.9;">HAKKIMDA</h3>
-                <p style="margin: 0; font-size: 15px; line-height: 1.6; opacity: 0.95;">${cvData.personalInfo.summary}</p>
-              </div>
-            ` : ''}
-            
-            <!-- Social Media Links -->
-            ${(cvData.personalInfo?.linkedIn || cvData.personalInfo?.github || cvData.personalInfo?.website) ? `
-              <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
-                <div style="display: flex; flex-wrap: wrap; gap: 15px; font-size: 13px;">
-                  ${cvData.personalInfo?.linkedIn ? `<div style="background: rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 20px;">💼 LinkedIn: ${cvData.personalInfo.linkedIn}</div>` : ''}
-                  ${cvData.personalInfo?.github ? `<div style="background: rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 20px;">💻 GitHub: ${cvData.personalInfo.github}</div>` : ''}
-                  ${cvData.personalInfo?.website ? `<div style="background: rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 20px;">🌐 Website: ${cvData.personalInfo.website}</div>` : ''}
-                </div>
+        <div style="max-width: 800px; margin: 0 auto;">
+          <!-- CV Header -->
+          <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px;">
+            ${cvData.personalInfo?.profileImage ? 
+              `<img src="${cvData.personalInfo.profileImage}" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 15px;" />` 
+              : ''
+            }
+            <h1 style="font-size: 32px; font-weight: bold; color: #1f2937; margin: 10px 0;">
+              ${cvData.personalInfo?.firstName} ${cvData.personalInfo?.lastName}
+            </h1>
+            <p style="color: #6b7280; font-size: 16px;">${cvData.personalInfo?.email}</p>
+            ${cvData.personalInfo?.phone ? `<p style="color: #6b7280; font-size: 16px;">${cvData.personalInfo.phone}</p>` : ''}
+            ${cvData.personalInfo?.gender ? `<p style="color: #6b7280; font-size: 14px;">Cinsiyet: ${cvData.personalInfo.gender}</p>` : ''}
+            ${cvData.personalInfo?.residenceCity || cvData.personalInfo?.residenceDistrict ? `<p style="color: #6b7280; font-size: 14px;">İkametgah: ${cvData.personalInfo?.residenceCity || ''}${cvData.personalInfo?.residenceCity && cvData.personalInfo?.residenceDistrict ? ' / ' : ''}${cvData.personalInfo?.residenceDistrict || ''}</p>` : ''}
+            ${cvData.personalInfo?.linkedIn || cvData.personalInfo?.github || cvData.personalInfo?.twitter || cvData.personalInfo?.website || cvData.personalInfo?.instagram || cvData.personalInfo?.facebook || cvData.personalInfo?.youtube || cvData.personalInfo?.tiktok || cvData.personalInfo?.discord || cvData.personalInfo?.telegram || cvData.personalInfo?.whatsapp || cvData.personalInfo?.medium || cvData.personalInfo?.behance || cvData.personalInfo?.dribbble || cvData.personalInfo?.stackoverflow ? `
+              <div style="margin-top: 10px;">
+                ${cvData.personalInfo?.linkedIn ? `<p style="color: #6b7280; font-size: 14px;">LinkedIn: ${cvData.personalInfo.linkedIn}</p>` : ''}
+                ${cvData.personalInfo?.github ? `<p style="color: #6b7280; font-size: 14px;">GitHub: ${cvData.personalInfo.github}</p>` : ''}
+                ${cvData.personalInfo?.twitter ? `<p style="color: #6b7280; font-size: 14px;">Twitter: ${cvData.personalInfo.twitter}</p>` : ''}
+                ${cvData.personalInfo?.instagram ? `<p style="color: #6b7280; font-size: 14px;">Instagram: ${cvData.personalInfo.instagram}</p>` : ''}
+                ${cvData.personalInfo?.facebook ? `<p style="color: #6b7280; font-size: 14px;">Facebook: ${cvData.personalInfo.facebook}</p>` : ''}
+                ${cvData.personalInfo?.youtube ? `<p style="color: #6b7280; font-size: 14px;">YouTube: ${cvData.personalInfo.youtube}</p>` : ''}
+                ${cvData.personalInfo?.tiktok ? `<p style="color: #6b7280; font-size: 14px;">TikTok: ${cvData.personalInfo.tiktok}</p>` : ''}
+                ${cvData.personalInfo?.discord ? `<p style="color: #6b7280; font-size: 14px;">Discord: ${cvData.personalInfo.discord}</p>` : ''}
+                ${cvData.personalInfo?.telegram ? `<p style="color: #6b7280; font-size: 14px;">Telegram: ${cvData.personalInfo.telegram}</p>` : ''}
+                ${cvData.personalInfo?.whatsapp ? `<p style="color: #6b7280; font-size: 14px;">WhatsApp: ${cvData.personalInfo.whatsapp}</p>` : ''}
+                ${cvData.personalInfo?.medium ? `<p style="color: #6b7280; font-size: 14px;">Medium: ${cvData.personalInfo.medium}</p>` : ''}
+                ${cvData.personalInfo?.behance ? `<p style="color: #6b7280; font-size: 14px;">Behance: ${cvData.personalInfo.behance}</p>` : ''}
+                ${cvData.personalInfo?.dribbble ? `<p style="color: #6b7280; font-size: 14px;">Dribbble: ${cvData.personalInfo.dribbble}</p>` : ''}
+                ${cvData.personalInfo?.stackoverflow ? `<p style="color: #6b7280; font-size: 14px;">Stack Overflow: ${cvData.personalInfo.stackoverflow}</p>` : ''}
+                ${cvData.personalInfo?.website ? `<p style="color: #6b7280; font-size: 14px;">Website: ${cvData.personalInfo.website}</p>` : ''}
               </div>
             ` : ''}
+            ${cvData.personalInfo?.summary ? `<p style="margin-top: 15px; color: #374151; line-height: 1.6;">${cvData.personalInfo.summary}</p>` : ''}
+            ${cvData.personalInfo?.sgkServiceDocument ? `<p style="margin-top: 10px; color: #059669; font-size: 14px; font-weight: 500;">✓ SGK Hizmet Dökümü: Yüklendi</p>` : ''}
           </div>
           
           <!-- Education -->
           ${cvData.education && cvData.education.length > 0 ? `
-          <div style="margin-bottom: 35px;">
-            <div style="display: flex; align-items: center; margin-bottom: 20px; padding: 15px 0; border-bottom: 3px solid #667eea;">
-              <span style="font-size: 24px; margin-right: 12px;">🎓</span>
-              <h2 style="font-size: 24px; font-weight: 700; color: #2d3748; margin: 0; letter-spacing: -0.5px;">ÖĞRENİM</h2>
-            </div>
+          <div style="margin-bottom: 25px;">
+            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
+              Öğrenim
+            </h2>
             ${cvData.education.map(edu => `
-              <div style="margin-bottom: 25px; padding: 20px; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 12px; border-left: 6px solid #667eea; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                <h3 style="font-weight: 700; color: #2d3748; margin-bottom: 8px; font-size: 18px;">${edu.degree}</h3>
-                <p style="color: #4a5568; font-size: 15px; margin-bottom: 8px; font-weight: 600;">${edu.fieldOfStudy} - ${edu.institution}</p>
-                <p style="color: #718096; font-size: 14px; margin-bottom: 12px; background: rgba(102, 126, 234, 0.1); padding: 6px 12px; border-radius: 6px; display: inline-block;">
-                  ${edu.current ? '📚 Devam ediyor' : edu.endDate ? `🎯 Mezun: ${new Date(edu.endDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' })}` : '📅 Mezuniyet tarihi belirtilmemiş'}
+              <div style="margin-bottom: 20px; padding-left: 20px; border-left: 3px solid #e5e7eb;">
+                <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${edu.degree}</h3>
+                <p style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">${edu.fieldOfStudy} - ${edu.institution}</p>
+                <p style="color: #9ca3af; font-size: 14px; margin-bottom: 10px;">
+                  ${edu.current ? 'Devam ediyor' : edu.endDate ? `Mezun: ${new Date(edu.endDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' })}` : 'Mezuniyet tarihi belirtilmemiş'}
                 </p>
-                ${edu.description ? `<p style="color: #4a5568; line-height: 1.7; margin: 12px 0 0 0; font-style: italic;">${edu.description}</p>` : ''}
+                ${edu.description ? `<p style="color: #374151; line-height: 1.6;">${edu.description}</p>` : ''}
               </div>
             `).join('')}
           </div>
@@ -150,21 +204,20 @@ const Dashboard: React.FC = () => {
           
           <!-- Experience -->
           ${cvData.experience && cvData.experience.length > 0 ? `
-          <div style="margin-bottom: 35px;">
-            <div style="display: flex; align-items: center; margin-bottom: 20px; padding: 15px 0; border-bottom: 3px solid #764ba2;">
-              <span style="font-size: 24px; margin-right: 12px;">💼</span>
-              <h2 style="font-size: 24px; font-weight: 700; color: #2d3748; margin: 0; letter-spacing: -0.5px;">İŞ DENEYİMİ</h2>
-            </div>
+          <div style="margin-bottom: 25px;">
+            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
+              İş Deneyimi
+            </h2>
             ${cvData.experience.map(exp => `
-              <div style="margin-bottom: 25px; padding: 20px; background: linear-gradient(135deg, #faf5ff 0%, #e9d5ff 100%); border-radius: 12px; border-left: 6px solid #764ba2; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                <h3 style="font-weight: 700; color: #2d3748; margin-bottom: 8px; font-size: 18px;">${exp.company} - ${exp.title}</h3>
-                ${exp.location ? `<p style="color: #4a5568; font-size: 15px; margin-bottom: 8px; font-weight: 600;">📍 ${exp.location}</p>` : ''}
-                <p style="color: #718096; font-size: 14px; margin-bottom: 12px; background: rgba(118, 75, 162, 0.1); padding: 6px 12px; border-radius: 6px; display: inline-block;">
-                  📅 ${new Date(exp.startDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' })} - 
-                  ${exp.current ? '🚀 Günümüz' : exp.endDate ? new Date(exp.endDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' }) : 'Belirtilmemiş'}
-                  ${exp.workDuration ? ` (⏱️ ${exp.workDuration})` : ''}
+              <div style="margin-bottom: 20px; padding-left: 20px; border-left: 3px solid #e5e7eb;">
+                <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${exp.company} - ${exp.title}</h3>
+                ${exp.location ? `<p style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">${exp.location}</p>` : ''}
+                <p style="color: #9ca3af; font-size: 14px; margin-bottom: 10px;">
+                  ${new Date(exp.startDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' })} - 
+                  ${exp.current ? 'Günümüz' : exp.endDate ? new Date(exp.endDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' }) : 'Belirtilmemiş'}
+                  ${exp.workDuration ? ` (${exp.workDuration})` : ''}
                 </p>
-                ${exp.description ? `<p style="color: #4a5568; line-height: 1.7; margin: 12px 0 0 0; font-style: italic;">${exp.description}</p>` : ''}
+                ${exp.description ? `<p style="color: #374151; line-height: 1.6;">${exp.description}</p>` : ''}
               </div>
             `).join('')}
           </div>
@@ -172,15 +225,14 @@ const Dashboard: React.FC = () => {
           
           <!-- Skills -->
           ${cvData.skills && cvData.skills.length > 0 ? `
-          <div style="margin-bottom: 35px;">
-            <div style="display: flex; align-items: center; margin-bottom: 20px; padding: 15px 0; border-bottom: 3px solid #10b981;">
-              <span style="font-size: 24px; margin-right: 12px;">⚡</span>
-              <h2 style="font-size: 24px; font-weight: 700; color: #2d3748; margin: 0; letter-spacing: -0.5px;">YETENEK VE YETKİNLİKLER</h2>
-            </div>
-            <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+          <div style="margin-bottom: 25px;">
+            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
+              Yetenek ve Yetkinlikler
+            </h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
               ${cvData.skills.map(skill => `
-                <span style="background: linear-gradient(135deg, #ecfdf5 0%, #a7f3d0 100%); color: #065f46; padding: 12px 16px; border-radius: 12px; font-size: 14px; font-weight: 600; border: 2px solid #10b981; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);">
-                  💡 ${skill.name}${skill.level ? ` (⭐ ${skill.level}/5)` : ''}${skill.yearsOfExperience ? ` - 🗓️ ${skill.yearsOfExperience} yıl` : ''}
+                <span style="background: #dbeafe; color: #1e40af; padding: 6px 12px; border-radius: 6px; font-size: 14px;">
+                  ${skill.name}${skill.level ? ` (${skill.level}/5)` : ''}${skill.yearsOfExperience ? ` - ${skill.yearsOfExperience} yıl` : ''}
                 </span>
               `).join('')}
             </div>
