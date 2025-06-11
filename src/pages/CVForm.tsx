@@ -224,7 +224,7 @@ const CVForm = () => {
     };
     setFormData(prev => ({
       ...prev,
-      education: [...(prev.education || []), newEducation]
+      education: [newEducation, ...(prev.education || [])]
     }));
   };
 
@@ -256,7 +256,7 @@ const CVForm = () => {
     };
     setFormData(prev => ({
       ...prev,
-      experience: [...(prev.experience || []), newExperience]
+      experience: [newExperience, ...(prev.experience || [])]
     }));
   };
 
@@ -286,7 +286,7 @@ const CVForm = () => {
     };
     setFormData(prev => ({
       ...prev,
-      skills: [...(prev.skills || []), newSkill]
+      skills: [newSkill, ...(prev.skills || [])]
     }));
   };
 
@@ -316,7 +316,7 @@ const CVForm = () => {
     };
     setFormData(prev => ({
       ...prev,
-      languages: [...(prev.languages || []), newLanguage]
+      languages: [newLanguage, ...(prev.languages || [])]
     }));
   };
 
@@ -337,7 +337,7 @@ const CVForm = () => {
     };
     setFormData(prev => ({
       ...prev,
-      references: [...(prev.references || []), newReference]
+      references: [newReference, ...(prev.references || [])]
     }));
   };
 
@@ -367,7 +367,7 @@ const CVForm = () => {
     };
     setFormData(prev => ({
       ...prev,
-      certificates: [...(prev.certificates || []), newCertificate]
+      certificates: [newCertificate, ...(prev.certificates || [])]
     }));
   };
 
@@ -390,7 +390,7 @@ const CVForm = () => {
   const addHobby = () => {
     setFormData(prev => ({
       ...prev,
-      hobbies: [...(prev.hobbies || []), '']
+      hobbies: ['', ...(prev.hobbies || [])]
     }));
   };
 
@@ -420,7 +420,7 @@ const CVForm = () => {
     };
     setFormData(prev => ({
       ...prev,
-      awards: [...(prev.awards || []), newAward]
+      awards: [newAward, ...(prev.awards || [])]
     }));
   };
 
@@ -452,7 +452,7 @@ const CVForm = () => {
     };
     setFormData(prev => ({
       ...prev,
-      publications: [...(prev.publications || []), newPublication]
+      publications: [newPublication, ...(prev.publications || [])]
     }));
   };
 
