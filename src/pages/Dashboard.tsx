@@ -67,8 +67,8 @@ const Dashboard: React.FC = () => {
       // Text-based PDF oluştur
       const pdf = new jsPDF('p', 'mm', 'a4');
       
-      // Arial font kullan - Türkçe karakter desteği var
-      pdf.setFont('arial', 'normal');
+      // Helvetica font kullan - daha iyi karakter desteği
+      pdf.setFont('helvetica', 'normal');
       
       let yPosition = 20;
       const pageWidth = 210;
@@ -94,9 +94,10 @@ const Dashboard: React.FC = () => {
         
         // Bölüm başlığı
         pdf.setFontSize(14);
-        pdf.setFont('arial', 'bold');
+        pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-        pdf.text(`${icon} ${title}`, margin, yPos + 2);
+        // Türkçe karakterleri düzgün görüntülemek için text encoding
+        pdf.text(decodeURIComponent(encodeURIComponent(`${icon} ${title}`)), margin, yPos + 2);
         
         // Alt çizgi
         pdf.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
@@ -130,51 +131,56 @@ const Dashboard: React.FC = () => {
         return lines;
       };
 
+      // Türkçe karakter için text output helper
+      const addText = (text: string, x: number, y: number) => {
+        pdf.text(decodeURIComponent(encodeURIComponent(text)), x, y);
+      };
+
       // Header arka plan
       pdf.setFillColor(245, 248, 255);
       pdf.rect(0, 0, pageWidth, 55, 'F');
       
       // İsim
       pdf.setFontSize(22);
-      pdf.setFont('arial', 'bold');
+      pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
       const fullName = `${cvData.personalInfo?.firstName || ''} ${cvData.personalInfo?.lastName || ''}`;
-      pdf.text(fullName, margin, yPosition + 5);
+      addText(fullName, margin, yPosition + 5);
       yPosition += 15;
 
       // Profesyonel unvan varsa ekle
-      if (cvData.personalInfo?.summary) {
-        pdf.setFontSize(12);
-        pdf.setFont('arial', 'italic');
-        pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
-        const summaryFirstLine = cvData.personalInfo.summary.split('.')[0] + '.';
-        if (summaryFirstLine.length < 80) {
-          pdf.text(summaryFirstLine, margin, yPosition);
-          yPosition += 8;
+              if (cvData.personalInfo?.summary) {
+          pdf.setFontSize(12);
+          pdf.setFont('helvetica', 'italic');
+          pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
+          const summaryFirstLine = cvData.personalInfo.summary.split('.')[0] + '.';
+          if (summaryFirstLine.length < 80) {
+            addText(summaryFirstLine, margin, yPosition);
+            yPosition += 8;
+          }
         }
-      }
 
       // İletişim Bilgileri
       pdf.setFontSize(10);
-      pdf.setFont('arial', 'normal');
+      pdf.setFont('helvetica', 'normal');
       pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
       
-      if (cvData.personalInfo?.email) {
-        pdf.text(`E-posta: ${cvData.personalInfo.email}`, margin, yPosition);
-        yPosition += lineHeight;
-      }
-      if (cvData.personalInfo?.phone) {
-        pdf.text(`Telefon: ${cvData.personalInfo.phone}`, margin, yPosition);
-        yPosition += lineHeight;
-      }
-      if (cvData.personalInfo?.residenceCity) {
-        pdf.text(`Şehir: ${cvData.personalInfo.residenceCity}${cvData.personalInfo?.residenceDistrict ? ' / ' + cvData.personalInfo.residenceDistrict : ''}`, margin, yPosition);
-        yPosition += lineHeight;
-      }
-      if (cvData.personalInfo?.gender) {
-        pdf.text(`Cinsiyet: ${cvData.personalInfo.gender}`, margin, yPosition);
-        yPosition += lineHeight;
-      }
+              if (cvData.personalInfo?.email) {
+          addText(`E-posta: ${cvData.personalInfo.email}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.personalInfo?.phone) {
+          addText(`Telefon: ${cvData.personalInfo.phone}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.personalInfo?.residenceCity) {
+          addText(`Şehir: ${cvData.personalInfo.residenceCity}${cvData.personalInfo?.residenceDistrict ? ' / ' + cvData.personalInfo.residenceDistrict : ''}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.personalInfo?.gender) {
+          addText(`Cinsiyet: ${cvData.personalInfo.gender}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
       
       yPosition += sectionSpacing;
 
@@ -184,14 +190,14 @@ const Dashboard: React.FC = () => {
         yPosition = addSection('HAKKIMDA', yPosition, '👤');
         
         pdf.setFontSize(11);
-        pdf.setFont('arial', 'normal');
+        pdf.setFont('helvetica', 'normal');
         pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
         const summaryLines = wrapText(cvData.personalInfo.summary, pageWidth - 2 * margin);
-        summaryLines.forEach(line => {
-          yPosition = checkNewPage(yPosition);
-          pdf.text(line, margin, yPosition);
-          yPosition += lineHeight;
-        });
+                  summaryLines.forEach(line => {
+            yPosition = checkNewPage(yPosition);
+            addText(line, margin, yPosition);
+            yPosition += lineHeight;
+          });
         yPosition += sectionSpacing;
       }
 
@@ -203,31 +209,31 @@ const Dashboard: React.FC = () => {
         cvData.education.forEach(edu => {
           yPosition = checkNewPage(yPosition, 25);
           
-          pdf.setFontSize(12);
-          pdf.setFont('arial', 'bold');
-          pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
-          pdf.text(edu.degree, margin, yPosition);
-          yPosition += lineHeight + 1;
-          
-          pdf.setFontSize(11);
-          pdf.setFont('arial', 'normal');
-          pdf.text(`${edu.fieldOfStudy} - ${edu.institution}`, margin, yPosition);
-          yPosition += lineHeight;
-          
-          const endDateText = edu.current ? 'Devam ediyor' : 
-            edu.endDate ? `Mezun: ${new Date(edu.endDate).toLocaleDateString('tr-TR')}` : 
-            'Mezuniyet tarihi belirtilmemiş';
-          pdf.text(endDateText, margin, yPosition);
-          yPosition += lineHeight;
-          
-          if (edu.description) {
-            const descLines = wrapText(edu.description, pageWidth - 2 * margin);
-            descLines.forEach(line => {
-              yPosition = checkNewPage(yPosition);
-              pdf.text(line, margin, yPosition);
-              yPosition += lineHeight;
-            });
-          }
+                      pdf.setFontSize(12);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
+            addText(edu.degree, margin, yPosition);
+            yPosition += lineHeight + 1;
+            
+            pdf.setFontSize(11);
+            pdf.setFont('helvetica', 'normal');
+            addText(`${edu.fieldOfStudy} - ${edu.institution}`, margin, yPosition);
+            yPosition += lineHeight;
+            
+            const endDateText = edu.current ? 'Devam ediyor' : 
+              edu.endDate ? `Mezun: ${new Date(edu.endDate).toLocaleDateString('tr-TR')}` : 
+              'Mezuniyet tarihi belirtilmemiş';
+            addText(endDateText, margin, yPosition);
+            yPosition += lineHeight;
+            
+            if (edu.description) {
+              const descLines = wrapText(edu.description, pageWidth - 2 * margin);
+              descLines.forEach(line => {
+                yPosition = checkNewPage(yPosition);
+                addText(line, margin, yPosition);
+                yPosition += lineHeight;
+              });
+            }
           yPosition += 8;
         });
         yPosition += sectionSpacing;
@@ -242,16 +248,16 @@ const Dashboard: React.FC = () => {
           yPosition = checkNewPage(yPosition, 25);
           
           pdf.setFontSize(12);
-          pdf.setFont('arial', 'bold');
+          pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
-          pdf.text(`${exp.company} - ${exp.title}`, margin, yPosition);
+                      addText(`${exp.company} - ${exp.title}`, margin, yPosition);
           yPosition += lineHeight + 1;
           
           pdf.setFontSize(11);
-          pdf.setFont('arial', 'normal');
+          pdf.setFont('helvetica', 'normal');
           
           if (exp.location) {
-            pdf.text(`Lokasyon: ${exp.location}`, margin, yPosition);
+            addText(`Lokasyon: ${exp.location}`, margin, yPosition);
             yPosition += lineHeight;
           }
           
@@ -259,17 +265,17 @@ const Dashboard: React.FC = () => {
             exp.current ? 'Günümüz' : 
             exp.endDate ? new Date(exp.endDate).toLocaleDateString('tr-TR') : 'Belirtilmemiş'
           }${exp.workDuration ? ` (${exp.workDuration})` : ''}`;
-          pdf.text(dateText, margin, yPosition);
+          addText(dateText, margin, yPosition);
           yPosition += lineHeight;
           
-          if (exp.description) {
-            const descLines = wrapText(exp.description, pageWidth - 2 * margin);
-            descLines.forEach(line => {
-              yPosition = checkNewPage(yPosition);
-              pdf.text(line, margin, yPosition);
-              yPosition += lineHeight;
-            });
-          }
+                      if (exp.description) {
+              const descLines = wrapText(exp.description, pageWidth - 2 * margin);
+              descLines.forEach(line => {
+                yPosition = checkNewPage(yPosition);
+                addText(line, margin, yPosition);
+                yPosition += lineHeight;
+              });
+            }
           yPosition += 8;
         });
         yPosition += sectionSpacing;
@@ -281,12 +287,12 @@ const Dashboard: React.FC = () => {
         yPosition = addSection('YETENEK VE YETKİNLİKLER', yPosition, '⚡');
         
         pdf.setFontSize(11);
-        pdf.setFont('arial', 'normal');
+        pdf.setFont('helvetica', 'normal');
         pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
         cvData.skills.forEach(skill => {
           yPosition = checkNewPage(yPosition);
           const skillText = `• ${skill.name}${skill.level ? ` (${skill.level}/5)` : ''}${skill.yearsOfExperience ? ` - ${skill.yearsOfExperience} yıl` : ''}`;
-          pdf.text(skillText, margin, yPosition);
+          addText(skillText, margin, yPosition);
           yPosition += lineHeight;
         });
         yPosition += sectionSpacing;
@@ -300,16 +306,16 @@ const Dashboard: React.FC = () => {
         pdf.setFontSize(11);
         cvData.certificates.forEach(cert => {
           yPosition = checkNewPage(yPosition, 15);
-          pdf.setFont('arial', 'bold');
+          pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
-          pdf.text(cert.name, margin, yPosition);
+          addText(cert.name, margin, yPosition);
           yPosition += lineHeight;
           
-          pdf.setFont('arial', 'normal');
-          pdf.text(`${cert.startDate} - ${cert.endDate}`, margin, yPosition);
+          pdf.setFont('helvetica', 'normal');
+          addText(`${cert.startDate} - ${cert.endDate}`, margin, yPosition);
           if (cert.duration) {
             yPosition += lineHeight;
-            pdf.text(`Süre: ${cert.duration} saat`, margin, yPosition);
+            addText(`Süre: ${cert.duration} saat`, margin, yPosition);
           }
           yPosition += 8;
         });
@@ -322,11 +328,11 @@ const Dashboard: React.FC = () => {
         yPosition = addSection('YABANCI DİL', yPosition, '🌍');
         
         pdf.setFontSize(11);
-        pdf.setFont('arial', 'normal');
+        pdf.setFont('helvetica', 'normal');
         cvData.languages.forEach(lang => {
           yPosition = checkNewPage(yPosition);
           const langText = `• ${lang.name}${lang.examType ? ` - ${lang.examType}` : ''}${lang.examScore ? ` (${lang.examScore})` : ''}`;
-          pdf.text(langText, margin, yPosition);
+          addText(langText, margin, yPosition);
           yPosition += lineHeight;
         });
         yPosition += sectionSpacing;
@@ -340,22 +346,22 @@ const Dashboard: React.FC = () => {
         pdf.setFontSize(11);
         cvData.publications.forEach(pub => {
           yPosition = checkNewPage(yPosition, 20);
-          pdf.setFont('arial', 'bold');
+          pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
-          pdf.text(pub.title, margin, yPosition);
+          addText(pub.title, margin, yPosition);
           yPosition += lineHeight;
           
-          pdf.setFont('arial', 'normal');
-          pdf.text(`Yayınlayıcı: ${pub.publisher}`, margin, yPosition);
+          pdf.setFont('helvetica', 'normal');
+          addText(`Yayınlayıcı: ${pub.publisher}`, margin, yPosition);
           yPosition += lineHeight;
-          pdf.text(`Tarih: ${pub.publishDate}`, margin, yPosition);
+          addText(`Tarih: ${pub.publishDate}`, margin, yPosition);
           yPosition += lineHeight;
           
           if (pub.description) {
             const descLines = wrapText(pub.description, pageWidth - 2 * margin);
             descLines.forEach(line => {
               yPosition = checkNewPage(yPosition);
-              pdf.text(line, margin, yPosition);
+              addText(line, margin, yPosition);
               yPosition += lineHeight;
             });
           }
@@ -372,22 +378,22 @@ const Dashboard: React.FC = () => {
         pdf.setFontSize(11);
         cvData.awards.forEach(award => {
           yPosition = checkNewPage(yPosition, 20);
-          pdf.setFont('arial', 'bold');
+          pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
-          pdf.text(award.title, margin, yPosition);
+          addText(award.title, margin, yPosition);
           yPosition += lineHeight;
           
-          pdf.setFont('arial', 'normal');
-          pdf.text(`Kuruluş: ${award.organization}`, margin, yPosition);
+          pdf.setFont('helvetica', 'normal');
+          addText(`Kuruluş: ${award.organization}`, margin, yPosition);
           yPosition += lineHeight;
-          pdf.text(`Tarih: ${award.date}`, margin, yPosition);
+          addText(`Tarih: ${award.date}`, margin, yPosition);
           yPosition += lineHeight;
           
           if (award.description) {
             const descLines = wrapText(award.description, pageWidth - 2 * margin);
             descLines.forEach(line => {
               yPosition = checkNewPage(yPosition);
-              pdf.text(line, margin, yPosition);
+              addText(line, margin, yPosition);
               yPosition += lineHeight;
             });
           }
@@ -404,19 +410,19 @@ const Dashboard: React.FC = () => {
         pdf.setFontSize(11);
         cvData.references.forEach(ref => {
           yPosition = checkNewPage(yPosition, 15);
-          pdf.setFont('arial', 'bold');
+          pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
-          pdf.text(ref.name, margin, yPosition);
+          addText(ref.name, margin, yPosition);
           yPosition += lineHeight;
           
-          pdf.setFont('arial', 'normal');
-          pdf.text(`Şirket: ${ref.company}`, margin, yPosition);
+          pdf.setFont('helvetica', 'normal');
+          addText(`Şirket: ${ref.company}`, margin, yPosition);
           yPosition += lineHeight;
-          pdf.text(`Telefon: ${ref.phone}`, margin, yPosition);
+          addText(`Telefon: ${ref.phone}`, margin, yPosition);
           yPosition += lineHeight;
           
           if (ref.type) {
-            pdf.text(`Tür: ${ref.type}`, margin, yPosition);
+            addText(`Tür: ${ref.type}`, margin, yPosition);
             yPosition += lineHeight;
           }
           yPosition += 8;
@@ -430,13 +436,13 @@ const Dashboard: React.FC = () => {
         yPosition = addSection('HOBİLER', yPosition, '🎨');
         
         pdf.setFontSize(11);
-        pdf.setFont('arial', 'normal');
+        pdf.setFont('helvetica', 'normal');
         
         const hobbiesText = cvData.hobbies.join(', ');
         const hobbiesLines = wrapText(hobbiesText, pageWidth - 2 * margin);
         hobbiesLines.forEach(line => {
           yPosition = checkNewPage(yPosition);
-          pdf.text(line, margin, yPosition);
+          addText(line, margin, yPosition);
           yPosition += lineHeight;
         });
         yPosition += sectionSpacing;
@@ -449,26 +455,26 @@ const Dashboard: React.FC = () => {
         yPosition = addSection('DEĞERLENDİRMELER', yPosition, '⭐');
         
         pdf.setFontSize(11);
-        pdf.setFont('arial', 'normal');
+        pdf.setFont('helvetica', 'normal');
         
         if (cvData.evaluation.workSatisfaction > 0) {
-          pdf.text(`Türksat'ta çalışmaktan memnunum: ${'★'.repeat(cvData.evaluation.workSatisfaction)}${'☆'.repeat(5 - cvData.evaluation.workSatisfaction)} (${cvData.evaluation.workSatisfaction}/5)`, margin, yPosition);
+          addText(`Türksat'ta çalışmaktan memnunum: ${'★'.repeat(cvData.evaluation.workSatisfaction)}${'☆'.repeat(5 - cvData.evaluation.workSatisfaction)} (${cvData.evaluation.workSatisfaction}/5)`, margin, yPosition);
           yPosition += lineHeight;
         }
         if (cvData.evaluation.facilitiesSatisfaction > 0) {
-          pdf.text(`Türksat'ın sağladığı imkânlardan memnunum: ${'★'.repeat(cvData.evaluation.facilitiesSatisfaction)}${'☆'.repeat(5 - cvData.evaluation.facilitiesSatisfaction)} (${cvData.evaluation.facilitiesSatisfaction}/5)`, margin, yPosition);
+          addText(`Türksat'ın sağladığı imkânlardan memnunum: ${'★'.repeat(cvData.evaluation.facilitiesSatisfaction)}${'☆'.repeat(5 - cvData.evaluation.facilitiesSatisfaction)} (${cvData.evaluation.facilitiesSatisfaction}/5)`, margin, yPosition);
           yPosition += lineHeight;
         }
         if (cvData.evaluation.longTermIntent > 0) {
-          pdf.text(`Türksat'ta uzun süre çalışmak isterim: ${'★'.repeat(cvData.evaluation.longTermIntent)}${'☆'.repeat(5 - cvData.evaluation.longTermIntent)} (${cvData.evaluation.longTermIntent}/5)`, margin, yPosition);
+          addText(`Türksat'ta uzun süre çalışmak isterim: ${'★'.repeat(cvData.evaluation.longTermIntent)}${'☆'.repeat(5 - cvData.evaluation.longTermIntent)} (${cvData.evaluation.longTermIntent}/5)`, margin, yPosition);
           yPosition += lineHeight;
         }
         if (cvData.evaluation.recommendation > 0) {
-          pdf.text(`Türksat'ı arkadaşlarıma tavsiye ederim: ${'★'.repeat(cvData.evaluation.recommendation)}${'☆'.repeat(5 - cvData.evaluation.recommendation)} (${cvData.evaluation.recommendation}/5)`, margin, yPosition);
+          addText(`Türksat'ı arkadaşlarıma tavsiye ederim: ${'★'.repeat(cvData.evaluation.recommendation)}${'☆'.repeat(5 - cvData.evaluation.recommendation)} (${cvData.evaluation.recommendation}/5)`, margin, yPosition);
           yPosition += lineHeight;
         }
         if (cvData.evaluation.applicationSatisfaction > 0) {
-          pdf.text(`Bu "Yetkinlik-X" uygulamasını beğendim: ${'★'.repeat(cvData.evaluation.applicationSatisfaction)}${'☆'.repeat(5 - cvData.evaluation.applicationSatisfaction)} (${cvData.evaluation.applicationSatisfaction}/5)`, margin, yPosition);
+          addText(`Bu "Yetkinlik-X" uygulamasını beğendim: ${'★'.repeat(cvData.evaluation.applicationSatisfaction)}${'☆'.repeat(5 - cvData.evaluation.applicationSatisfaction)} (${cvData.evaluation.applicationSatisfaction}/5)`, margin, yPosition);
           yPosition += lineHeight;
         }
         yPosition += sectionSpacing;
@@ -484,66 +490,66 @@ const Dashboard: React.FC = () => {
         yPosition = addSection('SOSYAL MEDYA', yPosition, '🌐');
         
         pdf.setFontSize(11);
-        pdf.setFont('arial', 'normal');
+        pdf.setFont('helvetica', 'normal');
         
         if (cvData.personalInfo?.linkedIn) {
-          pdf.text(`LinkedIn: ${cvData.personalInfo.linkedIn}`, margin, yPosition);
+          addText(`LinkedIn: ${cvData.personalInfo.linkedIn}`, margin, yPosition);
           yPosition += lineHeight;
         }
         if (cvData.personalInfo?.github) {
-          pdf.text(`GitHub: ${cvData.personalInfo.github}`, margin, yPosition);
+          addText(`GitHub: ${cvData.personalInfo.github}`, margin, yPosition);
           yPosition += lineHeight;
         }
         if (cvData.personalInfo?.website) {
-          pdf.text(`Website: ${cvData.personalInfo.website}`, margin, yPosition);
+          addText(`Website: ${cvData.personalInfo.website}`, margin, yPosition);
           yPosition += lineHeight;
         }
         if (cvData.personalInfo?.twitter) {
-          pdf.text(`Twitter: ${cvData.personalInfo.twitter}`, margin, yPosition);
+          addText(`Twitter: ${cvData.personalInfo.twitter}`, margin, yPosition);
           yPosition += lineHeight;
         }
         if (cvData.personalInfo?.instagram) {
-          pdf.text(`Instagram: ${cvData.personalInfo.instagram}`, margin, yPosition);
+          addText(`Instagram: ${cvData.personalInfo.instagram}`, margin, yPosition);
           yPosition += lineHeight;
         }
         if (cvData.personalInfo?.facebook) {
-          pdf.text(`Facebook: ${cvData.personalInfo.facebook}`, margin, yPosition);
+          addText(`Facebook: ${cvData.personalInfo.facebook}`, margin, yPosition);
           yPosition += lineHeight;
         }
         if (cvData.personalInfo?.youtube) {
-          pdf.text(`YouTube: ${cvData.personalInfo.youtube}`, margin, yPosition);
+          addText(`YouTube: ${cvData.personalInfo.youtube}`, margin, yPosition);
           yPosition += lineHeight;
         }
         if (cvData.personalInfo?.tiktok) {
-          pdf.text(`TikTok: ${cvData.personalInfo.tiktok}`, margin, yPosition);
+          addText(`TikTok: ${cvData.personalInfo.tiktok}`, margin, yPosition);
           yPosition += lineHeight;
         }
         if (cvData.personalInfo?.discord) {
-          pdf.text(`Discord: ${cvData.personalInfo.discord}`, margin, yPosition);
+          addText(`Discord: ${cvData.personalInfo.discord}`, margin, yPosition);
           yPosition += lineHeight;
         }
         if (cvData.personalInfo?.telegram) {
-          pdf.text(`Telegram: ${cvData.personalInfo.telegram}`, margin, yPosition);
+          addText(`Telegram: ${cvData.personalInfo.telegram}`, margin, yPosition);
           yPosition += lineHeight;
         }
         if (cvData.personalInfo?.whatsapp) {
-          pdf.text(`WhatsApp: ${cvData.personalInfo.whatsapp}`, margin, yPosition);
+          addText(`WhatsApp: ${cvData.personalInfo.whatsapp}`, margin, yPosition);
           yPosition += lineHeight;
         }
         if (cvData.personalInfo?.medium) {
-          pdf.text(`Medium: ${cvData.personalInfo.medium}`, margin, yPosition);
+          addText(`Medium: ${cvData.personalInfo.medium}`, margin, yPosition);
           yPosition += lineHeight;
         }
         if (cvData.personalInfo?.behance) {
-          pdf.text(`Behance: ${cvData.personalInfo.behance}`, margin, yPosition);
+          addText(`Behance: ${cvData.personalInfo.behance}`, margin, yPosition);
           yPosition += lineHeight;
         }
         if (cvData.personalInfo?.dribbble) {
-          pdf.text(`Dribbble: ${cvData.personalInfo.dribbble}`, margin, yPosition);
+          addText(`Dribbble: ${cvData.personalInfo.dribbble}`, margin, yPosition);
           yPosition += lineHeight;
         }
         if (cvData.personalInfo?.stackoverflow) {
-          pdf.text(`Stack Overflow: ${cvData.personalInfo.stackoverflow}`, margin, yPosition);
+          addText(`Stack Overflow: ${cvData.personalInfo.stackoverflow}`, margin, yPosition);
           yPosition += lineHeight;
         }
       }
