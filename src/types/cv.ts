@@ -58,12 +58,15 @@ export interface Experience {
   id: string;
   title: string;
   company: string;
+  department?: string;
   location?: string;
   startDate: string;
   endDate?: string;
   current?: boolean;
   description: string;
   workDuration?: string;
+  tasks?: string;
+  projectDetails?: string;
   projects?: string[];
   achievements?: string[];
   technologies?: string[];

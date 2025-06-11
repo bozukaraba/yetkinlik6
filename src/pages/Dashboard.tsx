@@ -162,13 +162,16 @@ const Dashboard: React.FC = () => {
                 <div style="position: absolute; top: -5px; left: -7px; width: 14px; height: 14px; background: #ed8936; border-radius: 50%; border: 3px solid white;"></div>
                 <h3 style="font-weight: 600; color: #2d3748; margin: 0 0 5px 0; font-size: 16px;">${exp.company}</h3>
                 <p style="color: #667eea; font-weight: 500; font-size: 15px; margin: 0 0 8px 0;">${exp.title}</p>
+                ${exp.department ? `<p style="color: #6b7280; font-size: 13px; margin: 0 0 5px 0; font-style: italic;">🏢 Departman: ${exp.department}</p>` : ''}
                 ${exp.location ? `<p style="color: #a0aec0; font-size: 13px; margin: 0 0 5px 0;">📍 ${exp.location}</p>` : ''}
                 <p style="color: #a0aec0; font-size: 13px; margin: 0 0 15px 0; display: flex; align-items: center; gap: 5px;">
                   <span style="width: 6px; height: 6px; background: #ed8936; border-radius: 50%; display: inline-block;"></span>
                   ${new Date(exp.startDate).getFullYear()} - ${exp.current ? 'Günümüz' : exp.endDate ? new Date(exp.endDate).getFullYear() : 'Belirtilmemiş'}
                   ${exp.workDuration ? ` (${exp.workDuration})` : ''}
                 </p>
-                ${exp.description ? `<p style="color: #4a5568; line-height: 1.6; margin: 0; font-size: 14px;">${exp.description}</p>` : ''}
+                ${exp.tasks ? `<div style="margin-bottom: 12px;"><strong style="color: #2d3748; font-size: 14px;">📋 Görevler:</strong><p style="color: #4a5568; line-height: 1.6; margin: 5px 0 0 0; font-size: 14px;">${exp.tasks}</p></div>` : ''}
+                ${exp.projectDetails ? `<div style="margin-bottom: 12px;"><strong style="color: #2d3748; font-size: 14px;">🚀 Projeler:</strong><p style="color: #4a5568; line-height: 1.6; margin: 5px 0 0 0; font-size: 14px;">${exp.projectDetails}</p></div>` : ''}
+                ${exp.description ? `<div style="margin-bottom: 0;"><strong style="color: #2d3748; font-size: 14px;">📝 Açıklama:</strong><p style="color: #4a5568; line-height: 1.6; margin: 5px 0 0 0; font-size: 14px;">${exp.description}</p></div>` : ''}
               </div>
             `).join('')}
           </div>

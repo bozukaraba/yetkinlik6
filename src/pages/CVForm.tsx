@@ -766,12 +766,15 @@ const CVForm = () => {
             ${formData.experience.map(exp => `
               <div style="margin-bottom: 20px; padding-left: 20px; border-left: 3px solid #e5e7eb;">
                 <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${exp.company} - ${exp.title}</h3>
+                ${exp.department ? `<p style="color: #6b7280; font-size: 14px; margin-bottom: 5px; font-style: italic;">Departman: ${exp.department}</p>` : ''}
                 <p style="color: #9ca3af; font-size: 14px; margin-bottom: 10px;">
                   ${new Date(exp.startDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' })} - 
                   ${exp.current ? 'Günümüz' : exp.endDate ? new Date(exp.endDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' }) : 'Belirtilmemiş'}
                   ${exp.workDuration ? ` (${exp.workDuration})` : ''}
                 </p>
-                ${exp.description ? `<p style="color: #374151; line-height: 1.6;">${exp.description}</p>` : ''}
+                ${exp.tasks ? `<div style="margin-bottom: 10px;"><strong style="color: #374151; font-size: 14px;">Görevler:</strong><p style="color: #374151; line-height: 1.6; margin-top: 5px;">${exp.tasks}</p></div>` : ''}
+                ${exp.projectDetails ? `<div style="margin-bottom: 10px;"><strong style="color: #374151; font-size: 14px;">Projeler:</strong><p style="color: #374151; line-height: 1.6; margin-top: 5px;">${exp.projectDetails}</p></div>` : ''}
+                ${exp.description ? `<div style="margin-bottom: 10px;"><strong style="color: #374151; font-size: 14px;">Açıklama:</strong><p style="color: #374151; line-height: 1.6; margin-top: 5px;">${exp.description}</p></div>` : ''}
               </div>
             `).join('')}
           </div>
@@ -1578,7 +1581,16 @@ const CVForm = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Pozisyon</label>
+                        <label className="block text-sm font-medium text-gray-700">Çalıştığınız Departman</label>
+                        <input
+                          type="text"
+                          value={exp.department || ''}
+                          onChange={(e) => updateExperience(index, 'department', e.target.value)}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Pozisyon Unvanı</label>
                         <input
                           type="text"
                           value={exp.title}
@@ -1623,6 +1635,28 @@ const CVForm = () => {
                           className="h-5 w-5 text-blue-600 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                         />
                         <label className="ml-2 block text-sm text-gray-900">Halen çalışıyorum</label>
+                      </div>
+                    </div>
+                    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Görev</label>
+                        <textarea
+                          value={exp.tasks || ''}
+                          onChange={(e) => updateExperience(index, 'tasks', e.target.value)}
+                          rows={3}
+                          placeholder="Görevlerinizi detaylıca açıklayınız..."
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Proje</label>
+                        <textarea
+                          value={exp.projectDetails || ''}
+                          onChange={(e) => updateExperience(index, 'projectDetails', e.target.value)}
+                          rows={3}
+                          placeholder="Yaptığınız projeleri detaylıca açıklayınız..."
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
                       </div>
                     </div>
                     <div className="mt-4">

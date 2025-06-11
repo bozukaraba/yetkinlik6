@@ -390,13 +390,16 @@ const AdminDashboard: React.FC = () => {
                 <div style="position: absolute; top: -5px; left: -7px; width: 14px; height: 14px; background: #ed8936; border-radius: 50%; border: 3px solid white;"></div>
                 <h3 style="font-weight: 600; color: #2d3748; margin: 0 0 5px 0; font-size: 16px;">${exp.company}</h3>
                 <p style="color: #667eea; font-weight: 500; font-size: 15px; margin: 0 0 8px 0;">${exp.title}</p>
+                ${exp.department ? `<p style="color: #6b7280; font-size: 13px; margin: 0 0 5px 0; font-style: italic;">🏢 Departman: ${exp.department}</p>` : ''}
                 ${exp.location ? `<p style="color: #a0aec0; font-size: 13px; margin: 0 0 5px 0;">📍 ${exp.location}</p>` : ''}
                 <p style="color: #a0aec0; font-size: 13px; margin: 0 0 15px 0; display: flex; align-items: center; gap: 5px;">
                   <span style="width: 6px; height: 6px; background: #ed8936; border-radius: 50%; display: inline-block;"></span>
                   ${new Date(exp.startDate).getFullYear()} - ${exp.current ? 'Günümüz' : exp.endDate ? new Date(exp.endDate).getFullYear() : 'Belirtilmemiş'}
                   ${exp.workDuration ? ` (${exp.workDuration})` : ''}
                 </p>
-                ${exp.description ? `<p style="color: #4a5568; line-height: 1.6; margin: 0; font-size: 14px;">${exp.description}</p>` : ''}
+                ${exp.tasks ? `<div style="margin-bottom: 12px;"><strong style="color: #2d3748; font-size: 14px;">📋 Görevler:</strong><p style="color: #4a5568; line-height: 1.6; margin: 5px 0 0 0; font-size: 14px;">${exp.tasks}</p></div>` : ''}
+                ${exp.projectDetails ? `<div style="margin-bottom: 12px;"><strong style="color: #2d3748; font-size: 14px;">🚀 Projeler:</strong><p style="color: #4a5568; line-height: 1.6; margin: 5px 0 0 0; font-size: 14px;">${exp.projectDetails}</p></div>` : ''}
+                ${exp.description ? `<div style="margin-bottom: 0;"><strong style="color: #2d3748; font-size: 14px;">📝 Açıklama:</strong><p style="color: #4a5568; line-height: 1.6; margin: 5px 0 0 0; font-size: 14px;">${exp.description}</p></div>` : ''}
               </div>
             `).join('')}
           </div>
@@ -1277,7 +1280,10 @@ const AdminDashboard: React.FC = () => {
                       {selectedCV.experience.map(exp => (
                         <div key={exp.id} className="border-l-2 border-gray-200 pl-4">
                           <h3 className="font-medium text-gray-900">{exp.company} - {exp.title}</h3>
-                          <p className="text-sm text-gray-600">{exp.location && `${exp.location}`}</p>
+                          {exp.department && (
+                            <p className="text-sm text-gray-600 italic">🏢 Departman: {exp.department}</p>
+                          )}
+                          <p className="text-sm text-gray-600">{exp.location && `📍 ${exp.location}`}</p>
                           <p className="text-sm text-gray-500">
                             {exp.startDate ? 
                               (exp.startDate.includes('-') && exp.startDate.split('-').length === 3 ? 
@@ -1292,7 +1298,24 @@ const AdminDashboard: React.FC = () => {
                             }
                             {exp.workDuration && ` (${exp.workDuration})`}
                           </p>
-                          <p className="mt-2 text-gray-700">{exp.description}</p>
+                          {exp.tasks && (
+                            <div className="mt-2">
+                              <strong className="text-sm text-gray-700">📋 Görevler:</strong>
+                              <p className="text-sm text-gray-700 mt-1">{exp.tasks}</p>
+                            </div>
+                          )}
+                          {exp.projectDetails && (
+                            <div className="mt-2">
+                              <strong className="text-sm text-gray-700">🚀 Projeler:</strong>
+                              <p className="text-sm text-gray-700 mt-1">{exp.projectDetails}</p>
+                            </div>
+                          )}
+                          {exp.description && (
+                            <div className="mt-2">
+                              <strong className="text-sm text-gray-700">📝 Açıklama:</strong>
+                              <p className="text-sm text-gray-700 mt-1">{exp.description}</p>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
