@@ -225,41 +225,320 @@ const AdminDashboard: React.FC = () => {
 
   const handleDownloadCV = async (cv: CVData) => {
     try {
-      // CV preview elementini bul
-      const element = document.getElementById('cv-preview');
-      if (!element) {
-        alert('CV önizleme bulunamadı. Lütfen tekrar deneyin.');
-        return;
-      }
+      // Temporary element oluştur - ESTETİK VERSİYON
+      const element = document.createElement('div');
+      element.style.width = '800px';
+      element.style.padding = '40px';
+      element.style.backgroundColor = '#ffffff';
+      
+      // CV içeriğini HTML olarak oluştur - ESTETİK VERSİYON
+      element.innerHTML = `
+        <div style="max-width: 800px; margin: 0 auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #2d3748; line-height: 1.6;">
+          <!-- CV Header -->
+          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; margin: -40px -40px 30px -40px; text-align: center; position: relative;">
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);"></div>
+            <div style="position: relative; z-index: 1;">
+              <h1 style="font-size: 36px; font-weight: 700; margin: 0 0 10px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                ${cv.personalInfo?.firstName} ${cv.personalInfo?.lastName}
+              </h1>
+              <div style="height: 3px; width: 60px; background: #fff; margin: 15px auto 20px auto; border-radius: 2px;"></div>
+              <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; font-size: 16px;">
+                ${cv.personalInfo?.email ? `
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 16px; height: 16px; background: #fff; border-radius: 50%; display: inline-block;"></span>
+                    ${cv.personalInfo.email}
+                  </div>
+                ` : ''}
+                ${cv.personalInfo?.phone ? `
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 16px; height: 16px; background: #fff; border-radius: 50%; display: inline-block;"></span>
+                    ${cv.personalInfo.phone}
+                  </div>
+                ` : ''}
+                ${cv.personalInfo?.residenceCity || cv.personalInfo?.residenceDistrict ? `
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 16px; height: 16px; background: #fff; border-radius: 50%; display: inline-block;"></span>
+                    ${cv.personalInfo?.residenceCity || ''}${cv.personalInfo?.residenceCity && cv.personalInfo?.residenceDistrict ? ' / ' : ''}${cv.personalInfo?.residenceDistrict || ''}
+                  </div>
+                ` : ''}
+              </div>
+              ${cv.personalInfo?.gender ? `
+                <div style="margin-top: 15px; font-size: 14px; opacity: 0.9;">
+                  Cinsiyet: ${cv.personalInfo.gender}
+                </div>
+              ` : ''}
+            </div>
+          </div>
 
-      // HTML'i canvas'a çevir
+          <!-- Summary -->
+          ${cv.personalInfo?.summary ? `
+          <div style="margin-bottom: 35px; background: #f8fafc; padding: 25px; border-radius: 12px; border-left: 5px solid #667eea;">
+            <h2 style="font-size: 22px; font-weight: 600; color: #667eea; margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
+              <span style="width: 8px; height: 8px; background: #667eea; border-radius: 50%; display: inline-block;"></span>
+              Hakkımda
+            </h2>
+            <p style="color: #4a5568; line-height: 1.7; margin: 0; font-size: 15px;">${cv.personalInfo.summary}</p>
+          </div>
+          ` : ''}
+
+          <!-- Education -->
+          ${cv.education && cv.education.length > 0 ? `
+          <div style="margin-bottom: 35px;">
+            <h2 style="font-size: 22px; font-weight: 600; color: #667eea; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+              <span style="width: 24px; height: 24px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">🎓</span>
+              Öğrenim
+            </h2>
+            ${cv.education.map((edu, index) => `
+              <div style="margin-bottom: 25px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid #38b2ac; position: relative;">
+                <div style="position: absolute; top: -5px; left: -7px; width: 14px; height: 14px; background: #38b2ac; border-radius: 50%; border: 3px solid white;"></div>
+                <h3 style="font-weight: 600; color: #2d3748; margin: 0 0 8px 0; font-size: 16px;">${edu.degree}</h3>
+                <p style="color: #667eea; font-weight: 500; font-size: 14px; margin: 0 0 5px 0;">${edu.fieldOfStudy} - ${edu.institution}</p>
+                <p style="color: #a0aec0; font-size: 13px; margin: 0 0 15px 0; display: flex; align-items: center; gap: 5px;">
+                  <span style="width: 6px; height: 6px; background: #38b2ac; border-radius: 50%; display: inline-block;"></span>
+                  ${edu.current ? 'Devam ediyor' : edu.endDate ? `Mezun: ${new Date(edu.endDate).getFullYear()}` : 'Mezuniyet tarihi belirtilmemiş'}
+                </p>
+                ${edu.description ? `<p style="color: #4a5568; line-height: 1.6; margin: 0; font-size: 14px; font-style: italic;">${edu.description}</p>` : ''}
+              </div>
+            `).join('')}
+          </div>
+          ` : ''}
+
+          <!-- Experience -->
+          ${cv.experience && cv.experience.length > 0 ? `
+          <div style="margin-bottom: 35px;">
+            <h2 style="font-size: 22px; font-weight: 600; color: #667eea; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+              <span style="width: 24px; height: 24px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">💼</span>
+              İş Deneyimi
+            </h2>
+            ${cv.experience.map((exp, index) => `
+              <div style="margin-bottom: 25px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid #ed8936; position: relative;">
+                <div style="position: absolute; top: -5px; left: -7px; width: 14px; height: 14px; background: #ed8936; border-radius: 50%; border: 3px solid white;"></div>
+                <h3 style="font-weight: 600; color: #2d3748; margin: 0 0 5px 0; font-size: 16px;">${exp.company}</h3>
+                <p style="color: #667eea; font-weight: 500; font-size: 15px; margin: 0 0 8px 0;">${exp.title}</p>
+                ${exp.location ? `<p style="color: #a0aec0; font-size: 13px; margin: 0 0 5px 0;">📍 ${exp.location}</p>` : ''}
+                <p style="color: #a0aec0; font-size: 13px; margin: 0 0 15px 0; display: flex; align-items: center; gap: 5px;">
+                  <span style="width: 6px; height: 6px; background: #ed8936; border-radius: 50%; display: inline-block;"></span>
+                  ${new Date(exp.startDate).getFullYear()} - ${exp.current ? 'Günümüz' : exp.endDate ? new Date(exp.endDate).getFullYear() : 'Belirtilmemiş'}
+                  ${exp.workDuration ? ` (${exp.workDuration})` : ''}
+                </p>
+                ${exp.description ? `<p style="color: #4a5568; line-height: 1.6; margin: 0; font-size: 14px;">${exp.description}</p>` : ''}
+              </div>
+            `).join('')}
+          </div>
+          ` : ''}
+
+          <!-- Skills -->
+          ${cv.skills && cv.skills.length > 0 ? `
+          <div style="margin-bottom: 35px;">
+            <h2 style="font-size: 22px; font-weight: 600; color: #667eea; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+              <span style="width: 24px; height: 24px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">⚡</span>
+              Yetenek ve Yetkinlikler
+            </h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+              ${cv.skills.map(skill => `
+                <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 10px 16px; border-radius: 25px; font-size: 14px; font-weight: 500; box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3); display: flex; align-items: center; gap: 8px;">
+                  <span style="width: 6px; height: 6px; background: white; border-radius: 50%; display: inline-block;"></span>
+                  ${skill.name}${skill.level ? ` (${skill.level}/5)` : ''}${skill.yearsOfExperience ? ` - ${skill.yearsOfExperience} yıl` : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          ` : ''}
+
+          <!-- Certificates -->
+          ${cv.certificates && cv.certificates.length > 0 ? `
+          <div style="margin-bottom: 35px;">
+            <h2 style="font-size: 22px; font-weight: 600; color: #667eea; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+              <span style="width: 24px; height: 24px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">🏆</span>
+              Sertifikalar
+            </h2>
+            ${cv.certificates.map(cert => `
+              <div style="margin-bottom: 20px; background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); border-left: 4px solid #38a169; position: relative;">
+                <div style="position: absolute; top: -5px; left: -7px; width: 14px; height: 14px; background: #38a169; border-radius: 50%; border: 3px solid white;"></div>
+                <h3 style="font-weight: 600; color: #2d3748; margin: 0 0 8px 0; font-size: 15px;">${cert.name}</h3>
+                <p style="color: #a0aec0; font-size: 13px; margin: 0;">📅 ${cert.startDate} - ${cert.endDate}</p>
+                ${cert.duration ? `<p style="color: #a0aec0; font-size: 13px; margin: 5px 0 0 0;">⏱️ Süre: ${cert.duration} saat</p>` : ''}
+              </div>
+            `).join('')}
+          </div>
+          ` : ''}
+
+          <!-- Languages -->
+          ${cv.languages && cv.languages.length > 0 ? `
+          <div style="margin-bottom: 35px;">
+            <h2 style="font-size: 22px; font-weight: 600; color: #667eea; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+              <span style="width: 24px; height: 24px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">🌍</span>
+              Yabancı Dil
+            </h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+              ${cv.languages.map(lang => `
+                <div style="background: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); border: 2px solid #e2e8f0; min-width: 150px; text-align: center;">
+                  <div style="font-weight: 600; color: #2d3748; font-size: 15px; margin-bottom: 5px;">${lang.name}</div>
+                  ${lang.examType ? `<div style="color: #667eea; font-size: 13px; margin-bottom: 3px;">${lang.examType}</div>` : ''}
+                  ${lang.examScore ? `<div style="color: #38a169; font-weight: 500; font-size: 14px;">${lang.examScore}</div>` : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          ` : ''}
+
+          <!-- Footer -->
+          <div style="margin-top: 40px; padding: 20px; background: #f7fafc; border-radius: 10px; text-align: center; border: 2px dashed #e2e8f0;">
+            <p style="color: #a0aec0; font-size: 12px; margin: 0;">
+              Bu CV Yetkinlik-X Sistemi ile oluşturulmuştur • ${new Date().toLocaleDateString('tr-TR')}
+            </p>
+          </div>
+        </div>
+      `;
+
+      // DOM'a geçici olarak ekle
+      document.body.appendChild(element);
+
+      // Canvas'a çevir
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         backgroundColor: '#ffffff'
       });
 
-      // PDF oluştur
+      // Elementi kaldır
+      document.body.removeChild(element);
+
+      // Canvas'ı PDF'e ekle
       const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      
-      const imgWidth = 210; // A4 genişlik
-      const pageHeight = 295; // A4 yükseklik
+      const imgWidth = 210; // A4 genişliği mm
+      const pageHeight = 295; // A4 yüksekliği mm  
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       let heightLeft = imgHeight;
 
       let position = 0;
 
-      // İlk sayfa
+      // İlk sayfayı ekle
+      const pdf = new jsPDF('p', 'mm', 'a4');
       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
 
-      // Eğer içerik birden fazla sayfaya sığmıyorsa
+      // Çok sayfalı PDF için
       while (heightLeft >= 0) {
         position = heightLeft - imgHeight;
         pdf.addPage();
         pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
+      }
+
+      // ARANABILIR METIN KATMANI EKLE
+      // Sayfa başına git
+      const pageCount = pdf.getNumberOfPages();
+      
+      for (let i = 1; i <= pageCount; i++) {
+        pdf.setPage(i);
+        
+        // Invisible text layer için font ayarları
+        pdf.setTextColor(255, 255, 255, 0); // Şeffaf metin
+        pdf.setFontSize(1); // Çok küçük font
+        
+        let yPosition = 10;
+        const lineHeight = 2;
+        
+        // Kişisel bilgiler
+        if (cv.personalInfo && i === 1) {
+          pdf.text(`${cv.personalInfo.firstName || ''} ${cv.personalInfo.lastName || ''}`, 10, yPosition);
+          yPosition += lineHeight;
+          
+          if (cv.personalInfo.email) {
+            pdf.text(cv.personalInfo.email, 10, yPosition);
+            yPosition += lineHeight;
+          }
+          
+          if (cv.personalInfo.phone) {
+            pdf.text(cv.personalInfo.phone, 10, yPosition);
+            yPosition += lineHeight;
+          }
+          
+          if (cv.personalInfo.residenceCity || cv.personalInfo.residenceDistrict) {
+            pdf.text(`${cv.personalInfo.residenceCity || ''} ${cv.personalInfo.residenceDistrict || ''}`, 10, yPosition);
+            yPosition += lineHeight;
+          }
+          
+          if (cv.personalInfo.summary) {
+            const summaryLines = pdf.splitTextToSize(cv.personalInfo.summary, 180);
+            summaryLines.forEach((line: string) => {
+              pdf.text(line, 10, yPosition);
+              yPosition += lineHeight;
+            });
+          }
+        }
+        
+        // Eğitim bilgileri
+        if (cv.education && cv.education.length > 0) {
+          pdf.text('Öğrenim Eğitim', 10, yPosition);
+          yPosition += lineHeight;
+          
+          cv.education.forEach(edu => {
+            pdf.text(`${edu.degree} ${edu.fieldOfStudy} ${edu.institution}`, 10, yPosition);
+            yPosition += lineHeight;
+            
+            if (edu.description) {
+              const descLines = pdf.splitTextToSize(edu.description, 180);
+              descLines.forEach((line: string) => {
+                pdf.text(line, 10, yPosition);
+                yPosition += lineHeight;
+              });
+            }
+          });
+        }
+        
+        // İş deneyimi
+        if (cv.experience && cv.experience.length > 0) {
+          pdf.text('İş Deneyimi Çalışma Tecrübe', 10, yPosition);
+          yPosition += lineHeight;
+          
+          cv.experience.forEach(exp => {
+            pdf.text(`${exp.company} ${exp.title} ${exp.location || ''}`, 10, yPosition);
+            yPosition += lineHeight;
+            
+            if (exp.description) {
+              const descLines = pdf.splitTextToSize(exp.description, 180);
+              descLines.forEach((line: string) => {
+                pdf.text(line, 10, yPosition);
+                yPosition += lineHeight;
+              });
+            }
+          });
+        }
+        
+        // Yetenekler
+        if (cv.skills && cv.skills.length > 0) {
+          pdf.text('Yetenek Yetkinlik Beceri Skill', 10, yPosition);
+          yPosition += lineHeight;
+          
+          cv.skills.forEach(skill => {
+            pdf.text(`${skill.name} ${skill.level || ''} ${skill.yearsOfExperience || ''}`, 10, yPosition);
+            yPosition += lineHeight;
+          });
+        }
+        
+        // Sertifikalar
+        if (cv.certificates && cv.certificates.length > 0) {
+          pdf.text('Sertifika Certificate Belge', 10, yPosition);
+          yPosition += lineHeight;
+          
+          cv.certificates.forEach(cert => {
+            pdf.text(`${cert.name} ${cert.startDate} ${cert.endDate} ${cert.duration || ''}`, 10, yPosition);
+            yPosition += lineHeight;
+          });
+        }
+        
+        // Diller
+        if (cv.languages && cv.languages.length > 0) {
+          pdf.text('Yabancı Dil Language İngilizce', 10, yPosition);
+          yPosition += lineHeight;
+          
+          cv.languages.forEach(lang => {
+            pdf.text(`${lang.name} ${lang.examType || ''} ${lang.examScore || ''}`, 10, yPosition);
+            yPosition += lineHeight;
+          });
+        }
       }
 
       // PDF'i indir
