@@ -1698,7 +1698,7 @@ const AdminDashboard: React.FC = () => {
                                 <span key={i} className={i < (selectedCV.evaluation?.longTermIntent || 0) ? 'text-yellow-400' : 'text-gray-300'}>★</span>
                               ))}
                             </div>
-                            <span className="ml-2 text-sm text-gray-600">({selectedCV.evaluation.longTermIntent}/5)</span>
+                            <span className="ml-2 text-sm text-gray-600">({selectedCV.evaluation?.longTermIntent || 0}/5)</span>
                           </div>
                         </div>
                       )}
@@ -1709,7 +1709,7 @@ const AdminDashboard: React.FC = () => {
                           <div className="flex items-center">
                             <div className="flex text-yellow-400">
                               {[...Array(5)].map((_, i) => (
-                                <span key={i} className={i < selectedCV.evaluation.recommendation ? 'text-yellow-400' : 'text-gray-300'}>★</span>
+                                <span key={i} className={i < (selectedCV.evaluation?.recommendation || 0) ? 'text-yellow-400' : 'text-gray-300'}>★</span>
                               ))}
                             </div>
                             <span className="ml-2 text-sm text-gray-600">({selectedCV.evaluation.recommendation}/5)</span>
@@ -1723,7 +1723,7 @@ const AdminDashboard: React.FC = () => {
                           <div className="flex items-center">
                             <div className="flex text-yellow-400">
                               {[...Array(5)].map((_, i) => (
-                                <span key={i} className={i < selectedCV.evaluation.applicationSatisfaction ? 'text-yellow-400' : 'text-gray-300'}>★</span>
+                                <span key={i} className={i < (selectedCV.evaluation?.applicationSatisfaction || 0) ? 'text-yellow-400' : 'text-gray-300'}>★</span>
                               ))}
                             </div>
                             <span className="ml-2 text-sm text-gray-600">({selectedCV.evaluation.applicationSatisfaction}/5)</span>
@@ -1774,7 +1774,11 @@ const AdminDashboard: React.FC = () => {
               </div>
               
               <button
-                onClick={() => setShowComparison(false)}
+                onClick={() => {
+                  setShowComparison(false);
+                  setSelectedCVs([]);
+                  setComparisonMode(false);
+                }}
                 className="text-gray-400 hover:text-gray-600"
               >
                 <X className="h-6 w-6" />
