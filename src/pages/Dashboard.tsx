@@ -251,27 +251,141 @@ const Dashboard: React.FC = () => {
       // Elementi kaldır
       document.body.removeChild(element);
 
-      // PDF oluştur
+      // Canvas'ı PDF'e ekle
       const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      
-      const imgWidth = 210; // A4 genişlik
-      const pageHeight = 295; // A4 yükseklik
+      const imgWidth = 210; // A4 genişliği mm
+      const pageHeight = 295; // A4 yüksekliği mm  
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       let heightLeft = imgHeight;
 
       let position = 0;
 
-      // İlk sayfa
+      // İlk sayfayı ekle
+      const pdf = new jsPDF('p', 'mm', 'a4');
       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
 
-      // Eğer içerik birden fazla sayfaya sığmıyorsa
+      // Çok sayfalı PDF için
       while (heightLeft >= 0) {
         position = heightLeft - imgHeight;
         pdf.addPage();
         pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
+      }
+
+      // ARANABILIR METIN KATMANI EKLE
+      // Sayfa başına git
+      const pageCount = pdf.getNumberOfPages();
+      
+      for (let i = 1; i <= pageCount; i++) {
+        pdf.setPage(i);
+        
+        // Invisible text layer için font ayarları
+        pdf.setTextColor(255, 255, 255, 0); // Şeffaf metin
+        pdf.setFontSize(1); // Çok küçük font
+        
+        let yPosition = 10;
+        const lineHeight = 2;
+        
+        // Kişisel bilgiler
+        if (cvData.personalInfo && i === 1) {
+          pdf.text(`${cvData.personalInfo.firstName || ''} ${cvData.personalInfo.lastName || ''}`, 10, yPosition);
+          yPosition += lineHeight;
+          
+          if (cvData.personalInfo.email) {
+            pdf.text(cvData.personalInfo.email, 10, yPosition);
+            yPosition += lineHeight;
+          }
+          
+          if (cvData.personalInfo.phone) {
+            pdf.text(cvData.personalInfo.phone, 10, yPosition);
+            yPosition += lineHeight;
+          }
+          
+          if (cvData.personalInfo.residenceCity || cvData.personalInfo.residenceDistrict) {
+            pdf.text(`${cvData.personalInfo.residenceCity || ''} ${cvData.personalInfo.residenceDistrict || ''}`, 10, yPosition);
+            yPosition += lineHeight;
+          }
+          
+          if (cvData.personalInfo.summary) {
+            const summaryLines = pdf.splitTextToSize(cvData.personalInfo.summary, 180);
+            summaryLines.forEach((line: string) => {
+              pdf.text(line, 10, yPosition);
+              yPosition += lineHeight;
+            });
+          }
+        }
+        
+        // Eğitim bilgileri
+        if (cvData.education && cvData.education.length > 0) {
+          pdf.text('Öğrenim Eğitim', 10, yPosition);
+          yPosition += lineHeight;
+          
+          cvData.education.forEach(edu => {
+            pdf.text(`${edu.degree} ${edu.fieldOfStudy} ${edu.institution}`, 10, yPosition);
+            yPosition += lineHeight;
+            
+            if (edu.description) {
+              const descLines = pdf.splitTextToSize(edu.description, 180);
+              descLines.forEach((line: string) => {
+                pdf.text(line, 10, yPosition);
+                yPosition += lineHeight;
+              });
+            }
+          });
+        }
+        
+        // İş deneyimi
+        if (cvData.experience && cvData.experience.length > 0) {
+          pdf.text('İş Deneyimi Çalışma Tecrübe', 10, yPosition);
+          yPosition += lineHeight;
+          
+          cvData.experience.forEach(exp => {
+            pdf.text(`${exp.company} ${exp.title} ${exp.location || ''}`, 10, yPosition);
+            yPosition += lineHeight;
+            
+            if (exp.description) {
+              const descLines = pdf.splitTextToSize(exp.description, 180);
+              descLines.forEach((line: string) => {
+                pdf.text(line, 10, yPosition);
+                yPosition += lineHeight;
+              });
+            }
+          });
+        }
+        
+        // Yetenekler
+        if (cvData.skills && cvData.skills.length > 0) {
+          pdf.text('Yetenek Yetkinlik Beceri Skill', 10, yPosition);
+          yPosition += lineHeight;
+          
+          cvData.skills.forEach(skill => {
+            pdf.text(`${skill.name} ${skill.level || ''} ${skill.yearsOfExperience || ''}`, 10, yPosition);
+            yPosition += lineHeight;
+          });
+        }
+        
+        // Sertifikalar
+        if (cvData.certificates && cvData.certificates.length > 0) {
+          pdf.text('Sertifika Certificate Belge', 10, yPosition);
+          yPosition += lineHeight;
+          
+          cvData.certificates.forEach(cert => {
+            pdf.text(`${cert.name} ${cert.startDate} ${cert.endDate} ${cert.duration || ''}`, 10, yPosition);
+            yPosition += lineHeight;
+          });
+        }
+        
+        // Diller
+        if (cvData.languages && cvData.languages.length > 0) {
+          pdf.text('Yabancı Dil Language İngilizce', 10, yPosition);
+          yPosition += lineHeight;
+          
+          cvData.languages.forEach(lang => {
+            pdf.text(`${lang.name} ${lang.examType || ''} ${lang.examScore || ''}`, 10, yPosition);
+            yPosition += lineHeight;
+          });
+        }
       }
 
       // PDF'i indir
