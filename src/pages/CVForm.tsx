@@ -3,9 +3,60 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getCVData, saveCVData } from '../services/cvService';
 import { CVData, PersonalInfo, Education, Experience, Skill, Language, Reference, Certificate, Award, Publication, Evaluation } from '../types/cv';
-import { ChevronLeft, ChevronRight, Save, Trash2, Download } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Save, Trash2, Download, GripVertical } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+// Sortable Item component for drag and drop
+interface SortableItemProps {
+  id: string;
+  children: React.ReactNode;
+}
+
+const SortableItem: React.FC<SortableItemProps> = ({ id, children }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="relative">
+      <div className="absolute left-2 top-2 z-10 cursor-grab active:cursor-grabbing" {...attributes} {...listeners}>
+        <GripVertical className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+      </div>
+      {children}
+    </div>
+  );
+};
 
 const CVForm = () => {
   const navigate = useNavigate();
@@ -55,6 +106,91 @@ const CVForm = () => {
   };
   
   const [formData, setFormData] = useState<CVData>(initialFormData);
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Drag end handlers
+  const handleEducationDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      setFormData(prev => {
+        const oldIndex = prev.education?.findIndex(edu => edu.id === active.id) ?? -1;
+        const newIndex = prev.education?.findIndex(edu => edu.id === over.id) ?? -1;
+        
+        if (oldIndex !== -1 && newIndex !== -1 && prev.education) {
+          return {
+            ...prev,
+            education: arrayMove(prev.education, oldIndex, newIndex)
+          };
+        }
+        return prev;
+      });
+    }
+  };
+
+  const handleExperienceDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      setFormData(prev => {
+        const oldIndex = prev.experience?.findIndex(exp => exp.id === active.id) ?? -1;
+        const newIndex = prev.experience?.findIndex(exp => exp.id === over.id) ?? -1;
+        
+        if (oldIndex !== -1 && newIndex !== -1 && prev.experience) {
+          return {
+            ...prev,
+            experience: arrayMove(prev.experience, oldIndex, newIndex)
+          };
+        }
+        return prev;
+      });
+    }
+  };
+
+  const handleSkillDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      setFormData(prev => {
+        const oldIndex = prev.skills?.findIndex(skill => skill.id === active.id) ?? -1;
+        const newIndex = prev.skills?.findIndex(skill => skill.id === over.id) ?? -1;
+        
+        if (oldIndex !== -1 && newIndex !== -1 && prev.skills) {
+          return {
+            ...prev,
+            skills: arrayMove(prev.skills, oldIndex, newIndex)
+          };
+        }
+        return prev;
+      });
+    }
+  };
+
+  const handleLanguageDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      setFormData(prev => {
+        const oldIndex = prev.languages?.findIndex(lang => lang.id === active.id) ?? -1;
+        const newIndex = prev.languages?.findIndex(lang => lang.id === over.id) ?? -1;
+        
+        if (oldIndex !== -1 && newIndex !== -1 && prev.languages) {
+          return {
+            ...prev,
+            languages: arrayMove(prev.languages, oldIndex, newIndex)
+          };
+        }
+        return prev;
+      });
+    }
+  };
 
   useEffect(() => {
     const loadExistingCV = async () => {
@@ -1261,20 +1397,27 @@ const CVForm = () => {
                 </button>
               </div>
             ) : (
-              <div className="space-y-4">
-                {formData.education?.map((edu, index) => (
-                  <div key={edu.id} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-gray-700">Öğrenim #{index + 1}</h4>
-                      <button
-                        type="button"
-                        onClick={() => removeEducation(index)}
-                        className="text-red-500 hover:text-red-700"
-                        title="Sil"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    </div>
+              <DndContext 
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleEducationDragEnd}
+              >
+                <SortableContext items={formData.education?.map(edu => edu.id) || []} strategy={verticalListSortingStrategy}>
+                  <div className="space-y-4">
+                    {formData.education?.map((edu, index) => (
+                      <SortableItem key={edu.id} id={edu.id}>
+                        <div className="border rounded-lg p-4 pl-10">
+                          <div className="flex justify-between items-start mb-3">
+                            <h4 className="font-medium text-gray-700">Öğrenim #{index + 1}</h4>
+                            <button
+                              type="button"
+                              onClick={() => removeEducation(index)}
+                              className="text-red-500 hover:text-red-700"
+                              title="Sil"
+                            >
+                              <Trash2 className="h-5 w-5" />
+                            </button>
+                          </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Öğrenim Düzeyi</label>
@@ -1339,9 +1482,12 @@ const CVForm = () => {
                         className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                       />
                     </div>
+                        </div>
+                      </SortableItem>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </SortableContext>
+              </DndContext>
             )}
           </div>
         );
@@ -1372,20 +1518,27 @@ const CVForm = () => {
                 </button>
               </div>
             ) : (
-              <div className="space-y-4">
-                {formData.experience?.map((exp, index) => (
-                  <div key={exp.id} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-gray-700">Deneyim #{index + 1}</h4>
-                      <button
-                        type="button"
-                        onClick={() => removeExperience(index)}
-                        className="text-red-500 hover:text-red-700"
-                        title="Sil"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    </div>
+              <DndContext 
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleExperienceDragEnd}
+              >
+                <SortableContext items={formData.experience?.map(exp => exp.id) || []} strategy={verticalListSortingStrategy}>
+                  <div className="space-y-4">
+                    {formData.experience?.map((exp, index) => (
+                      <SortableItem key={exp.id} id={exp.id}>
+                        <div className="border rounded-lg p-4 pl-10">
+                          <div className="flex justify-between items-start mb-3">
+                            <h4 className="font-medium text-gray-700">Deneyim #{index + 1}</h4>
+                            <button
+                              type="button"
+                              onClick={() => removeExperience(index)}
+                              className="text-red-500 hover:text-red-700"
+                              title="Sil"
+                            >
+                              <Trash2 className="h-5 w-5" />
+                            </button>
+                          </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Şirket</label>
@@ -1453,9 +1606,12 @@ const CVForm = () => {
                         className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                       />
                     </div>
+                        </div>
+                      </SortableItem>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </SortableContext>
+              </DndContext>
             )}
           </div>
         );
@@ -1487,20 +1643,27 @@ const CVForm = () => {
                 </button>
               </div>
             ) : (
-              <div className="space-y-4">
-                {formData.skills?.map((skill, index) => (
-                  <div key={skill.id} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-gray-700">Yetenek #{index + 1}</h4>
-                      <button
-                        type="button"
-                        onClick={() => removeSkill(index)}
-                        className="text-red-500 hover:text-red-700"
-                        title="Sil"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    </div>
+              <DndContext 
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleSkillDragEnd}
+              >
+                <SortableContext items={formData.skills?.map(skill => skill.id) || []} strategy={verticalListSortingStrategy}>
+                  <div className="space-y-4">
+                    {formData.skills?.map((skill, index) => (
+                      <SortableItem key={skill.id} id={skill.id}>
+                        <div className="border rounded-lg p-4 pl-10">
+                          <div className="flex justify-between items-start mb-3">
+                            <h4 className="font-medium text-gray-700">Yetenek #{index + 1}</h4>
+                            <button
+                              type="button"
+                              onClick={() => removeSkill(index)}
+                              className="text-red-500 hover:text-red-700"
+                              title="Sil"
+                            >
+                              <Trash2 className="h-5 w-5" />
+                            </button>
+                          </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Yetenek Adı</label>
@@ -1541,9 +1704,12 @@ const CVForm = () => {
                         />
                       </div>
                     </div>
+                        </div>
+                      </SortableItem>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </SortableContext>
+              </DndContext>
             )}
           </div>
         );
@@ -1667,20 +1833,27 @@ const CVForm = () => {
                 </button>
               </div>
             ) : (
-              <div className="space-y-4">
-                {formData.languages?.map((lang, index) => (
-                  <div key={lang.id} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-gray-700">Dil #{index + 1}</h4>
-                      <button
-                        type="button"
-                        onClick={() => removeLanguage(index)}
-                        className="text-red-500 hover:text-red-700"
-                        title="Sil"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    </div>
+              <DndContext 
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleLanguageDragEnd}
+              >
+                <SortableContext items={formData.languages?.map(lang => lang.id) || []} strategy={verticalListSortingStrategy}>
+                  <div className="space-y-4">
+                    {formData.languages?.map((lang, index) => (
+                      <SortableItem key={lang.id} id={lang.id}>
+                        <div className="border rounded-lg p-4 pl-10">
+                          <div className="flex justify-between items-start mb-3">
+                            <h4 className="font-medium text-gray-700">Dil #{index + 1}</h4>
+                            <button
+                              type="button"
+                              onClick={() => removeLanguage(index)}
+                              className="text-red-500 hover:text-red-700"
+                              title="Sil"
+                            >
+                              <Trash2 className="h-5 w-5" />
+                            </button>
+                          </div>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Yabancı Dil Türü</label>
@@ -1737,9 +1910,12 @@ const CVForm = () => {
                         />
                       </div>
                     </div>
+                        </div>
+                      </SortableItem>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </SortableContext>
+              </DndContext>
             )}
           </div>
         );
