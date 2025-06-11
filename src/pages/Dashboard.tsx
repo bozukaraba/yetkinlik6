@@ -5,6 +5,7 @@ import { FileEdit, Clock, CheckCircle2, AlertCircle, Settings, Users } from 'luc
 import { getCVData, getAllCVs } from '../services/cvService';
 import { CVData } from '../types/cv';
 import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const Dashboard: React.FC = () => {
   const { currentUser, isAdmin } = useAuth();
@@ -67,82 +68,16 @@ const Dashboard: React.FC = () => {
     }
 
     try {
-      // PDF oluştur - Text based
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      let yPosition = 20;
-      const pageWidth = 210;
-      const margin = 20;
-      const lineHeight = 6;
-      const sectionSpacing = 15;
-
-      // Helper functions
-      const checkNewPage = (currentY: number, additionalHeight = 20) => {
-        if (currentY + additionalHeight > 280) {
-          pdf.addPage();
-          return 20;
-        }
-        return currentY;
-      };
-
-      const addSection = (title: string, yPos: number) => {
-        pdf.setFontSize(16);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text(title, margin, yPos);
-        pdf.setDrawColor(0, 102, 204);
-        pdf.setLineWidth(0.5);
-        pdf.line(margin, yPos + 3, pageWidth - margin, yPos + 3);
-        return yPos + 12;
-      };
-
-      const wrapText = (text: string, maxWidth: number): string[] => {
-        const words = text.split(' ');
-        const lines = [];
-        let currentLine = '';
-        
-        for (const word of words) {
-          const testLine = currentLine + (currentLine ? ' ' : '') + word;
-          const textWidth = pdf.getTextWidth(testLine);
-          
-          if (textWidth > maxWidth && currentLine) {
-            lines.push(currentLine);
-            currentLine = word;
-          } else {
-            currentLine = testLine;
-          }
-        }
-        
-        if (currentLine) {
-          lines.push(currentLine);
-        }
-        
-        return lines;
-      };
-
-      // Header
-      pdf.setFontSize(24);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(0, 102, 204);
-      pdf.text(`${cvData.personalInfo?.firstName || ''} ${cvData.personalInfo?.lastName || ''}`, margin, yPosition);
-      yPosition += 10;
-
-      // İletişim Bilgileri
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(0, 0, 0);
-      if (cvData.personalInfo?.email) {
-        pdf.text(`E-posta: ${cvData.personalInfo.email}`, margin, yPosition);
-        yPosition += lineHeight;
-      }
-      if (cvData.personalInfo?.phone) {
-        pdf.text(`Telefon: ${cvData.personalInfo.phone}`, margin, yPosition);
-        yPosition += lineHeight;
-      }
-      if (cvData.personalInfo?.residenceCity) {
-        pdf.text(`Şehir: ${cvData.personalInfo.residenceCity}${cvData.personalInfo?.residenceDistrict ? ' / ' + cvData.personalInfo.residenceDistrict : ''}`, margin, yPosition);
-        yPosition += lineHeight;
-      }
+      // CV önizleme elementini oluştur
+      const element = document.createElement('div');
+      element.id = 'cv-preview-temp';
+      element.style.position = 'absolute';
+      element.style.left = '-9999px';
       
-      yPosition += sectionSpacing;
+      element.style.padding = '40px';
+      element.style.width = '210mm';
+      element.style.minHeight = '297mm';
+      element.style.fontFamily = 'Arial, sans-serif';
       
       // CV içeriğini oluştur
       element.innerHTML = `
