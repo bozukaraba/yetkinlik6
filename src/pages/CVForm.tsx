@@ -2545,7 +2545,7 @@ const CVForm = () => {
                 onClick={() => setCurrentStep(10)}
                 className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 10 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
                 <span className="block text-sm font-bold">10</span>
-                <span className="block mt-1 text-xs">Hobi</span>
+                <span className="block mt-1 text-xs">İlgi Alanları</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(11)}
