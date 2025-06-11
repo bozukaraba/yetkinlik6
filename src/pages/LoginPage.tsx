@@ -83,7 +83,7 @@ const LoginPage: React.FC = () => {
             <h3 className="text-2xl font-bold text-gray-900 text-center mb-6">
               Bizim için çok değerlisiniz.
             </h3>
-            <div className="space-y-4 leading-relaxed">
+            <div className="space-y-4 leading-relaxed text-center">
               <p className="text-base text-black">
                 Bu özgeçmiş, sizi daha yakından tanımamız ve birlikte daha iyi bir gelecek inşa etmemiz için önemli bir vesile.
               </p>
