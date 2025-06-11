@@ -225,10 +225,16 @@ const AdminDashboard: React.FC = () => {
 
   const handleDownloadCV = async (cv: CVData) => {
     try {
-      // Temporary element oluştur - ESTETİK VERSİYON
+      // CV önizleme elementini oluştur
       const element = document.createElement('div');
-      element.style.width = '800px';
+      element.id = 'cv-preview-temp';
+      element.style.position = 'absolute';
+      element.style.left = '-9999px';
+      element.style.top = '0';
       element.style.padding = '40px';
+      element.style.width = '210mm';
+      element.style.minHeight = '297mm';
+      element.style.fontFamily = 'Arial, sans-serif';
       element.style.backgroundColor = '#ffffff';
       
       // CV içeriğini HTML olarak oluştur - ESTETİK VERSİYON
@@ -391,14 +397,15 @@ const AdminDashboard: React.FC = () => {
         </div>
       `;
 
-      // DOM'a geçici olarak ekle
+      // Elementi DOM'a ekle
       document.body.appendChild(element);
 
-      // Canvas'a çevir
+      // HTML'i canvas'a çevir
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        logging: false
       });
 
       // Elementi kaldır
