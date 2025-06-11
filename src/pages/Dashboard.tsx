@@ -5,7 +5,6 @@ import { FileEdit, Clock, CheckCircle2, AlertCircle, Settings, Users } from 'luc
 import { getCVData, getAllCVs } from '../services/cvService';
 import { CVData } from '../types/cv';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 const Dashboard: React.FC = () => {
   const { currentUser, isAdmin } = useAuth();
@@ -62,311 +61,275 @@ const Dashboard: React.FC = () => {
   };
 
   const handleDownloadCV = async () => {
-    if (!cvData) {
-      alert('CV bulunamadı. Lütfen önce CV oluşturun.');
-      return;
-    }
+    if (!cvData || !currentUser) return;
 
     try {
-      // CV önizleme elementini oluştur
-      const element = document.createElement('div');
-      element.id = 'cv-preview-temp';
-      element.style.position = 'absolute';
-      element.style.left = '-9999px';
-      
-      element.style.padding = '40px';
-      element.style.width = '210mm';
-      element.style.minHeight = '297mm';
-      element.style.fontFamily = 'Arial, sans-serif';
-      
-      // CV içeriğini oluştur
-      element.innerHTML = `
-        <div style="max-width: 800px; margin: 0 auto;">
-          <!-- CV Header -->
-          <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px;">
-            ${cvData.personalInfo?.profileImage ? 
-              `<img src="${cvData.personalInfo.profileImage}" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 15px;" />` 
-              : ''
-            }
-            <h1 style="font-size: 32px; font-weight: bold; color: #1f2937; margin: 10px 0;">
-              ${cvData.personalInfo?.firstName} ${cvData.personalInfo?.lastName}
-            </h1>
-            <p style="color: #6b7280; font-size: 16px;">${cvData.personalInfo?.email}</p>
-            ${cvData.personalInfo?.phone ? `<p style="color: #6b7280; font-size: 16px;">${cvData.personalInfo.phone}</p>` : ''}
-            ${cvData.personalInfo?.gender ? `<p style="color: #6b7280; font-size: 14px;">Cinsiyet: ${cvData.personalInfo.gender}</p>` : ''}
-            ${cvData.personalInfo?.residenceCity || cvData.personalInfo?.residenceDistrict ? `<p style="color: #6b7280; font-size: 14px;">İkametgah: ${cvData.personalInfo?.residenceCity || ''}${cvData.personalInfo?.residenceCity && cvData.personalInfo?.residenceDistrict ? ' / ' : ''}${cvData.personalInfo?.residenceDistrict || ''}</p>` : ''}
-            ${cvData.personalInfo?.linkedIn || cvData.personalInfo?.github || cvData.personalInfo?.twitter || cvData.personalInfo?.website || cvData.personalInfo?.instagram || cvData.personalInfo?.facebook || cvData.personalInfo?.youtube || cvData.personalInfo?.tiktok || cvData.personalInfo?.discord || cvData.personalInfo?.telegram || cvData.personalInfo?.whatsapp || cvData.personalInfo?.medium || cvData.personalInfo?.behance || cvData.personalInfo?.dribbble || cvData.personalInfo?.stackoverflow ? `
-              <div style="margin-top: 10px;">
-                ${cvData.personalInfo?.linkedIn ? `<p style="color: #6b7280; font-size: 14px;">LinkedIn: ${cvData.personalInfo.linkedIn}</p>` : ''}
-                ${cvData.personalInfo?.github ? `<p style="color: #6b7280; font-size: 14px;">GitHub: ${cvData.personalInfo.github}</p>` : ''}
-                ${cvData.personalInfo?.twitter ? `<p style="color: #6b7280; font-size: 14px;">Twitter: ${cvData.personalInfo.twitter}</p>` : ''}
-                ${cvData.personalInfo?.instagram ? `<p style="color: #6b7280; font-size: 14px;">Instagram: ${cvData.personalInfo.instagram}</p>` : ''}
-                ${cvData.personalInfo?.facebook ? `<p style="color: #6b7280; font-size: 14px;">Facebook: ${cvData.personalInfo.facebook}</p>` : ''}
-                ${cvData.personalInfo?.youtube ? `<p style="color: #6b7280; font-size: 14px;">YouTube: ${cvData.personalInfo.youtube}</p>` : ''}
-                ${cvData.personalInfo?.tiktok ? `<p style="color: #6b7280; font-size: 14px;">TikTok: ${cvData.personalInfo.tiktok}</p>` : ''}
-                ${cvData.personalInfo?.discord ? `<p style="color: #6b7280; font-size: 14px;">Discord: ${cvData.personalInfo.discord}</p>` : ''}
-                ${cvData.personalInfo?.telegram ? `<p style="color: #6b7280; font-size: 14px;">Telegram: ${cvData.personalInfo.telegram}</p>` : ''}
-                ${cvData.personalInfo?.whatsapp ? `<p style="color: #6b7280; font-size: 14px;">WhatsApp: ${cvData.personalInfo.whatsapp}</p>` : ''}
-                ${cvData.personalInfo?.medium ? `<p style="color: #6b7280; font-size: 14px;">Medium: ${cvData.personalInfo.medium}</p>` : ''}
-                ${cvData.personalInfo?.behance ? `<p style="color: #6b7280; font-size: 14px;">Behance: ${cvData.personalInfo.behance}</p>` : ''}
-                ${cvData.personalInfo?.dribbble ? `<p style="color: #6b7280; font-size: 14px;">Dribbble: ${cvData.personalInfo.dribbble}</p>` : ''}
-                ${cvData.personalInfo?.stackoverflow ? `<p style="color: #6b7280; font-size: 14px;">Stack Overflow: ${cvData.personalInfo.stackoverflow}</p>` : ''}
-                ${cvData.personalInfo?.website ? `<p style="color: #6b7280; font-size: 14px;">Website: ${cvData.personalInfo.website}</p>` : ''}
-              </div>
-            ` : ''}
-            ${cvData.personalInfo?.summary ? `<p style="margin-top: 15px; color: #374151; line-height: 1.6;">${cvData.personalInfo.summary}</p>` : ''}
-            ${cvData.personalInfo?.sgkServiceDocument ? `<p style="margin-top: 10px; color: #059669; font-size: 14px; font-weight: 500;">✓ SGK Hizmet Dökümü: Yüklendi</p>` : ''}
-          </div>
-          
-          <!-- Education -->
-          ${cvData.education && cvData.education.length > 0 ? `
-          <div style="margin-bottom: 25px;">
-            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
-              Öğrenim
-            </h2>
-            ${cvData.education.map(edu => `
-              <div style="margin-bottom: 20px; padding-left: 20px; border-left: 3px solid #e5e7eb;">
-                <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${edu.degree}</h3>
-                <p style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">${edu.fieldOfStudy} - ${edu.institution}</p>
-                <p style="color: #9ca3af; font-size: 14px; margin-bottom: 10px;">
-                  ${edu.current ? 'Devam ediyor' : edu.endDate ? `Mezun: ${new Date(edu.endDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' })}` : 'Mezuniyet tarihi belirtilmemiş'}
-                </p>
-                ${edu.description ? `<p style="color: #374151; line-height: 1.6;">${edu.description}</p>` : ''}
-              </div>
-            `).join('')}
-          </div>
-          ` : ''}
-          
-          <!-- Experience -->
-          ${cvData.experience && cvData.experience.length > 0 ? `
-          <div style="margin-bottom: 25px;">
-            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
-              İş Deneyimi
-            </h2>
-            ${cvData.experience.map(exp => `
-              <div style="margin-bottom: 20px; padding-left: 20px; border-left: 3px solid #e5e7eb;">
-                <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${exp.company} - ${exp.title}</h3>
-                ${exp.location ? `<p style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">${exp.location}</p>` : ''}
-                <p style="color: #9ca3af; font-size: 14px; margin-bottom: 10px;">
-                  ${new Date(exp.startDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' })} - 
-                  ${exp.current ? 'Günümüz' : exp.endDate ? new Date(exp.endDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' }) : 'Belirtilmemiş'}
-                  ${exp.workDuration ? ` (${exp.workDuration})` : ''}
-                </p>
-                ${exp.description ? `<p style="color: #374151; line-height: 1.6;">${exp.description}</p>` : ''}
-              </div>
-            `).join('')}
-          </div>
-          ` : ''}
-          
-          <!-- Skills -->
-          ${cvData.skills && cvData.skills.length > 0 ? `
-          <div style="margin-bottom: 25px;">
-            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
-              Yetenek ve Yetkinlikler
-            </h2>
-            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-              ${cvData.skills.map(skill => `
-                <span style="background: #dbeafe; color: #1e40af; padding: 6px 12px; border-radius: 6px; font-size: 14px;">
-                  ${skill.name}${skill.level ? ` (${skill.level}/5)` : ''}${skill.yearsOfExperience ? ` - ${skill.yearsOfExperience} yıl` : ''}
-                </span>
-              `).join('')}
-            </div>
-          </div>
-          ` : ''}
-          
-          <!-- Certificates -->
-          ${cvData.certificates && cvData.certificates.length > 0 ? `
-          <div style="margin-bottom: 25px;">
-            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
-              Sertifikalar
-            </h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-              ${cvData.certificates.map(cert => `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
-                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${cert.name}</h3>
-                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">Başlangıç: ${cert.startDate}</p>
-                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">Bitiş: ${cert.endDate}</p>
-                  ${cert.duration ? `<p style="color: #9ca3af; font-size: 12px;">Süre: ${cert.duration} saat</p>` : ''}
-                </div>
-              `).join('')}
-            </div>
-          </div>
-          ` : ''}
-          
-          <!-- Languages -->
-          ${cvData.languages && cvData.languages.length > 0 ? `
-          <div style="margin-bottom: 25px;">
-            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
-              Yabancı Dil
-            </h2>
-            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-              ${cvData.languages.map(lang => `
-                <span style="background: #f3f4f6; color: #374151; padding: 6px 12px; border-radius: 6px; font-size: 14px;">
-                  ${lang.name}${lang.examType ? ` - ${lang.examType}` : ''}${lang.examScore ? ` (${lang.examScore})` : ''}${lang.certificateDate ? ` - ${lang.certificateDate}` : ''}
-                </span>
-              `).join('')}
-            </div>
-          </div>
-          ` : ''}
-          
-          <!-- Publications -->
-          ${cvData.publications && cvData.publications.length > 0 ? `
-          <div style="margin-bottom: 25px;">
-            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
-              Yayınlar ve Makaleler
-            </h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-              ${cvData.publications.map(pub => `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
-                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${pub.title}</h3>
-                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">Yayınlayıcı: ${pub.publisher}</p>
-                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">Tarih: ${pub.publishDate}</p>
-                  ${pub.description ? `<p style="color: #9ca3af; font-size: 12px;">${pub.description}</p>` : ''}
-                </div>
-              `).join('')}
-            </div>
-          </div>
-          ` : ''}
-          
-          <!-- Awards -->
-          ${cvData.awards && cvData.awards.length > 0 ? `
-          <div style="margin-bottom: 25px;">
-            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
-              Ödüller ve Başarılar
-            </h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-              ${cvData.awards.map(award => `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
-                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${award.title}</h3>
-                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">${award.organization}</p>
-                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">Tarih: ${award.date}</p>
-                  ${award.description ? `<p style="color: #9ca3af; font-size: 12px;">${award.description}</p>` : ''}
-                </div>
-              `).join('')}
-            </div>
-          </div>
-          ` : ''}
-          
-          <!-- References -->
-          ${cvData.references && cvData.references.length > 0 ? `
-          <div style="margin-bottom: 25px;">
-            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
-              Referanslar
-            </h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-              ${cvData.references.map(ref => `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
-                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${ref.name}</h3>
-                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">${ref.company}</p>
-                  <p style="color: #6b7280; font-size: 14px; margin-bottom: 3px;">${ref.phone}</p>
-                  ${ref.type ? `<p style="color: #9ca3af; font-size: 12px;">${ref.type}</p>` : ''}
-                </div>
-              `).join('')}
-            </div>
-          </div>
-          ` : ''}
-          
-          <!-- Hobbies -->
-          ${cvData.hobbies && cvData.hobbies.length > 0 ? `
-          <div style="margin-bottom: 25px;">
-            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
-              Hobiler
-            </h2>
-            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-              ${cvData.hobbies.map(hobby => `
-                <span style="background: #f3f4f6; color: #374151; padding: 6px 12px; border-radius: 6px; font-size: 14px;">
-                  ${hobby}
-                </span>
-              `).join('')}
-            </div>
-          </div>
-          ` : ''}
-          
-          <!-- Evaluation -->
-          ${cvData.evaluation && (cvData.evaluation.workSatisfaction > 0 || cvData.evaluation.facilitiesSatisfaction > 0 || cvData.evaluation.longTermIntent > 0 || cvData.evaluation.recommendation > 0 || cvData.evaluation.applicationSatisfaction > 0) ? `
-          <div style="margin-bottom: 25px;">
-            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
-              Değerlendirmeler
-            </h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-              ${cvData.evaluation.workSatisfaction > 0 ? `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
-                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">Türksat'ta çalışmaktan memnunum</h3>
-                  <p style="color: #6b7280; font-size: 14px;">${'★'.repeat(cvData.evaluation.workSatisfaction)}${'☆'.repeat(5 - cvData.evaluation.workSatisfaction)} (${cvData.evaluation.workSatisfaction}/5)</p>
-                </div>
-              ` : ''}
-              ${cvData.evaluation.facilitiesSatisfaction > 0 ? `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
-                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">Türksat'ın sağladığı imkânlardan memnunum</h3>
-                  <p style="color: #6b7280; font-size: 14px;">${'★'.repeat(cvData.evaluation.facilitiesSatisfaction)}${'☆'.repeat(5 - cvData.evaluation.facilitiesSatisfaction)} (${cvData.evaluation.facilitiesSatisfaction}/5)</p>
-                </div>
-              ` : ''}
-              ${cvData.evaluation.longTermIntent > 0 ? `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
-                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">Türksat'ta uzun süre çalışmak isterim</h3>
-                  <p style="color: #6b7280; font-size: 14px;">${'★'.repeat(cvData.evaluation.longTermIntent)}${'☆'.repeat(5 - cvData.evaluation.longTermIntent)} (${cvData.evaluation.longTermIntent}/5)</p>
-                </div>
-              ` : ''}
-              ${cvData.evaluation.recommendation > 0 ? `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
-                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">Türksat'ı arkadaşlarıma tavsiye ederim</h3>
-                  <p style="color: #6b7280; font-size: 14px;">${'★'.repeat(cvData.evaluation.recommendation)}${'☆'.repeat(5 - cvData.evaluation.recommendation)} (${cvData.evaluation.recommendation}/5)</p>
-                </div>
-              ` : ''}
-              ${cvData.evaluation.applicationSatisfaction > 0 ? `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
-                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">Bu "Yetkinlik-X" uygulamasını beğendim</h3>
-                  <p style="color: #6b7280; font-size: 14px;">${'★'.repeat(cvData.evaluation.applicationSatisfaction)}${'☆'.repeat(5 - cvData.evaluation.applicationSatisfaction)} (${cvData.evaluation.applicationSatisfaction}/5)</p>
-                </div>
-              ` : ''}
-            </div>
-          </div>
-          ` : ''}
-        </div>
-      `;
-      
-      document.body.appendChild(element);
-      
-      // HTML'i canvas'a çevir
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#ffffff'
-      });
-      
-      // Geçici elementi kaldır
-      document.body.removeChild(element);
-      
-      // PDF oluştur
-      const imgData = canvas.toDataURL('image/png');
+      // Text-based PDF oluştur
       const pdf = new jsPDF('p', 'mm', 'a4');
+      let yPosition = 20;
+      const pageWidth = 210;
+      const margin = 20;
+      const lineHeight = 6;
+      const sectionSpacing = 15;
+
+      // Helper functions
+      const checkNewPage = (currentY: number, additionalHeight = 20) => {
+        if (currentY + additionalHeight > 280) {
+          pdf.addPage();
+          return 20;
+        }
+        return currentY;
+      };
+
+      const addSection = (title: string, yPos: number) => {
+        pdf.setFontSize(16);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(title, margin, yPos);
+        pdf.setDrawColor(0, 102, 204);
+        pdf.setLineWidth(0.5);
+        pdf.line(margin, yPos + 3, pageWidth - margin, yPos + 3);
+        return yPos + 12;
+      };
+
+      const wrapText = (text: string, maxWidth: number): string[] => {
+        const words = text.split(' ');
+        const lines = [];
+        let currentLine = '';
+        
+        for (const word of words) {
+          const testLine = currentLine + (currentLine ? ' ' : '') + word;
+          const textWidth = pdf.getTextWidth(testLine);
+          
+          if (textWidth > maxWidth && currentLine) {
+            lines.push(currentLine);
+            currentLine = word;
+          } else {
+            currentLine = testLine;
+          }
+        }
+        
+        if (currentLine) {
+          lines.push(currentLine);
+        }
+        
+        return lines;
+      };
+
+      // Header - İsim
+      pdf.setFontSize(24);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(0, 102, 204);
+      pdf.text(`${cvData.personalInfo?.firstName || ''} ${cvData.personalInfo?.lastName || ''}`, margin, yPosition);
+      yPosition += 12;
+
+      // İletişim Bilgileri
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(0, 0, 0);
       
-      const imgWidth = 210; // A4 genişlik
-      const pageHeight = 295; // A4 yükseklik
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      
-      let position = 0;
-      
-      // İlk sayfa
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-      
-      // Eğer içerik birden fazla sayfaya sığmıyorsa
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+      if (cvData.personalInfo?.email) {
+        pdf.text(`E-posta: ${cvData.personalInfo.email}`, margin, yPosition);
+        yPosition += lineHeight;
+      }
+      if (cvData.personalInfo?.phone) {
+        pdf.text(`Telefon: ${cvData.personalInfo.phone}`, margin, yPosition);
+        yPosition += lineHeight;
+      }
+      if (cvData.personalInfo?.residenceCity) {
+        pdf.text(`Şehir: ${cvData.personalInfo.residenceCity}${cvData.personalInfo?.residenceDistrict ? ' / ' + cvData.personalInfo.residenceDistrict : ''}`, margin, yPosition);
+        yPosition += lineHeight;
+      }
+      if (cvData.personalInfo?.gender) {
+        pdf.text(`Cinsiyet: ${cvData.personalInfo.gender}`, margin, yPosition);
+        yPosition += lineHeight;
       }
       
-      // PDF'i indir
-      const fileName = `${cvData.personalInfo?.firstName}_${cvData.personalInfo?.lastName}_CV.pdf`;
-      pdf.save(fileName);
-      
+      yPosition += sectionSpacing;
+
+      // Hakkımda
+      if (cvData.personalInfo?.summary) {
+        yPosition = checkNewPage(yPosition);
+        yPosition = addSection('HAKKIMDA', yPosition);
+        
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        const summaryLines = wrapText(cvData.personalInfo.summary, pageWidth - 2 * margin);
+        summaryLines.forEach(line => {
+          yPosition = checkNewPage(yPosition);
+          pdf.text(line, margin, yPosition);
+          yPosition += lineHeight;
+        });
+        yPosition += sectionSpacing;
+      }
+
+      // Eğitim
+      if (cvData.education && cvData.education.length > 0) {
+        yPosition = checkNewPage(yPosition);
+        yPosition = addSection('ÖĞRENİM', yPosition);
+        
+        cvData.education.forEach(edu => {
+          yPosition = checkNewPage(yPosition, 25);
+          
+          pdf.setFontSize(12);
+          pdf.setFont('helvetica', 'bold');
+          pdf.text(edu.degree, margin, yPosition);
+          yPosition += lineHeight + 1;
+          
+          pdf.setFontSize(11);
+          pdf.setFont('helvetica', 'normal');
+          pdf.text(`${edu.fieldOfStudy} - ${edu.institution}`, margin, yPosition);
+          yPosition += lineHeight;
+          
+          const endDateText = edu.current ? 'Devam ediyor' : 
+            edu.endDate ? `Mezun: ${new Date(edu.endDate).toLocaleDateString('tr-TR')}` : 
+            'Mezuniyet tarihi belirtilmemiş';
+          pdf.text(endDateText, margin, yPosition);
+          yPosition += lineHeight;
+          
+          if (edu.description) {
+            const descLines = wrapText(edu.description, pageWidth - 2 * margin);
+            descLines.forEach(line => {
+              yPosition = checkNewPage(yPosition);
+              pdf.text(line, margin, yPosition);
+              yPosition += lineHeight;
+            });
+          }
+          yPosition += 8;
+        });
+        yPosition += sectionSpacing;
+      }
+
+      // İş Deneyimi
+      if (cvData.experience && cvData.experience.length > 0) {
+        yPosition = checkNewPage(yPosition);
+        yPosition = addSection('İŞ DENEYİMİ', yPosition);
+        
+        cvData.experience.forEach(exp => {
+          yPosition = checkNewPage(yPosition, 25);
+          
+          pdf.setFontSize(12);
+          pdf.setFont('helvetica', 'bold');
+          pdf.text(`${exp.company} - ${exp.title}`, margin, yPosition);
+          yPosition += lineHeight + 1;
+          
+          pdf.setFontSize(11);
+          pdf.setFont('helvetica', 'normal');
+          
+          if (exp.location) {
+            pdf.text(`Lokasyon: ${exp.location}`, margin, yPosition);
+            yPosition += lineHeight;
+          }
+          
+          const dateText = `${new Date(exp.startDate).toLocaleDateString('tr-TR')} - ${
+            exp.current ? 'Günümüz' : 
+            exp.endDate ? new Date(exp.endDate).toLocaleDateString('tr-TR') : 'Belirtilmemiş'
+          }${exp.workDuration ? ` (${exp.workDuration})` : ''}`;
+          pdf.text(dateText, margin, yPosition);
+          yPosition += lineHeight;
+          
+          if (exp.description) {
+            const descLines = wrapText(exp.description, pageWidth - 2 * margin);
+            descLines.forEach(line => {
+              yPosition = checkNewPage(yPosition);
+              pdf.text(line, margin, yPosition);
+              yPosition += lineHeight;
+            });
+          }
+          yPosition += 8;
+        });
+        yPosition += sectionSpacing;
+      }
+
+      // Yetenekler
+      if (cvData.skills && cvData.skills.length > 0) {
+        yPosition = checkNewPage(yPosition);
+        yPosition = addSection('YETENEK VE YETKİNLİKLER', yPosition);
+        
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        cvData.skills.forEach(skill => {
+          yPosition = checkNewPage(yPosition);
+          const skillText = `• ${skill.name}${skill.level ? ` (${skill.level}/5)` : ''}${skill.yearsOfExperience ? ` - ${skill.yearsOfExperience} yıl` : ''}`;
+          pdf.text(skillText, margin, yPosition);
+          yPosition += lineHeight;
+        });
+        yPosition += sectionSpacing;
+      }
+
+      // Sertifikalar
+      if (cvData.certificates && cvData.certificates.length > 0) {
+        yPosition = checkNewPage(yPosition);
+        yPosition = addSection('SERTİFİKALAR', yPosition);
+        
+        pdf.setFontSize(11);
+        cvData.certificates.forEach(cert => {
+          yPosition = checkNewPage(yPosition, 15);
+          pdf.setFont('helvetica', 'bold');
+          pdf.text(cert.name, margin, yPosition);
+          yPosition += lineHeight;
+          
+          pdf.setFont('helvetica', 'normal');
+          pdf.text(`${cert.startDate} - ${cert.endDate}`, margin, yPosition);
+          if (cert.duration) {
+            yPosition += lineHeight;
+            pdf.text(`Süre: ${cert.duration} saat`, margin, yPosition);
+          }
+          yPosition += 8;
+        });
+        yPosition += sectionSpacing;
+      }
+
+      // Yabancı Dil
+      if (cvData.languages && cvData.languages.length > 0) {
+        yPosition = checkNewPage(yPosition);
+        yPosition = addSection('YABANCI DİL', yPosition);
+        
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        cvData.languages.forEach(lang => {
+          yPosition = checkNewPage(yPosition);
+          const langText = `• ${lang.name}${lang.examType ? ` - ${lang.examType}` : ''}${lang.examScore ? ` (${lang.examScore})` : ''}`;
+          pdf.text(langText, margin, yPosition);
+          yPosition += lineHeight;
+        });
+        yPosition += sectionSpacing;
+      }
+
+      // Sosyal Medya
+      if (cvData.personalInfo?.linkedIn || cvData.personalInfo?.github || cvData.personalInfo?.website || 
+          cvData.personalInfo?.twitter || cvData.personalInfo?.instagram) {
+        yPosition = checkNewPage(yPosition);
+        yPosition = addSection('SOSYAL MEDYA', yPosition);
+        
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        
+        if (cvData.personalInfo?.linkedIn) {
+          pdf.text(`LinkedIn: ${cvData.personalInfo.linkedIn}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.personalInfo?.github) {
+          pdf.text(`GitHub: ${cvData.personalInfo.github}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.personalInfo?.website) {
+          pdf.text(`Website: ${cvData.personalInfo.website}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.personalInfo?.twitter) {
+          pdf.text(`Twitter: ${cvData.personalInfo.twitter}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.personalInfo?.instagram) {
+          pdf.text(`Instagram: ${cvData.personalInfo.instagram}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+      }
+
+      // PDF'i kaydet
+      pdf.save(`CV_${cvData.personalInfo?.firstName}_${cvData.personalInfo?.lastName}.pdf`);
     } catch (error) {
-      console.error('PDF oluşturma hatası:', error);
-      alert('PDF oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
+      console.error('PDF oluşturmada hata:', error);
     }
   };
 
