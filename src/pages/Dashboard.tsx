@@ -66,6 +66,11 @@ const Dashboard: React.FC = () => {
     try {
       // Text-based PDF oluştur
       const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      // Türkçe karakter desteği için font encoding ayarla
+      pdf.setFont('helvetica', 'normal');
+      pdf.setCharSpace(0);
+      
       let yPosition = 20;
       const pageWidth = 210;
       const margin = 20;
@@ -295,9 +300,151 @@ const Dashboard: React.FC = () => {
         yPosition += sectionSpacing;
       }
 
+      // Yayınlar
+      if (cvData.publications && cvData.publications.length > 0) {
+        yPosition = checkNewPage(yPosition);
+        yPosition = addSection('YAYINLAR VE MAKALELER', yPosition);
+        
+        pdf.setFontSize(11);
+        cvData.publications.forEach(pub => {
+          yPosition = checkNewPage(yPosition, 20);
+          pdf.setFont('helvetica', 'bold');
+          pdf.text(pub.title, margin, yPosition);
+          yPosition += lineHeight;
+          
+          pdf.setFont('helvetica', 'normal');
+          pdf.text(`Yayınlayıcı: ${pub.publisher}`, margin, yPosition);
+          yPosition += lineHeight;
+          pdf.text(`Tarih: ${pub.publishDate}`, margin, yPosition);
+          yPosition += lineHeight;
+          
+          if (pub.description) {
+            const descLines = wrapText(pub.description, pageWidth - 2 * margin);
+            descLines.forEach(line => {
+              yPosition = checkNewPage(yPosition);
+              pdf.text(line, margin, yPosition);
+              yPosition += lineHeight;
+            });
+          }
+          yPosition += 8;
+        });
+        yPosition += sectionSpacing;
+      }
+
+      // Ödüller
+      if (cvData.awards && cvData.awards.length > 0) {
+        yPosition = checkNewPage(yPosition);
+        yPosition = addSection('ÖDÜLLER VE BAŞARILAR', yPosition);
+        
+        pdf.setFontSize(11);
+        cvData.awards.forEach(award => {
+          yPosition = checkNewPage(yPosition, 20);
+          pdf.setFont('helvetica', 'bold');
+          pdf.text(award.title, margin, yPosition);
+          yPosition += lineHeight;
+          
+          pdf.setFont('helvetica', 'normal');
+          pdf.text(`Kuruluş: ${award.organization}`, margin, yPosition);
+          yPosition += lineHeight;
+          pdf.text(`Tarih: ${award.date}`, margin, yPosition);
+          yPosition += lineHeight;
+          
+          if (award.description) {
+            const descLines = wrapText(award.description, pageWidth - 2 * margin);
+            descLines.forEach(line => {
+              yPosition = checkNewPage(yPosition);
+              pdf.text(line, margin, yPosition);
+              yPosition += lineHeight;
+            });
+          }
+          yPosition += 8;
+        });
+        yPosition += sectionSpacing;
+      }
+
+      // Referanslar
+      if (cvData.references && cvData.references.length > 0) {
+        yPosition = checkNewPage(yPosition);
+        yPosition = addSection('REFERANSLAR', yPosition);
+        
+        pdf.setFontSize(11);
+        cvData.references.forEach(ref => {
+          yPosition = checkNewPage(yPosition, 15);
+          pdf.setFont('helvetica', 'bold');
+          pdf.text(ref.name, margin, yPosition);
+          yPosition += lineHeight;
+          
+          pdf.setFont('helvetica', 'normal');
+          pdf.text(`Şirket: ${ref.company}`, margin, yPosition);
+          yPosition += lineHeight;
+          pdf.text(`Telefon: ${ref.phone}`, margin, yPosition);
+          yPosition += lineHeight;
+          
+          if (ref.type) {
+            pdf.text(`Tür: ${ref.type}`, margin, yPosition);
+            yPosition += lineHeight;
+          }
+          yPosition += 8;
+        });
+        yPosition += sectionSpacing;
+      }
+
+      // Hobiler
+      if (cvData.hobbies && cvData.hobbies.length > 0) {
+        yPosition = checkNewPage(yPosition);
+        yPosition = addSection('HOBİLER', yPosition);
+        
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        
+        const hobbiesText = cvData.hobbies.join(', ');
+        const hobbiesLines = wrapText(hobbiesText, pageWidth - 2 * margin);
+        hobbiesLines.forEach(line => {
+          yPosition = checkNewPage(yPosition);
+          pdf.text(line, margin, yPosition);
+          yPosition += lineHeight;
+        });
+        yPosition += sectionSpacing;
+      }
+
+      // Değerlendirmeler
+      if (cvData.evaluation && (cvData.evaluation.workSatisfaction > 0 || cvData.evaluation.facilitiesSatisfaction > 0 || 
+          cvData.evaluation.longTermIntent > 0 || cvData.evaluation.recommendation > 0 || cvData.evaluation.applicationSatisfaction > 0)) {
+        yPosition = checkNewPage(yPosition);
+        yPosition = addSection('DEĞERLENDİRMELER', yPosition);
+        
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        
+        if (cvData.evaluation.workSatisfaction > 0) {
+          pdf.text(`Türksat'ta çalışmaktan memnunum: ${'★'.repeat(cvData.evaluation.workSatisfaction)}${'☆'.repeat(5 - cvData.evaluation.workSatisfaction)} (${cvData.evaluation.workSatisfaction}/5)`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.evaluation.facilitiesSatisfaction > 0) {
+          pdf.text(`Türksat'ın sağladığı imkânlardan memnunum: ${'★'.repeat(cvData.evaluation.facilitiesSatisfaction)}${'☆'.repeat(5 - cvData.evaluation.facilitiesSatisfaction)} (${cvData.evaluation.facilitiesSatisfaction}/5)`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.evaluation.longTermIntent > 0) {
+          pdf.text(`Türksat'ta uzun süre çalışmak isterim: ${'★'.repeat(cvData.evaluation.longTermIntent)}${'☆'.repeat(5 - cvData.evaluation.longTermIntent)} (${cvData.evaluation.longTermIntent}/5)`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.evaluation.recommendation > 0) {
+          pdf.text(`Türksat'ı arkadaşlarıma tavsiye ederim: ${'★'.repeat(cvData.evaluation.recommendation)}${'☆'.repeat(5 - cvData.evaluation.recommendation)} (${cvData.evaluation.recommendation}/5)`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.evaluation.applicationSatisfaction > 0) {
+          pdf.text(`Bu "Yetkinlik-X" uygulamasını beğendim: ${'★'.repeat(cvData.evaluation.applicationSatisfaction)}${'☆'.repeat(5 - cvData.evaluation.applicationSatisfaction)} (${cvData.evaluation.applicationSatisfaction}/5)`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        yPosition += sectionSpacing;
+      }
+
       // Sosyal Medya
       if (cvData.personalInfo?.linkedIn || cvData.personalInfo?.github || cvData.personalInfo?.website || 
-          cvData.personalInfo?.twitter || cvData.personalInfo?.instagram) {
+          cvData.personalInfo?.twitter || cvData.personalInfo?.instagram || cvData.personalInfo?.facebook || 
+          cvData.personalInfo?.youtube || cvData.personalInfo?.tiktok || cvData.personalInfo?.discord || 
+          cvData.personalInfo?.telegram || cvData.personalInfo?.whatsapp || cvData.personalInfo?.medium || 
+          cvData.personalInfo?.behance || cvData.personalInfo?.dribbble || cvData.personalInfo?.stackoverflow) {
         yPosition = checkNewPage(yPosition);
         yPosition = addSection('SOSYAL MEDYA', yPosition);
         
@@ -322,6 +469,46 @@ const Dashboard: React.FC = () => {
         }
         if (cvData.personalInfo?.instagram) {
           pdf.text(`Instagram: ${cvData.personalInfo.instagram}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.personalInfo?.facebook) {
+          pdf.text(`Facebook: ${cvData.personalInfo.facebook}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.personalInfo?.youtube) {
+          pdf.text(`YouTube: ${cvData.personalInfo.youtube}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.personalInfo?.tiktok) {
+          pdf.text(`TikTok: ${cvData.personalInfo.tiktok}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.personalInfo?.discord) {
+          pdf.text(`Discord: ${cvData.personalInfo.discord}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.personalInfo?.telegram) {
+          pdf.text(`Telegram: ${cvData.personalInfo.telegram}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.personalInfo?.whatsapp) {
+          pdf.text(`WhatsApp: ${cvData.personalInfo.whatsapp}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.personalInfo?.medium) {
+          pdf.text(`Medium: ${cvData.personalInfo.medium}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.personalInfo?.behance) {
+          pdf.text(`Behance: ${cvData.personalInfo.behance}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.personalInfo?.dribbble) {
+          pdf.text(`Dribbble: ${cvData.personalInfo.dribbble}`, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        if (cvData.personalInfo?.stackoverflow) {
+          pdf.text(`Stack Overflow: ${cvData.personalInfo.stackoverflow}`, margin, yPosition);
           yPosition += lineHeight;
         }
       }
