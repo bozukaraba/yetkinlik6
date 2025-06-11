@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getCVData, saveCVData } from '../services/cvService';
-import { CVData, PersonalInfo, Education, Experience, Skill, Language, Reference, Certificate, Award, Publication, Evaluation } from '../types/cv';
+import { CVData, PersonalInfo, Education, Experience, Skill, Language, Reference, Certificate, Award, Publication, Evaluation, Hobby } from '../types/cv';
 import { ChevronLeft, ChevronRight, Save, Trash2, Download, GripVertical } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -552,17 +552,25 @@ const CVForm = () => {
   };
 
   const addHobby = () => {
+    const newHobby: Hobby = {
+      id: crypto.randomUUID(),
+      category: 'Kültür',
+      sortOrder: 0
+    };
     setFormData(prev => ({
       ...prev,
-      hobbies: ['', ...(prev.hobbies || [])]
+      hobbies: [newHobby, ...(prev.hobbies || [])].map((hobby, index) => ({
+        ...hobby,
+        sortOrder: index
+      }))
     }));
   };
 
-  const updateHobby = (index: number, value: string) => {
+  const updateHobby = (index: number, field: keyof Hobby, value: string) => {
     setFormData(prev => ({
       ...prev,
       hobbies: prev.hobbies?.map((hobby, i) => 
-        i === index ? value : hobby
+        i === index ? { ...hobby, [field]: value } : hobby
       )
     }));
   };
@@ -877,12 +885,12 @@ const CVForm = () => {
           ${formData.hobbies && formData.hobbies.length > 0 ? `
           <div style="margin-bottom: 25px;">
             <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
-              Hobiler
+              Hobi ve İlgi Alanları
             </h2>
             <div style="display: flex; flex-wrap: wrap; gap: 8px;">
               ${formData.hobbies.map(hobby => `
                 <span style="background: #f3f4f6; color: #374151; padding: 6px 12px; border-radius: 6px; font-size: 14px;">
-                  ${hobby}
+                  ${hobby.category === 'Diğer' ? hobby.customValue || 'Diğer' : hobby.category}
                 </span>
               `).join('')}
             </div>
@@ -2248,7 +2256,7 @@ const CVForm = () => {
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Hobi Bilgileri</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Hobi ve İlgi Alanları</h3>
               <button
                 type="button"
                 onClick={addHobby}
@@ -2285,14 +2293,38 @@ const CVForm = () => {
                         <Trash2 className="h-5 w-5" />
                       </button>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Hobi</label>
-                      <input
-                        type="text"
-                        value={hobby}
-                        onChange={(e) => updateHobby(index, e.target.value)}
-                        className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                      />
+                    <div className="grid grid-cols-1 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Kategori</label>
+                        <select
+                          value={hobby.category}
+                          onChange={(e) => updateHobby(index, 'category', e.target.value)}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        >
+                          <option value="Kültür">Kültür</option>
+                          <option value="Sanat">Sanat</option>
+                          <option value="Spor">Spor</option>
+                          <option value="Müzik">Müzik</option>
+                          <option value="Gezi">Gezi</option>
+                          <option value="Etkinlik">Etkinlik</option>
+                          <option value="Dernek – Vakıf Faaliyetleri">Dernek – Vakıf Faaliyetleri</option>
+                          <option value="Bilgisayar Oyunları">Bilgisayar Oyunları</option>
+                          <option value="Grafik Tasarım">Grafik Tasarım</option>
+                          <option value="Diğer">Diğer</option>
+                        </select>
+                      </div>
+                      {hobby.category === 'Diğer' && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">Diğer (Özel Metin)</label>
+                          <input
+                            type="text"
+                            value={hobby.customValue || ''}
+                            onChange={(e) => updateHobby(index, 'customValue', e.target.value)}
+                            placeholder="Hobi/ilgi alanınızı yazınız..."
+                            className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}

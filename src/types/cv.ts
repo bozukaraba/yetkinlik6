@@ -158,6 +158,13 @@ export interface Volunteer {
   description?: string;
 }
 
+export interface Hobby {
+  id: string;
+  category: 'Kültür' | 'Sanat' | 'Spor' | 'Müzik' | 'Gezi' | 'Etkinlik' | 'Dernek – Vakıf Faaliyetleri' | 'Bilgisayar Oyunları' | 'Grafik Tasarım' | 'Diğer';
+  customValue?: string; // Diğer seçeneği için
+  sortOrder?: number;
+}
+
 export interface Evaluation {
   workSatisfaction: number; // Türksat'ta çalışmaktan memnunum
   facilitiesSatisfaction: number; // Türksat'ın çalışma ile ilgili sağladığı imkânlardan memnunum
@@ -179,7 +186,7 @@ export interface CVData {
   publications?: Publication[];
   volunteer?: Volunteer[];
   references?: Reference[];
-  hobbies?: string[];
+  hobbies?: Hobby[];
   awards?: Award[];
   evaluation?: Evaluation;
   createdAt?: string;

@@ -1518,16 +1518,16 @@ const AdminDashboard: React.FC = () => {
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h1m4 0h1m6-6V7a3 3 0 00-3-3H6a3 3 0 00-3 3v4a3 3 0 003 3h7m2 5.172V14h-8c-1.105 0-2-.895-2-2V9c0-1.105.895-2 2-2h8c1.105 0 2 .895 2 2v3" />
                       </svg>
-                      Hobiler
+                      Hobi ve İlgi Alanları
                     </h2>
                     
                     <div className="flex flex-wrap gap-2">
                       {selectedCV.hobbies.map((hobby, index) => (
                         <span 
-                          key={index} 
+                          key={hobby.id || index} 
                           className="px-3 py-1 bg-purple-100 text-purple-800 rounded"
                         >
-                          {hobby}
+                          {typeof hobby === 'string' ? hobby : (hobby.category === 'Diğer' ? hobby.customValue || 'Diğer' : hobby.category)}
                         </span>
                       ))}
                     </div>
