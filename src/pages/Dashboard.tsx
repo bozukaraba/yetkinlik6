@@ -5,6 +5,7 @@ import { FileEdit, Clock, CheckCircle2, AlertCircle, Settings, Users } from 'luc
 import { getCVData, getAllCVs } from '../services/cvService';
 import { CVData } from '../types/cv';
 import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const Dashboard: React.FC = () => {
   const { currentUser, isAdmin } = useAuth();
@@ -64,500 +65,175 @@ const Dashboard: React.FC = () => {
     if (!cvData || !currentUser) return;
 
     try {
-      // Text-based PDF oluştur
+      // CV önizleme elementini oluştur
+      const element = document.createElement('div');
+      element.id = 'cv-preview-temp';
+      element.style.position = 'absolute';
+      element.style.left = '-9999px';
+      element.style.top = '0';
+      element.style.padding = '40px';
+      element.style.width = '210mm';
+      element.style.minHeight = '297mm';
+      element.style.fontFamily = 'Arial, sans-serif';
+      element.style.backgroundColor = '#ffffff';
+      
+      // CV içeriğini HTML olarak oluştur
+      element.innerHTML = `
+        <div style="max-width: 800px; margin: 0 auto; font-family: Arial, sans-serif;">
+          <!-- CV Header -->
+          <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px;">
+            <h1 style="font-size: 32px; font-weight: bold; color: #1f2937; margin: 10px 0;">
+              ${cvData.personalInfo?.firstName} ${cvData.personalInfo?.lastName}
+            </h1>
+            <p style="color: #6b7280; font-size: 16px;">${cvData.personalInfo?.email}</p>
+            ${cvData.personalInfo?.phone ? `<p style="color: #6b7280; font-size: 16px;">${cvData.personalInfo.phone}</p>` : ''}
+            ${cvData.personalInfo?.gender ? `<p style="color: #6b7280; font-size: 14px;">Cinsiyet: ${cvData.personalInfo.gender}</p>` : ''}
+            ${cvData.personalInfo?.residenceCity || cvData.personalInfo?.residenceDistrict ? `<p style="color: #6b7280; font-size: 14px;">Şehir: ${cvData.personalInfo?.residenceCity || ''}${cvData.personalInfo?.residenceCity && cvData.personalInfo?.residenceDistrict ? ' / ' : ''}${cvData.personalInfo?.residenceDistrict || ''}</p>` : ''}
+          </div>
+
+          <!-- Summary -->
+          ${cvData.personalInfo?.summary ? `
+          <div style="margin-bottom: 25px;">
+            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
+              Hakkımda
+            </h2>
+            <p style="color: #374151; line-height: 1.6;">${cvData.personalInfo.summary}</p>
+          </div>
+          ` : ''}
+
+          <!-- Education -->
+          ${cvData.education && cvData.education.length > 0 ? `
+          <div style="margin-bottom: 25px;">
+            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
+              Öğrenim
+            </h2>
+            ${cvData.education.map(edu => `
+              <div style="margin-bottom: 20px; padding-left: 20px; border-left: 3px solid #e5e7eb;">
+                <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${edu.degree}</h3>
+                <p style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">${edu.fieldOfStudy} - ${edu.institution}</p>
+                <p style="color: #9ca3af; font-size: 14px; margin-bottom: 10px;">
+                  ${edu.current ? 'Devam ediyor' : edu.endDate ? `Mezun: ${new Date(edu.endDate).getFullYear()}` : 'Mezuniyet tarihi belirtilmemiş'}
+                </p>
+                ${edu.description ? `<p style="color: #374151; line-height: 1.6;">${edu.description}</p>` : ''}
+              </div>
+            `).join('')}
+          </div>
+          ` : ''}
+
+          <!-- Experience -->
+          ${cvData.experience && cvData.experience.length > 0 ? `
+          <div style="margin-bottom: 25px;">
+            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
+              İş Deneyimi
+            </h2>
+            ${cvData.experience.map(exp => `
+              <div style="margin-bottom: 20px; padding-left: 20px; border-left: 3px solid #e5e7eb;">
+                <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${exp.company} - ${exp.title}</h3>
+                ${exp.location ? `<p style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">Lokasyon: ${exp.location}</p>` : ''}
+                <p style="color: #9ca3af; font-size: 14px; margin-bottom: 10px;">
+                  ${new Date(exp.startDate).getFullYear()} - ${exp.current ? 'Günümüz' : exp.endDate ? new Date(exp.endDate).getFullYear() : 'Belirtilmemiş'}
+                  ${exp.workDuration ? ` (${exp.workDuration})` : ''}
+                </p>
+                ${exp.description ? `<p style="color: #374151; line-height: 1.6;">${exp.description}</p>` : ''}
+              </div>
+            `).join('')}
+          </div>
+          ` : ''}
+
+          <!-- Skills -->
+          ${cvData.skills && cvData.skills.length > 0 ? `
+          <div style="margin-bottom: 25px;">
+            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
+              Yetenek ve Yetkinlikler
+            </h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+              ${cvData.skills.map(skill => `
+                <span style="background-color: #f3f4f6; color: #374151; padding: 8px 12px; border-radius: 6px; font-size: 14px;">
+                  ${skill.name}${skill.level ? ` (${skill.level}/5)` : ''}${skill.yearsOfExperience ? ` - ${skill.yearsOfExperience} yıl` : ''}
+                </span>
+              `).join('')}
+            </div>
+          </div>
+          ` : ''}
+
+          <!-- Certificates -->
+          ${cvData.certificates && cvData.certificates.length > 0 ? `
+          <div style="margin-bottom: 25px;">
+            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
+              Sertifikalar
+            </h2>
+            ${cvData.certificates.map(cert => `
+              <div style="margin-bottom: 15px; padding-left: 20px; border-left: 3px solid #e5e7eb;">
+                <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${cert.name}</h3>
+                <p style="color: #6b7280; font-size: 14px;">${cert.startDate} - ${cert.endDate}</p>
+                ${cert.duration ? `<p style="color: #6b7280; font-size: 14px;">Süre: ${cert.duration} saat</p>` : ''}
+              </div>
+            `).join('')}
+          </div>
+          ` : ''}
+
+          <!-- Languages -->
+          ${cvData.languages && cvData.languages.length > 0 ? `
+          <div style="margin-bottom: 25px;">
+            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
+              Yabancı Dil
+            </h2>
+            ${cvData.languages.map(lang => `
+              <div style="margin-bottom: 10px; padding-left: 20px; border-left: 3px solid #e5e7eb;">
+                <span style="font-weight: bold; color: #1f2937;">${lang.name}</span>
+                ${lang.examType ? ` - ${lang.examType}` : ''}
+                ${lang.examScore ? ` (${lang.examScore})` : ''}
+              </div>
+            `).join('')}
+          </div>
+          ` : ''}
+        </div>
+      `;
+
+      // Elementi DOM'a ekle
+      document.body.appendChild(element);
+
+      // HTML'i canvas'a çevir
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false
+      });
+
+      // Elementi kaldır
+      document.body.removeChild(element);
+
+      // PDF oluştur
+      const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       
-      // Helvetica font kullan - daha iyi karakter desteği
-      pdf.setFont('helvetica', 'normal');
-      
-      let yPosition = 20;
-      const pageWidth = 210;
-      const margin = 20;
-      const lineHeight = 7;
-      const sectionSpacing = 18;
-      const primaryColor = [41, 98, 180]; // Mavi
-      const textColor = [44, 62, 80]; // Koyu gri
+      const imgWidth = 210; // A4 genişlik
+      const pageHeight = 295; // A4 yükseklik
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
 
-      // Helper functions
-      const checkNewPage = (currentY: number, additionalHeight = 20) => {
-        if (currentY + additionalHeight > 280) {
-          pdf.addPage();
-          return 20;
-        }
-        return currentY;
-      };
+      let position = 0;
 
-      const addSection = (title: string, yPos: number, icon: string = '●') => {
-        // Bölüm başlığı arka planı
-        pdf.setFillColor(245, 248, 255); // Açık mavi arka plan
-        pdf.rect(margin - 5, yPos - 5, pageWidth - 2 * margin + 10, 12, 'F');
-        
-        // Bölüm başlığı
-        pdf.setFontSize(14);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-        // Türkçe karakterleri düzgün görüntülemek için text encoding
-        pdf.text(decodeURIComponent(encodeURIComponent(`${icon} ${title}`)), margin, yPos + 2);
-        
-        // Alt çizgi
-        pdf.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-        pdf.setLineWidth(0.8);
-        pdf.line(margin, yPos + 5, pageWidth - margin, yPos + 5);
-        
-        return yPos + 15;
-      };
+      // İlk sayfa
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
 
-      const wrapText = (text: string, maxWidth: number): string[] => {
-        const words = text.split(' ');
-        const lines = [];
-        let currentLine = '';
-        
-        for (const word of words) {
-          const testLine = currentLine + (currentLine ? ' ' : '') + word;
-          const textWidth = pdf.getTextWidth(testLine);
-          
-          if (textWidth > maxWidth && currentLine) {
-            lines.push(currentLine);
-            currentLine = word;
-          } else {
-            currentLine = testLine;
-          }
-        }
-        
-        if (currentLine) {
-          lines.push(currentLine);
-        }
-        
-        return lines;
-      };
-
-      // Türkçe karakter için text output helper
-      const addText = (text: string, x: number, y: number) => {
-        pdf.text(decodeURIComponent(encodeURIComponent(text)), x, y);
-      };
-
-      // Header arka plan
-      pdf.setFillColor(245, 248, 255);
-      pdf.rect(0, 0, pageWidth, 55, 'F');
-      
-      // İsim
-      pdf.setFontSize(22);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-      const fullName = `${cvData.personalInfo?.firstName || ''} ${cvData.personalInfo?.lastName || ''}`;
-      addText(fullName, margin, yPosition + 5);
-      yPosition += 15;
-
-      // Profesyonel unvan varsa ekle
-              if (cvData.personalInfo?.summary) {
-          pdf.setFontSize(12);
-          pdf.setFont('helvetica', 'italic');
-          pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
-          const summaryFirstLine = cvData.personalInfo.summary.split('.')[0] + '.';
-          if (summaryFirstLine.length < 80) {
-            addText(summaryFirstLine, margin, yPosition);
-            yPosition += 8;
-          }
-        }
-
-      // İletişim Bilgileri
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
-      
-              if (cvData.personalInfo?.email) {
-          addText(`E-posta: ${cvData.personalInfo.email}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.personalInfo?.phone) {
-          addText(`Telefon: ${cvData.personalInfo.phone}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.personalInfo?.residenceCity) {
-          addText(`Şehir: ${cvData.personalInfo.residenceCity}${cvData.personalInfo?.residenceDistrict ? ' / ' + cvData.personalInfo.residenceDistrict : ''}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.personalInfo?.gender) {
-          addText(`Cinsiyet: ${cvData.personalInfo.gender}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-      
-      yPosition += sectionSpacing;
-
-      // Hakkımda
-      if (cvData.personalInfo?.summary) {
-        yPosition = checkNewPage(yPosition);
-        yPosition = addSection('HAKKIMDA', yPosition, '👤');
-        
-        pdf.setFontSize(11);
-        pdf.setFont('helvetica', 'normal');
-        pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
-        const summaryLines = wrapText(cvData.personalInfo.summary, pageWidth - 2 * margin);
-                  summaryLines.forEach(line => {
-            yPosition = checkNewPage(yPosition);
-            addText(line, margin, yPosition);
-            yPosition += lineHeight;
-          });
-        yPosition += sectionSpacing;
+      // Eğer içerik birden fazla sayfaya sığmıyorsa
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
       }
 
-      // Eğitim
-      if (cvData.education && cvData.education.length > 0) {
-        yPosition = checkNewPage(yPosition);
-        yPosition = addSection('ÖĞRENİM', yPosition, '🎓');
-        
-        cvData.education.forEach(edu => {
-          yPosition = checkNewPage(yPosition, 25);
-          
-                      pdf.setFontSize(12);
-            pdf.setFont('helvetica', 'bold');
-            pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
-            addText(edu.degree, margin, yPosition);
-            yPosition += lineHeight + 1;
-            
-            pdf.setFontSize(11);
-            pdf.setFont('helvetica', 'normal');
-            addText(`${edu.fieldOfStudy} - ${edu.institution}`, margin, yPosition);
-            yPosition += lineHeight;
-            
-            const endDateText = edu.current ? 'Devam ediyor' : 
-              edu.endDate ? `Mezun: ${new Date(edu.endDate).toLocaleDateString('tr-TR')}` : 
-              'Mezuniyet tarihi belirtilmemiş';
-            addText(endDateText, margin, yPosition);
-            yPosition += lineHeight;
-            
-            if (edu.description) {
-              const descLines = wrapText(edu.description, pageWidth - 2 * margin);
-              descLines.forEach(line => {
-                yPosition = checkNewPage(yPosition);
-                addText(line, margin, yPosition);
-                yPosition += lineHeight;
-              });
-            }
-          yPosition += 8;
-        });
-        yPosition += sectionSpacing;
-      }
+      // PDF'i indir
+      const fileName = `${cvData.personalInfo?.firstName}_${cvData.personalInfo?.lastName}_CV.pdf`;
+      pdf.save(fileName);
 
-      // İş Deneyimi
-      if (cvData.experience && cvData.experience.length > 0) {
-        yPosition = checkNewPage(yPosition);
-        yPosition = addSection('İŞ DENEYİMİ', yPosition, '💼');
-        
-        cvData.experience.forEach(exp => {
-          yPosition = checkNewPage(yPosition, 25);
-          
-          pdf.setFontSize(12);
-          pdf.setFont('helvetica', 'bold');
-          pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
-                      addText(`${exp.company} - ${exp.title}`, margin, yPosition);
-          yPosition += lineHeight + 1;
-          
-          pdf.setFontSize(11);
-          pdf.setFont('helvetica', 'normal');
-          
-          if (exp.location) {
-            addText(`Lokasyon: ${exp.location}`, margin, yPosition);
-            yPosition += lineHeight;
-          }
-          
-          const dateText = `${new Date(exp.startDate).toLocaleDateString('tr-TR')} - ${
-            exp.current ? 'Günümüz' : 
-            exp.endDate ? new Date(exp.endDate).toLocaleDateString('tr-TR') : 'Belirtilmemiş'
-          }${exp.workDuration ? ` (${exp.workDuration})` : ''}`;
-          addText(dateText, margin, yPosition);
-          yPosition += lineHeight;
-          
-                      if (exp.description) {
-              const descLines = wrapText(exp.description, pageWidth - 2 * margin);
-              descLines.forEach(line => {
-                yPosition = checkNewPage(yPosition);
-                addText(line, margin, yPosition);
-                yPosition += lineHeight;
-              });
-            }
-          yPosition += 8;
-        });
-        yPosition += sectionSpacing;
-      }
-
-      // Yetenekler
-      if (cvData.skills && cvData.skills.length > 0) {
-        yPosition = checkNewPage(yPosition);
-        yPosition = addSection('YETENEK VE YETKİNLİKLER', yPosition, '⚡');
-        
-        pdf.setFontSize(11);
-        pdf.setFont('helvetica', 'normal');
-        pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
-        cvData.skills.forEach(skill => {
-          yPosition = checkNewPage(yPosition);
-          const skillText = `• ${skill.name}${skill.level ? ` (${skill.level}/5)` : ''}${skill.yearsOfExperience ? ` - ${skill.yearsOfExperience} yıl` : ''}`;
-          addText(skillText, margin, yPosition);
-          yPosition += lineHeight;
-        });
-        yPosition += sectionSpacing;
-      }
-
-      // Sertifikalar
-      if (cvData.certificates && cvData.certificates.length > 0) {
-        yPosition = checkNewPage(yPosition);
-        yPosition = addSection('SERTİFİKALAR', yPosition, '🏆');
-        
-        pdf.setFontSize(11);
-        cvData.certificates.forEach(cert => {
-          yPosition = checkNewPage(yPosition, 15);
-          pdf.setFont('helvetica', 'bold');
-          pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
-          addText(cert.name, margin, yPosition);
-          yPosition += lineHeight;
-          
-          pdf.setFont('helvetica', 'normal');
-          addText(`${cert.startDate} - ${cert.endDate}`, margin, yPosition);
-          if (cert.duration) {
-            yPosition += lineHeight;
-            addText(`Süre: ${cert.duration} saat`, margin, yPosition);
-          }
-          yPosition += 8;
-        });
-        yPosition += sectionSpacing;
-      }
-
-      // Yabancı Dil
-      if (cvData.languages && cvData.languages.length > 0) {
-        yPosition = checkNewPage(yPosition);
-        yPosition = addSection('YABANCI DİL', yPosition, '🌍');
-        
-        pdf.setFontSize(11);
-        pdf.setFont('helvetica', 'normal');
-        cvData.languages.forEach(lang => {
-          yPosition = checkNewPage(yPosition);
-          const langText = `• ${lang.name}${lang.examType ? ` - ${lang.examType}` : ''}${lang.examScore ? ` (${lang.examScore})` : ''}`;
-          addText(langText, margin, yPosition);
-          yPosition += lineHeight;
-        });
-        yPosition += sectionSpacing;
-      }
-
-      // Yayınlar
-      if (cvData.publications && cvData.publications.length > 0) {
-        yPosition = checkNewPage(yPosition);
-        yPosition = addSection('YAYINLAR VE MAKALELER', yPosition, '📚');
-        
-        pdf.setFontSize(11);
-        cvData.publications.forEach(pub => {
-          yPosition = checkNewPage(yPosition, 20);
-          pdf.setFont('helvetica', 'bold');
-          pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
-          addText(pub.title, margin, yPosition);
-          yPosition += lineHeight;
-          
-          pdf.setFont('helvetica', 'normal');
-          addText(`Yayınlayıcı: ${pub.publisher}`, margin, yPosition);
-          yPosition += lineHeight;
-          addText(`Tarih: ${pub.publishDate}`, margin, yPosition);
-          yPosition += lineHeight;
-          
-          if (pub.description) {
-            const descLines = wrapText(pub.description, pageWidth - 2 * margin);
-            descLines.forEach(line => {
-              yPosition = checkNewPage(yPosition);
-              addText(line, margin, yPosition);
-              yPosition += lineHeight;
-            });
-          }
-          yPosition += 8;
-        });
-        yPosition += sectionSpacing;
-      }
-
-      // Ödüller
-      if (cvData.awards && cvData.awards.length > 0) {
-        yPosition = checkNewPage(yPosition);
-        yPosition = addSection('ÖDÜLLER VE BAŞARILAR', yPosition, '🥇');
-        
-        pdf.setFontSize(11);
-        cvData.awards.forEach(award => {
-          yPosition = checkNewPage(yPosition, 20);
-          pdf.setFont('helvetica', 'bold');
-          pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
-          addText(award.title, margin, yPosition);
-          yPosition += lineHeight;
-          
-          pdf.setFont('helvetica', 'normal');
-          addText(`Kuruluş: ${award.organization}`, margin, yPosition);
-          yPosition += lineHeight;
-          addText(`Tarih: ${award.date}`, margin, yPosition);
-          yPosition += lineHeight;
-          
-          if (award.description) {
-            const descLines = wrapText(award.description, pageWidth - 2 * margin);
-            descLines.forEach(line => {
-              yPosition = checkNewPage(yPosition);
-              addText(line, margin, yPosition);
-              yPosition += lineHeight;
-            });
-          }
-          yPosition += 8;
-        });
-        yPosition += sectionSpacing;
-      }
-
-      // Referanslar
-      if (cvData.references && cvData.references.length > 0) {
-        yPosition = checkNewPage(yPosition);
-        yPosition = addSection('REFERANSLAR', yPosition, '👥');
-        
-        pdf.setFontSize(11);
-        cvData.references.forEach(ref => {
-          yPosition = checkNewPage(yPosition, 15);
-          pdf.setFont('helvetica', 'bold');
-          pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
-          addText(ref.name, margin, yPosition);
-          yPosition += lineHeight;
-          
-          pdf.setFont('helvetica', 'normal');
-          addText(`Şirket: ${ref.company}`, margin, yPosition);
-          yPosition += lineHeight;
-          addText(`Telefon: ${ref.phone}`, margin, yPosition);
-          yPosition += lineHeight;
-          
-          if (ref.type) {
-            addText(`Tür: ${ref.type}`, margin, yPosition);
-            yPosition += lineHeight;
-          }
-          yPosition += 8;
-        });
-        yPosition += sectionSpacing;
-      }
-
-      // Hobiler
-      if (cvData.hobbies && cvData.hobbies.length > 0) {
-        yPosition = checkNewPage(yPosition);
-        yPosition = addSection('HOBİLER', yPosition, '🎨');
-        
-        pdf.setFontSize(11);
-        pdf.setFont('helvetica', 'normal');
-        
-        const hobbiesText = cvData.hobbies.join(', ');
-        const hobbiesLines = wrapText(hobbiesText, pageWidth - 2 * margin);
-        hobbiesLines.forEach(line => {
-          yPosition = checkNewPage(yPosition);
-          addText(line, margin, yPosition);
-          yPosition += lineHeight;
-        });
-        yPosition += sectionSpacing;
-      }
-
-      // Değerlendirmeler
-      if (cvData.evaluation && (cvData.evaluation.workSatisfaction > 0 || cvData.evaluation.facilitiesSatisfaction > 0 || 
-          cvData.evaluation.longTermIntent > 0 || cvData.evaluation.recommendation > 0 || cvData.evaluation.applicationSatisfaction > 0)) {
-        yPosition = checkNewPage(yPosition);
-        yPosition = addSection('DEĞERLENDİRMELER', yPosition, '⭐');
-        
-        pdf.setFontSize(11);
-        pdf.setFont('helvetica', 'normal');
-        
-        if (cvData.evaluation.workSatisfaction > 0) {
-          addText(`Türksat'ta çalışmaktan memnunum: ${'★'.repeat(cvData.evaluation.workSatisfaction)}${'☆'.repeat(5 - cvData.evaluation.workSatisfaction)} (${cvData.evaluation.workSatisfaction}/5)`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.evaluation.facilitiesSatisfaction > 0) {
-          addText(`Türksat'ın sağladığı imkânlardan memnunum: ${'★'.repeat(cvData.evaluation.facilitiesSatisfaction)}${'☆'.repeat(5 - cvData.evaluation.facilitiesSatisfaction)} (${cvData.evaluation.facilitiesSatisfaction}/5)`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.evaluation.longTermIntent > 0) {
-          addText(`Türksat'ta uzun süre çalışmak isterim: ${'★'.repeat(cvData.evaluation.longTermIntent)}${'☆'.repeat(5 - cvData.evaluation.longTermIntent)} (${cvData.evaluation.longTermIntent}/5)`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.evaluation.recommendation > 0) {
-          addText(`Türksat'ı arkadaşlarıma tavsiye ederim: ${'★'.repeat(cvData.evaluation.recommendation)}${'☆'.repeat(5 - cvData.evaluation.recommendation)} (${cvData.evaluation.recommendation}/5)`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.evaluation.applicationSatisfaction > 0) {
-          addText(`Bu "Yetkinlik-X" uygulamasını beğendim: ${'★'.repeat(cvData.evaluation.applicationSatisfaction)}${'☆'.repeat(5 - cvData.evaluation.applicationSatisfaction)} (${cvData.evaluation.applicationSatisfaction}/5)`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        yPosition += sectionSpacing;
-      }
-
-      // Sosyal Medya
-      if (cvData.personalInfo?.linkedIn || cvData.personalInfo?.github || cvData.personalInfo?.website || 
-          cvData.personalInfo?.twitter || cvData.personalInfo?.instagram || cvData.personalInfo?.facebook || 
-          cvData.personalInfo?.youtube || cvData.personalInfo?.tiktok || cvData.personalInfo?.discord || 
-          cvData.personalInfo?.telegram || cvData.personalInfo?.whatsapp || cvData.personalInfo?.medium || 
-          cvData.personalInfo?.behance || cvData.personalInfo?.dribbble || cvData.personalInfo?.stackoverflow) {
-        yPosition = checkNewPage(yPosition);
-        yPosition = addSection('SOSYAL MEDYA', yPosition, '🌐');
-        
-        pdf.setFontSize(11);
-        pdf.setFont('helvetica', 'normal');
-        
-        if (cvData.personalInfo?.linkedIn) {
-          addText(`LinkedIn: ${cvData.personalInfo.linkedIn}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.personalInfo?.github) {
-          addText(`GitHub: ${cvData.personalInfo.github}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.personalInfo?.website) {
-          addText(`Website: ${cvData.personalInfo.website}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.personalInfo?.twitter) {
-          addText(`Twitter: ${cvData.personalInfo.twitter}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.personalInfo?.instagram) {
-          addText(`Instagram: ${cvData.personalInfo.instagram}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.personalInfo?.facebook) {
-          addText(`Facebook: ${cvData.personalInfo.facebook}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.personalInfo?.youtube) {
-          addText(`YouTube: ${cvData.personalInfo.youtube}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.personalInfo?.tiktok) {
-          addText(`TikTok: ${cvData.personalInfo.tiktok}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.personalInfo?.discord) {
-          addText(`Discord: ${cvData.personalInfo.discord}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.personalInfo?.telegram) {
-          addText(`Telegram: ${cvData.personalInfo.telegram}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.personalInfo?.whatsapp) {
-          addText(`WhatsApp: ${cvData.personalInfo.whatsapp}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.personalInfo?.medium) {
-          addText(`Medium: ${cvData.personalInfo.medium}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.personalInfo?.behance) {
-          addText(`Behance: ${cvData.personalInfo.behance}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.personalInfo?.dribbble) {
-          addText(`Dribbble: ${cvData.personalInfo.dribbble}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-        if (cvData.personalInfo?.stackoverflow) {
-          addText(`Stack Overflow: ${cvData.personalInfo.stackoverflow}`, margin, yPosition);
-          yPosition += lineHeight;
-        }
-      }
-
-      // PDF'i kaydet
-      pdf.save(`CV_${cvData.personalInfo?.firstName}_${cvData.personalInfo?.lastName}.pdf`);
     } catch (error) {
-      console.error('PDF oluşturmada hata:', error);
+      console.error('PDF oluşturma hatası:', error);
+      alert('PDF oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
     }
   };
 
