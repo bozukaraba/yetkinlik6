@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getAllCVs, searchCVsByKeywords } from '../services/cvService';
 import { CVData } from '../types/cv';
-import { Search, FileText, User, Calendar, Briefcase, Tag, Download, Star, BarChart3, Filter, X } from 'lucide-react';
+import { Search, FileText, User, Calendar, Briefcase, Tag, Download, Star, BarChart3, Filter, X, Mail, GitCompare, ArrowRight } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -32,6 +32,20 @@ const AdminDashboard: React.FC = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [selectedCV, setSelectedCV] = useState<CVData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // CV Karşılaştırma için state'ler
+  const [showComparison, setShowComparison] = useState(false);
+  const [selectedCVs, setSelectedCVs] = useState<CVData[]>([]);
+  const [comparisonMode, setComparisonMode] = useState(false);
+  
+  // Email gönderimi için state'ler
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailData, setEmailData] = useState({
+    recipientEmail: '',
+    subject: '',
+    message: '',
+    cvToSend: null as CVData | null
+  });
   
   // Gelişmiş filtreleme state'leri
   const [showFilters, setShowFilters] = useState(false);
@@ -221,6 +235,143 @@ const AdminDashboard: React.FC = () => {
 
   const handleViewCV = (cv: CVData) => {
     setSelectedCV(cv);
+  };
+
+  // CV Karşılaştırma fonksiyonları
+  const handleComparisonToggle = (cv: CVData) => {
+    if (selectedCVs.find(item => item.id === cv.id)) {
+      setSelectedCVs(prev => prev.filter(item => item.id !== cv.id));
+    } else if (selectedCVs.length < 2) {
+      setSelectedCVs(prev => [...prev, cv]);
+    } else {
+      alert('En fazla 2 CV seçebilirsiniz');
+    }
+  };
+
+  const handleStartComparison = () => {
+    if (selectedCVs.length === 2) {
+      setShowComparison(true);
+    } else {
+      alert('Karşılaştırma için 2 CV seçin');
+    }
+  };
+
+  const handleComparisonModeToggle = () => {
+    setComparisonMode(!comparisonMode);
+    setSelectedCVs([]);
+    setShowComparison(false);
+  };
+
+  // Email gönderimi fonksiyonları
+  const handleEmailCV = (cv: CVData) => {
+    setEmailData({
+      recipientEmail: '',
+      subject: `${cv.personalInfo?.firstName} ${cv.personalInfo?.lastName} - CV`,
+      message: `Merhaba,\n\n${cv.personalInfo?.firstName} ${cv.personalInfo?.lastName} adlı adayın CV'sini ekte bulabilirsiniz.\n\nİyi çalışmalar,\nYetkinlik-X Sistemi`,
+      cvToSend: cv
+    });
+    setShowEmailModal(true);
+  };
+
+  const handleSendEmail = async () => {
+    if (!emailData.recipientEmail || !emailData.cvToSend) {
+      alert('Email adresi ve CV seçimi gerekli');
+      return;
+    }
+
+    try {
+      // PDF oluştur
+      const pdfBlob = await generatePDFBlob(emailData.cvToSend);
+      
+      // Email gönderimi (örnek - gerçek implementasyon için backend gerekli)
+      const emailForm = new FormData();
+      emailForm.append('to', emailData.recipientEmail);
+      emailForm.append('subject', emailData.subject);
+      emailForm.append('message', emailData.message);
+      emailForm.append('attachment', pdfBlob, `${emailData.cvToSend.personalInfo?.firstName}_${emailData.cvToSend.personalInfo?.lastName}_CV.pdf`);
+
+      // Burada gerçek email servisi çağrılacak
+      console.log('Email gönderimi:', {
+        to: emailData.recipientEmail,
+        subject: emailData.subject,
+        message: emailData.message,
+        hasAttachment: true
+      });
+
+      alert('Email başarıyla gönderildi! (Geliştirme modunda - konsola log atıldı)');
+      setShowEmailModal(false);
+      setEmailData({
+        recipientEmail: '',
+        subject: '',
+        message: '',
+        cvToSend: null
+      });
+    } catch (error) {
+      console.error('Email gönderme hatası:', error);
+      alert('Email gönderilemedi. Lütfen tekrar deneyin.');
+    }
+  };
+
+  // PDF Blob oluşturma fonksiyonu
+  const generatePDFBlob = async (cv: CVData): Promise<Blob> => {
+    // PDF oluşturma kodunu buraya taşıyacağız (handleDownloadCV'den)
+    const element = document.createElement('div');
+    element.id = 'cv-preview-temp';
+    element.style.position = 'absolute';
+    element.style.left = '-9999px';
+    element.style.top = '0';
+    element.style.padding = '40px';
+    element.style.width = '210mm';
+    element.style.minHeight = '297mm';
+    element.style.fontFamily = 'Arial, sans-serif';
+    element.style.backgroundColor = '#ffffff';
+    
+    // CV HTML içeriği (handleDownloadCV'deki ile aynı)
+    element.innerHTML = `
+      <div style="max-width: 800px; margin: 0 auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #2d3748; line-height: 1.6;">
+        <!-- CV Header -->
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; margin: -40px -40px 30px -40px; text-align: center; position: relative;">
+          <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);"></div>
+          <div style="position: relative; z-index: 1;">
+            <h1 style="font-size: 36px; font-weight: 700; margin: 0 0 10px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+              ${cv.personalInfo?.firstName} ${cv.personalInfo?.lastName}
+            </h1>
+            <div style="height: 3px; width: 60px; background: #fff; margin: 15px auto 20px auto; border-radius: 2px;"></div>
+            <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; font-size: 16px;">
+              ${cv.personalInfo?.email ? `
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="width: 16px; height: 16px; background: #fff; border-radius: 50%; display: inline-block;"></span>
+                  ${cv.personalInfo.email}
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        </div>
+        <!-- Diğer bölümler buraya eklenecek... -->
+      </div>
+    `;
+
+    document.body.appendChild(element);
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false
+    });
+    document.body.removeChild(element);
+
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgWidth = 210;
+    const pageHeight = 295;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+    
+    return new Promise((resolve) => {
+      const blob = pdf.output('blob');
+      resolve(blob);
+    });
   };
 
   const handleDownloadCV = async (cv: CVData) => {
@@ -856,10 +1007,46 @@ const AdminDashboard: React.FC = () => {
           <div className="bg-white bg-opacity-95 rounded-lg shadow-md p-4 backdrop-blur-sm">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-gray-800">CV Listesi</h2>
-              <div className="text-sm text-gray-600">
-                {isLoading ? 'Yükleniyor...' : `${cvList.length} sonuç`}
+              <div className="flex items-center gap-2">
+                <div className="text-sm text-gray-600">
+                  {isLoading ? 'Yükleniyor...' : `${cvList.length} sonuç`}
+                </div>
+                <button
+                  onClick={handleComparisonModeToggle}
+                  className={`px-3 py-1 rounded-md text-sm transition-colors ${
+                    comparisonMode
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  <GitCompare className="h-4 w-4 inline mr-1" />
+                  Karşılaştır
+                </button>
               </div>
             </div>
+            
+            {comparisonMode && (
+              <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <div className="text-sm text-purple-700">
+                    Karşılaştırma modu: {selectedCVs.length}/2 CV seçildi
+                  </div>
+                  {selectedCVs.length === 2 && (
+                    <button
+                      onClick={handleStartComparison}
+                      className="px-3 py-1 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700 transition-colors"
+                    >
+                      Karşılaştır <ArrowRight className="h-3 w-3 inline ml-1" />
+                    </button>
+                  )}
+                </div>
+                {selectedCVs.length > 0 && (
+                  <div className="mt-2 text-xs text-purple-600">
+                    Seçilen: {selectedCVs.map(cv => `${cv.personalInfo?.firstName} ${cv.personalInfo?.lastName}`).join(', ')}
+                  </div>
+                )}
+              </div>
+            )
             
             {isLoading ? (
               <div className="flex justify-center items-center h-64">
@@ -876,37 +1063,62 @@ const AdminDashboard: React.FC = () => {
                     {cvList.map((cv) => (
                       <div 
                         key={cv.id} 
-                        className={`p-4 rounded-md cursor-pointer transition-colors ${
+                        className={`p-4 rounded-md transition-colors ${
                           selectedCV?.id === cv.id
                             ? 'bg-blue-50 border border-blue-200'
                             : 'bg-gray-50 hover:bg-gray-100 border border-gray-200'
-                        }`}
-                        onClick={() => handleViewCV(cv)}
+                        } ${comparisonMode ? '' : 'cursor-pointer'}`}
+                        onClick={comparisonMode ? undefined : () => handleViewCV(cv)}
                       >
                         <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="font-medium text-gray-900">{cv.personalInfo?.firstName} {cv.personalInfo?.lastName}</h3>
-                            <p className="text-sm text-gray-600">{cv.personalInfo?.email}</p>
-                            
-                            {cv.skills && cv.skills.length > 0 && (
-                              <div className="mt-2 flex flex-wrap gap-1">
-                                {cv.skills.slice(0, 3).map(skill => (
-                                  <span 
-                                    key={skill.id} 
-                                    className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
-                                  >
-                                    {skill.name}
-                                  </span>
-                                ))}
-                                {cv.skills.length > 3 && (
-                                  <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded">
-                                    +{cv.skills.length - 3} daha
-                                  </span>
-                                )}
-                              </div>
+                          <div className="flex items-start gap-3 flex-1">
+                            {comparisonMode && (
+                              <input
+                                type="checkbox"
+                                checked={selectedCVs.some(item => item.id === cv.id)}
+                                onChange={() => handleComparisonToggle(cv)}
+                                className="mt-1 h-4 w-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                                onClick={(e) => e.stopPropagation()}
+                              />
                             )}
+                            <div className="flex-1">
+                              <h3 className="font-medium text-gray-900">{cv.personalInfo?.firstName} {cv.personalInfo?.lastName}</h3>
+                              <p className="text-sm text-gray-600">{cv.personalInfo?.email}</p>
+                              
+                              {cv.skills && cv.skills.length > 0 && (
+                                <div className="mt-2 flex flex-wrap gap-1">
+                                  {cv.skills.slice(0, 3).map(skill => (
+                                    <span 
+                                      key={skill.id} 
+                                      className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
+                                    >
+                                      {skill.name}
+                                    </span>
+                                  ))}
+                                  {cv.skills.length > 3 && (
+                                    <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded">
+                                      +{cv.skills.length - 3} daha
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
                           </div>
-                          <FileText className="h-5 w-5 text-gray-400" />
+                          <div className="flex items-center gap-2">
+                            {!comparisonMode && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEmailCV(cv);
+                                }}
+                                className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                                title="Email Gönder"
+                              >
+                                <Mail className="h-4 w-4" />
+                              </button>
+                            )}
+                            <FileText className="h-5 w-5 text-gray-400" />
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -1107,13 +1319,22 @@ const AdminDashboard: React.FC = () => {
                       </div>
                     </div>
                     
-                    <button
-                      onClick={() => handleDownloadCV(selectedCV)}
-                      className="flex items-center px-3 py-1 text-sm bg-blue-50 text-blue-700 rounded hover:bg-blue-100 transition-colors"
-                    >
-                      <Download className="h-4 w-4 mr-1" />
-                      CV İndir
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEmailCV(selectedCV)}
+                        className="flex items-center px-3 py-1 text-sm bg-green-50 text-green-700 rounded hover:bg-green-100 transition-colors"
+                      >
+                        <Mail className="h-4 w-4 mr-1" />
+                        Email Gönder
+                      </button>
+                      <button
+                        onClick={() => handleDownloadCV(selectedCV)}
+                        className="flex items-center px-3 py-1 text-sm bg-blue-50 text-blue-700 rounded hover:bg-blue-100 transition-colors"
+                      >
+                        <Download className="h-4 w-4 mr-1" />
+                        CV İndir
+                      </button>
+                    </div>
                   </div>
                   
                   {selectedCV.personalInfo?.summary && (
@@ -1554,6 +1775,176 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Email Modal */}
+      {showEmailModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">CV Email Gönderimi</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Alıcı Email
+                </label>
+                <input
+                  type="email"
+                  value={emailData.recipientEmail}
+                  onChange={(e) => setEmailData(prev => ({ ...prev, recipientEmail: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="ornek@email.com"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Konu
+                </label>
+                <input
+                  type="text"
+                  value={emailData.subject}
+                  onChange={(e) => setEmailData(prev => ({ ...prev, subject: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Mesaj
+                </label>
+                <textarea
+                  rows={4}
+                  value={emailData.message}
+                  onChange={(e) => setEmailData(prev => ({ ...prev, message: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-2 mt-6">
+              <button
+                onClick={() => setShowEmailModal(false)}
+                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                İptal
+              </button>
+              <button
+                onClick={handleSendEmail}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Gönder
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CV Comparison Modal */}
+      {showComparison && selectedCVs.length === 2 && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-semibold text-gray-900">CV Karşılaştırması</h3>
+              <button
+                onClick={() => setShowComparison(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {selectedCVs.map((cv, index) => (
+                <div key={cv.id} className="bg-gray-50 rounded-lg p-4">
+                  <div className="text-center mb-4">
+                    <h4 className="text-xl font-semibold text-gray-900">
+                      {cv.personalInfo?.firstName} {cv.personalInfo?.lastName}
+                    </h4>
+                    <p className="text-gray-600">{cv.personalInfo?.email}</p>
+                  </div>
+                  
+                  {/* Basic Info */}
+                  <div className="mb-4">
+                    <h5 className="font-medium text-gray-800 mb-2">Temel Bilgiler</h5>
+                    <div className="text-sm space-y-1">
+                      <p>📞 {cv.personalInfo?.phone || 'Belirtilmemiş'}</p>
+                      <p>📍 {cv.personalInfo?.residenceCity || 'Belirtilmemiş'}</p>
+                      <p>👤 {cv.personalInfo?.gender || 'Belirtilmemiş'}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Education */}
+                  <div className="mb-4">
+                    <h5 className="font-medium text-gray-800 mb-2">Eğitim ({cv.education?.length || 0})</h5>
+                    <div className="text-sm space-y-1">
+                      {cv.education?.slice(0, 2).map((edu, i) => (
+                        <p key={i}>🎓 {edu.degree} - {edu.institution}</p>
+                      )) || <p className="text-gray-500 italic">Eğitim bilgisi yok</p>}
+                    </div>
+                  </div>
+                  
+                  {/* Experience */}
+                  <div className="mb-4">
+                    <h5 className="font-medium text-gray-800 mb-2">Deneyim ({cv.experience?.length || 0})</h5>
+                    <div className="text-sm space-y-1">
+                      {cv.experience?.slice(0, 2).map((exp, i) => (
+                        <p key={i}>💼 {exp.title} - {exp.company}</p>
+                      )) || <p className="text-gray-500 italic">İş deneyimi yok</p>}
+                    </div>
+                  </div>
+                  
+                  {/* Skills */}
+                  <div className="mb-4">
+                    <h5 className="font-medium text-gray-800 mb-2">Beceriler ({cv.skills?.length || 0})</h5>
+                    <div className="flex flex-wrap gap-1">
+                      {cv.skills?.slice(0, 6).map((skill, i) => (
+                        <span key={i} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                          {skill.name}
+                        </span>
+                      )) || <p className="text-gray-500 italic text-sm">Beceri bilgisi yok</p>}
+                    </div>
+                  </div>
+                  
+                  {/* Certificates */}
+                  <div className="mb-4">
+                    <h5 className="font-medium text-gray-800 mb-2">Sertifikalar ({cv.certificates?.length || 0})</h5>
+                    <div className="text-sm space-y-1">
+                      {cv.certificates?.slice(0, 2).map((cert, i) => (
+                        <p key={i}>🏆 {cert.name}</p>
+                      )) || <p className="text-gray-500 italic">Sertifika bilgisi yok</p>}
+                    </div>
+                  </div>
+                  
+                  {/* Languages */}
+                  <div>
+                    <h5 className="font-medium text-gray-800 mb-2">Diller ({cv.languages?.length || 0})</h5>
+                    <div className="flex flex-wrap gap-1">
+                      {cv.languages?.map((lang, i) => (
+                        <span key={i} className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
+                          {lang.name}
+                        </span>
+                      )) || <p className="text-gray-500 italic text-sm">Dil bilgisi yok</p>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="flex justify-center gap-4 mt-6">
+              {selectedCVs.map((cv) => (
+                <button
+                  key={cv.id}
+                  onClick={() => handleDownloadCV(cv)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  {cv.personalInfo?.firstName} CV İndir
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
