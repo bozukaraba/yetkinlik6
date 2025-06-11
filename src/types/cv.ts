@@ -42,6 +42,7 @@ export interface Education {
   institution: string;
   degree: string;
   fieldOfStudy: string;
+  educationLevel?: 'Ortaokul' | 'Lise' | 'Ön Lisans' | 'Lisans' | 'Yüksek Lisans' | 'Doktora';
   startDate: string;
   endDate?: string;
   current?: boolean;

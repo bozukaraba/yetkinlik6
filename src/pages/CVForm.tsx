@@ -623,6 +623,7 @@ const CVForm = () => {
               <div style="margin-bottom: 20px; padding-left: 20px; border-left: 3px solid #e5e7eb;">
                 <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">${edu.degree}</h3>
                 <p style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">${edu.fieldOfStudy} - ${edu.institution}</p>
+                ${edu.educationLevel ? `<p style="color: #9ca3af; font-size: 14px; margin-bottom: 5px;">${edu.educationLevel}</p>` : ''}
                 <p style="color: #9ca3af; font-size: 14px; margin-bottom: 10px;">
                   ${edu.current ? 'Devam ediyor' : edu.endDate ? `Mezun: ${new Date(edu.endDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' })}` : 'Mezuniyet tarihi belirtilmemiş'}
                 </p>
@@ -1275,6 +1276,22 @@ const CVForm = () => {
                       </button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Öğrenim Düzeyi</label>
+                        <select
+                          value={edu.educationLevel || ''}
+                          onChange={(e) => updateEducation(index, 'educationLevel', e.target.value)}
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        >
+                          <option value="">Seçiniz</option>
+                          <option value="Ortaokul">Ortaokul</option>
+                          <option value="Lise">Lise</option>
+                          <option value="Ön Lisans">Ön Lisans</option>
+                          <option value="Lisans">Lisans</option>
+                          <option value="Yüksek Lisans">Yüksek Lisans</option>
+                          <option value="Doktora">Doktora</option>
+                        </select>
+                      </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Okul Adı</label>
                         <input
