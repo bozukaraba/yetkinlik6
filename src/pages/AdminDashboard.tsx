@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getAllCVs, searchCVsByKeywords } from '../services/cvService';
 import { CVData } from '../types/cv';
-import { Search, FileText, User, Calendar, Briefcase, Tag, Download, Star, BarChart3, Filter, X, GitCompare, ArrowRight, TrendingUp, Award } from 'lucide-react';
+import { Search, FileText, User, Calendar, Briefcase, Tag, Download, Star, BarChart3, Filter, X } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -33,11 +33,7 @@ const AdminDashboard: React.FC = () => {
   const [selectedCV, setSelectedCV] = useState<CVData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
-  // CV Karşılaştırma için state'ler
-  const [showComparison, setShowComparison] = useState(false);
-  const [selectedCVs, setSelectedCVs] = useState<CVData[]>([]);
-  const [comparisonMode, setComparisonMode] = useState(false);
-  const [comparisonType, setComparisonType] = useState<'basic' | 'advanced'>('basic');
+
   
   // Gelişmiş filtreleme state'leri
   const [showFilters, setShowFilters] = useState(false);
@@ -229,80 +225,9 @@ const AdminDashboard: React.FC = () => {
     setSelectedCV(cv);
   };
 
-  // CV Karşılaştırma fonksiyonları
-  const handleComparisonToggle = (cv: CVData) => {
-    if (selectedCVs.find(item => item.id === cv.id)) {
-      setSelectedCVs(prev => prev.filter(item => item.id !== cv.id));
-    } else if (selectedCVs.length < 2) {
-      setSelectedCVs(prev => [...prev, cv]);
-    } else {
-      alert('En fazla 2 CV seçebilirsiniz');
-    }
-  };
 
-  const handleStartComparison = () => {
-    if (selectedCVs.length === 2) {
-      setShowComparison(true);
-    } else {
-      alert('Karşılaştırma için 2 CV seçin');
-    }
-  };
 
-  const handleComparisonModeToggle = () => {
-    setComparisonMode(!comparisonMode);
-    setSelectedCVs([]);
-    setShowComparison(false);
-  };
 
-  // CV Skor hesaplama fonksiyonu
-  const calculateCVScore = (cv: CVData): number => {
-    let score = 0;
-    
-    // Eğitim skoru (0-25 puan)
-    if (cv.education && cv.education.length > 0) {
-      const eduScore = Math.min(cv.education.length * 8, 25);
-      score += eduScore;
-    }
-    
-    // Deneyim skoru (0-30 puan)
-    if (cv.experience && cv.experience.length > 0) {
-      const expScore = Math.min(cv.experience.length * 10, 30);
-      score += expScore;
-    }
-    
-    // Beceri skoru (0-25 puan)
-    if (cv.skills && cv.skills.length > 0) {
-      const avgSkillLevel = cv.skills.reduce((sum, skill) => sum + (skill.level || 3), 0) / cv.skills.length;
-      const skillScore = Math.min((cv.skills.length * avgSkillLevel * 2), 25);
-      score += skillScore;
-    }
-    
-    // Sertifika skoru (0-15 puan)
-    if (cv.certificates && cv.certificates.length > 0) {
-      const certScore = Math.min(cv.certificates.length * 5, 15);
-      score += certScore;
-    }
-    
-    // Dil skoru (0-5 puan)
-    if (cv.languages && cv.languages.length > 0) {
-      const langScore = Math.min(cv.languages.length * 2, 5);
-      score += langScore;
-    }
-    
-    return Math.round(score);
-  };
-
-  // Kategori skorları hesaplama
-  const getCategoryScores = (cv: CVData) => {
-    return {
-      education: cv.education?.length || 0,
-      experience: cv.experience?.length || 0,
-      skills: cv.skills?.length || 0,
-      certificates: cv.certificates?.length || 0,
-      languages: cv.languages?.length || 0,
-      totalScore: calculateCVScore(cv)
-    };
-  };
 
   // PDF Blob oluşturma fonksiyonu
   const generatePDFBlob = async (cv: CVData): Promise<Blob> => {
@@ -999,46 +924,10 @@ const AdminDashboard: React.FC = () => {
           <div className="bg-white bg-opacity-95 rounded-lg shadow-md p-4 backdrop-blur-sm">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-gray-800">CV Listesi</h2>
-              <div className="flex items-center gap-2">
-                <div className="text-sm text-gray-600">
-                  {isLoading ? 'Yükleniyor...' : `${cvList.length} sonuç`}
-                </div>
-                <button
-                  onClick={handleComparisonModeToggle}
-                  className={`px-3 py-1 rounded-md text-sm transition-colors ${
-                    comparisonMode
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
-                >
-                  <GitCompare className="h-4 w-4 inline mr-1" />
-                  Karşılaştır
-                </button>
+              <div className="text-sm text-gray-600">
+                {isLoading ? 'Yükleniyor...' : `${cvList.length} sonuç`}
               </div>
             </div>
-            
-            {comparisonMode && (
-              <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
-                <div className="flex justify-between items-center">
-                  <div className="text-sm text-purple-700">
-                    Karşılaştırma modu: {selectedCVs.length}/2 CV seçildi
-                  </div>
-                  {selectedCVs.length === 2 && (
-                    <button
-                      onClick={handleStartComparison}
-                      className="px-3 py-1 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700 transition-colors"
-                    >
-                      Karşılaştır <ArrowRight className="h-3 w-3 inline ml-1" />
-                    </button>
-                  )}
-                </div>
-                {selectedCVs.length > 0 && (
-                  <div className="mt-2 text-xs text-purple-600">
-                    Seçilen: {selectedCVs.map(cv => `${cv.personalInfo?.firstName} ${cv.personalInfo?.lastName}`).join(', ')}
-                  </div>
-                )}
-              </div>
-            )}
             
             {isLoading ? (
               <div className="flex justify-center items-center h-64">
@@ -1055,24 +944,15 @@ const AdminDashboard: React.FC = () => {
                     {cvList.map((cv) => (
                       <div 
                         key={cv.id} 
-                        className={`p-4 rounded-md transition-colors ${
+                        className={`p-4 rounded-md transition-colors cursor-pointer ${
                           selectedCV?.id === cv.id
                             ? 'bg-blue-50 border border-blue-200'
                             : 'bg-gray-50 hover:bg-gray-100 border border-gray-200'
-                        } ${comparisonMode ? '' : 'cursor-pointer'}`}
-                        onClick={comparisonMode ? undefined : () => handleViewCV(cv)}
+                        }`}
+                        onClick={() => handleViewCV(cv)}
                       >
                         <div className="flex justify-between items-start">
                           <div className="flex items-start gap-3 flex-1">
-                            {comparisonMode && (
-                              <input
-                                type="checkbox"
-                                checked={selectedCVs.some(item => item.id === cv.id)}
-                                onChange={() => handleComparisonToggle(cv)}
-                                className="mt-1 h-4 w-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
-                                onClick={(e) => e.stopPropagation()}
-                              />
-                            )}
                             <div className="flex-1">
                               <h3 className="font-medium text-gray-900">{cv.personalInfo?.firstName} {cv.personalInfo?.lastName}</h3>
                               <p className="text-sm text-gray-600">{cv.personalInfo?.email}</p>
@@ -1747,213 +1627,7 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* CV Comparison Modal */}
-      {showComparison && selectedCVs.length === 2 && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-4">
-                <h3 className="text-2xl font-semibold text-gray-900">CV Karşılaştırması</h3>
-                
-                {/* Karşılaştırma Tipi Seçimi */}
-                <div className="flex bg-gray-100 rounded-lg p-1">
-                  <button
-                    onClick={() => setComparisonType('basic')}
-                    className={`px-3 py-1 text-sm rounded transition-colors ${comparisonType === 'basic' ? 'bg-white text-blue-600 shadow' : 'text-gray-600 hover:text-gray-800'}`}
-                  >
-                    Temel
-                  </button>
-                  <button
-                    onClick={() => setComparisonType('advanced')}
-                    className={`px-3 py-1 text-sm rounded transition-colors flex items-center ${comparisonType === 'advanced' ? 'bg-white text-blue-600 shadow' : 'text-gray-600 hover:text-gray-800'}`}
-                  >
-                    <TrendingUp className="h-4 w-4 mr-1" />
-                    Skor Bazlı
-                  </button>
-                </div>
-              </div>
-              
-              <button
-                onClick={() => {
-                  setShowComparison(false);
-                  setSelectedCVs([]);
-                  setComparisonMode(false);
-                }}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-            
-            {/* Skor Bazlı Karşılaştırma */}
-            {comparisonType === 'advanced' && (
-              <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border">
-                <h4 className="font-semibold text-gray-800 mb-4 flex items-center">
-                  <Award className="h-5 w-5 mr-2 text-purple-600" />
-                  Gelişmiş Skor Karşılaştırması
-                </h4>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {selectedCVs.map((cv) => {
-                    const scores = getCategoryScores(cv);
-                    return (
-                      <div key={cv.id} className="bg-white rounded-lg p-4 border border-gray-200">
-                        <h5 className="font-medium text-gray-800 mb-3 text-center">
-                          {cv.personalInfo?.firstName} {cv.personalInfo?.lastName}
-                        </h5>
-                        
-                        {/* Toplam Skor */}
-                        <div className="mb-4 p-3 bg-gray-50 rounded-lg text-center">
-                          <div className="text-sm text-gray-600 mb-1">Toplam Skor</div>
-                          <div className={`text-2xl font-bold ${scores.totalScore >= 70 ? 'text-green-600' : scores.totalScore >= 40 ? 'text-yellow-600' : 'text-red-600'}`}>
-                            {scores.totalScore}/100
-                          </div>
-                          <div className="text-xs text-gray-500 mt-1">
-                            {scores.totalScore >= 70 ? 'Mükemmel' : scores.totalScore >= 40 ? 'İyi' : 'Geliştirilmeli'}
-                          </div>
-                        </div>
-                        
-                        {/* Kategori Skorları */}
-                        <div className="space-y-3">
-                          <div className="flex justify-between items-center p-2 bg-blue-50 rounded">
-                            <span className="text-sm font-medium">🎓 Eğitim</span>
-                            <span className="font-bold text-blue-700">{scores.education} adet</span>
-                          </div>
-                          <div className="flex justify-between items-center p-2 bg-green-50 rounded">
-                            <span className="text-sm font-medium">💼 Deneyim</span>
-                            <span className="font-bold text-green-700">{scores.experience} adet</span>
-                          </div>
-                          <div className="flex justify-between items-center p-2 bg-purple-50 rounded">
-                            <span className="text-sm font-medium">⚡ Beceri</span>
-                            <span className="font-bold text-purple-700">{scores.skills} adet</span>
-                          </div>
-                          <div className="flex justify-between items-center p-2 bg-yellow-50 rounded">
-                            <span className="text-sm font-medium">🏆 Sertifika</span>
-                            <span className="font-bold text-yellow-700">{scores.certificates} adet</span>
-                          </div>
-                          <div className="flex justify-between items-center p-2 bg-indigo-50 rounded">
-                            <span className="text-sm font-medium">🌍 Dil</span>
-                            <span className="font-bold text-indigo-700">{scores.languages} adet</span>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                
-                {/* Karşılaştırma Önerisi */}
-                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                  <div className="text-sm font-medium text-blue-800 mb-1">📊 Karşılaştırma Sonucu</div>
-                  <div className="text-sm text-blue-700">
-                    {(() => {
-                      const [cv1Score, cv2Score] = selectedCVs.map(cv => getCategoryScores(cv).totalScore);
-                      const diff = Math.abs(cv1Score - cv2Score);
-                      const winner = selectedCVs[cv1Score > cv2Score ? 0 : 1];
-                      
-                      if (diff <= 5) {
-                        return "İki aday da birbirine çok yakın skorlara sahip. Detaylı inceleme önerilir.";
-                      } else if (diff <= 15) {
-                        return `${winner.personalInfo?.firstName} ${winner.personalInfo?.lastName} hafif önde. İkisi de değerlendirilebilir.`;
-                      } else {
-                        return `${winner.personalInfo?.firstName} ${winner.personalInfo?.lastName} açık farkla önde. Öncelikli aday olarak değerlendirilebilir.`;
-                      }
-                    })()}
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {selectedCVs.map((cv, index) => (
-                <div key={cv.id} className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-center mb-4">
-                    <h4 className="text-xl font-semibold text-gray-900">
-                      {cv.personalInfo?.firstName} {cv.personalInfo?.lastName}
-                    </h4>
-                    <p className="text-gray-600">{cv.personalInfo?.email}</p>
-                  </div>
-                  
-                  {/* Basic Info */}
-                  <div className="mb-4">
-                    <h5 className="font-medium text-gray-800 mb-2">Temel Bilgiler</h5>
-                    <div className="text-sm space-y-1">
-                      <p>📞 {cv.personalInfo?.phone || 'Belirtilmemiş'}</p>
-                      <p>📍 {cv.personalInfo?.residenceCity || 'Belirtilmemiş'}</p>
-                      <p>👤 {cv.personalInfo?.gender || 'Belirtilmemiş'}</p>
-                    </div>
-                  </div>
-                  
-                  {/* Education */}
-                  <div className="mb-4">
-                    <h5 className="font-medium text-gray-800 mb-2">Eğitim ({cv.education?.length || 0})</h5>
-                    <div className="text-sm space-y-1">
-                      {cv.education?.slice(0, 2).map((edu, i) => (
-                        <p key={i}>🎓 {edu.degree} - {edu.institution}</p>
-                      )) || <p className="text-gray-500 italic">Eğitim bilgisi yok</p>}
-                    </div>
-                  </div>
-                  
-                  {/* Experience */}
-                  <div className="mb-4">
-                    <h5 className="font-medium text-gray-800 mb-2">Deneyim ({cv.experience?.length || 0})</h5>
-                    <div className="text-sm space-y-1">
-                      {cv.experience?.slice(0, 2).map((exp, i) => (
-                        <p key={i}>💼 {exp.title} - {exp.company}</p>
-                      )) || <p className="text-gray-500 italic">İş deneyimi yok</p>}
-                    </div>
-                  </div>
-                  
-                  {/* Skills */}
-                  <div className="mb-4">
-                    <h5 className="font-medium text-gray-800 mb-2">Beceriler ({cv.skills?.length || 0})</h5>
-                    <div className="flex flex-wrap gap-1">
-                      {cv.skills?.slice(0, 6).map((skill, i) => (
-                        <span key={i} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
-                          {skill.name}
-                        </span>
-                      )) || <p className="text-gray-500 italic text-sm">Beceri bilgisi yok</p>}
-                    </div>
-                  </div>
-                  
-                  {/* Certificates */}
-                  <div className="mb-4">
-                    <h5 className="font-medium text-gray-800 mb-2">Sertifikalar ({cv.certificates?.length || 0})</h5>
-                    <div className="text-sm space-y-1">
-                      {cv.certificates?.slice(0, 2).map((cert, i) => (
-                        <p key={i}>🏆 {cert.name}</p>
-                      )) || <p className="text-gray-500 italic">Sertifika bilgisi yok</p>}
-                    </div>
-                  </div>
-                  
-                  {/* Languages */}
-                  <div>
-                    <h5 className="font-medium text-gray-800 mb-2">Diller ({cv.languages?.length || 0})</h5>
-                    <div className="flex flex-wrap gap-1">
-                      {cv.languages?.map((lang, i) => (
-                        <span key={i} className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
-                          {lang.name}
-                        </span>
-                      )) || <p className="text-gray-500 italic text-sm">Dil bilgisi yok</p>}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            <div className="flex justify-center gap-4 mt-6">
-              {selectedCVs.map((cv) => (
-                <button
-                  key={cv.id}
-                  onClick={() => handleDownloadCV(cv)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  {cv.personalInfo?.firstName} CV İndir
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 };
