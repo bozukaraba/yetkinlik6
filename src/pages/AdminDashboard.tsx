@@ -1046,7 +1046,7 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 )}
               </div>
-            )
+            )}
             
             {isLoading ? (
               <div className="flex justify-center items-center h-64">
