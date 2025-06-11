@@ -51,6 +51,7 @@ export interface Education {
   relevantCourses?: string[];
   projects?: string[];
   awards?: string[];
+  sortOrder?: number;
 }
 
 export interface Experience {
@@ -73,6 +74,7 @@ export interface Experience {
     email?: string;
     phone?: string;
   }[];
+  sortOrder?: number;
 }
 
 export interface Skill {
@@ -81,6 +83,7 @@ export interface Skill {
   level?: number; // 1-5
   category?: string;
   yearsOfExperience?: number;
+  sortOrder?: number;
 }
 
 export interface Language {
@@ -89,6 +92,7 @@ export interface Language {
   examType?: string;
   certificateDate?: string;
   examScore?: string;
+  sortOrder?: number;
 }
 
 export interface Certificate {
@@ -97,6 +101,7 @@ export interface Certificate {
   startDate: string;
   endDate: string;
   duration: string;
+  sortOrder?: number;
 }
 
 export interface Project {
@@ -119,6 +124,7 @@ export interface Publication {
   publisher?: string;
   url?: string;
   description?: string;
+  sortOrder?: number;
 }
 
 export interface Award {
@@ -127,6 +133,7 @@ export interface Award {
   organization: string;
   date: string;
   description?: string;
+  sortOrder?: number;
 }
 
 export interface Reference {
@@ -135,6 +142,7 @@ export interface Reference {
   company: string;
   phone: string;
   type: string;
+  sortOrder?: number;
 }
 
 export interface Volunteer {

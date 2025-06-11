@@ -125,9 +125,12 @@ const CVForm = () => {
         const newIndex = prev.education?.findIndex(edu => edu.id === over.id) ?? -1;
         
         if (oldIndex !== -1 && newIndex !== -1 && prev.education) {
+          const reorderedEducation = arrayMove(prev.education, oldIndex, newIndex)
+            .map((edu, index) => ({ ...edu, sortOrder: index }));
+          
           return {
             ...prev,
-            education: arrayMove(prev.education, oldIndex, newIndex)
+            education: reorderedEducation
           };
         }
         return prev;
@@ -144,9 +147,12 @@ const CVForm = () => {
         const newIndex = prev.experience?.findIndex(exp => exp.id === over.id) ?? -1;
         
         if (oldIndex !== -1 && newIndex !== -1 && prev.experience) {
+          const reorderedExperience = arrayMove(prev.experience, oldIndex, newIndex)
+            .map((exp, index) => ({ ...exp, sortOrder: index }));
+          
           return {
             ...prev,
-            experience: arrayMove(prev.experience, oldIndex, newIndex)
+            experience: reorderedExperience
           };
         }
         return prev;
@@ -163,9 +169,12 @@ const CVForm = () => {
         const newIndex = prev.skills?.findIndex(skill => skill.id === over.id) ?? -1;
         
         if (oldIndex !== -1 && newIndex !== -1 && prev.skills) {
+          const reorderedSkills = arrayMove(prev.skills, oldIndex, newIndex)
+            .map((skill, index) => ({ ...skill, sortOrder: index }));
+          
           return {
             ...prev,
-            skills: arrayMove(prev.skills, oldIndex, newIndex)
+            skills: reorderedSkills
           };
         }
         return prev;
@@ -182,9 +191,12 @@ const CVForm = () => {
         const newIndex = prev.languages?.findIndex(lang => lang.id === over.id) ?? -1;
         
         if (oldIndex !== -1 && newIndex !== -1 && prev.languages) {
+          const reorderedLanguages = arrayMove(prev.languages, oldIndex, newIndex)
+            .map((lang, index) => ({ ...lang, sortOrder: index }));
+          
           return {
             ...prev,
-            languages: arrayMove(prev.languages, oldIndex, newIndex)
+            languages: reorderedLanguages
           };
         }
         return prev;
@@ -198,7 +210,19 @@ const CVForm = () => {
         try {
           const existingCV = await getCVData(currentUser.id);
           if (existingCV) {
-            setFormData(existingCV);
+            // Sort arrays by sortOrder when loading CV
+            const sortedCV = {
+              ...existingCV,
+              education: existingCV.education?.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)),
+              experience: existingCV.experience?.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)),
+              skills: existingCV.skills?.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)),
+              languages: existingCV.languages?.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)),
+              certificates: existingCV.certificates?.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)),
+              awards: existingCV.awards?.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)),
+              publications: existingCV.publications?.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)),
+              references: existingCV.references?.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)),
+            };
+            setFormData(sortedCV);
           }
         } catch (error) {
           console.error('CV yüklenirken hata oluştu:', error);
@@ -356,11 +380,12 @@ const CVForm = () => {
       fieldOfStudy: '',
       startDate: '',
       current: false,
-      description: ''
+      description: '',
+      sortOrder: 0
     };
     setFormData(prev => ({
       ...prev,
-      education: [newEducation, ...(prev.education || [])]
+      education: [newEducation, ...(prev.education || []).map(edu => ({ ...edu, sortOrder: (edu.sortOrder || 0) + 1 }))]
     }));
   };
 
@@ -388,11 +413,12 @@ const CVForm = () => {
       startDate: '',
       current: false,
       description: '',
-      workDuration: ''
+      workDuration: '',
+      sortOrder: 0
     };
     setFormData(prev => ({
       ...prev,
-      experience: [newExperience, ...(prev.experience || [])]
+      experience: [newExperience, ...(prev.experience || []).map(exp => ({ ...exp, sortOrder: (exp.sortOrder || 0) + 1 }))]
     }));
   };
 
@@ -418,11 +444,12 @@ const CVForm = () => {
       name: '',
       level: 1,
       category: '',
-      yearsOfExperience: 0
+      yearsOfExperience: 0,
+      sortOrder: 0
     };
     setFormData(prev => ({
       ...prev,
-      skills: [newSkill, ...(prev.skills || [])]
+      skills: [newSkill, ...(prev.skills || []).map(skill => ({ ...skill, sortOrder: (skill.sortOrder || 0) + 1 }))]
     }));
   };
 
@@ -448,11 +475,12 @@ const CVForm = () => {
       name: '',
       examType: '',
       certificateDate: '',
-      examScore: ''
+      examScore: '',
+      sortOrder: 0
     };
     setFormData(prev => ({
       ...prev,
-      languages: [newLanguage, ...(prev.languages || [])]
+      languages: [newLanguage, ...(prev.languages || []).map(lang => ({ ...lang, sortOrder: (lang.sortOrder || 0) + 1 }))]
     }));
   };
 
