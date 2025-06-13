@@ -1713,7 +1713,7 @@ const CVForm = () => {
                 Yetenek Ekle
               </button>
             </div>
-            <p className="text-sm text-gray-600">(Java, .NET, Excel, Pazarlama, Muhasebe, Satın Alma vb.)</p>
+            <p className="text-sm text-gray-600">(Java, .NET, Excel, Pazarlama, Muhasebe, Satın Alma, İş Geliştirme, Yazılım Geliştirme, Analiz, İnsan Kaynakları vb.)</p>
             
             {formData.skills?.length === 0 ? (
               <div className="text-center py-8 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg">
