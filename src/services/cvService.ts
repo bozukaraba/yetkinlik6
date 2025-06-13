@@ -298,6 +298,7 @@ export const searchCVsByKeywords = async (keywords: string[]): Promise<CVData[]>
         cv.personalInfo?.firstName || '',
         cv.personalInfo?.lastName || '',
         cv.personalInfo?.email || '',
+        cv.personalInfo?.turksatEmployeeNumber || '',
         cv.personalInfo?.summary || '',
         cv.personalInfo?.city || '',
         ...(cv.skills || []).map(skill => skill.name),
