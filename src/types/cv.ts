@@ -3,6 +3,7 @@ export interface PersonalInfo {
   lastName?: string;
   email?: string;
   phone?: string;
+  turksatEmployeeNumber?: string; // Türksat Sicil No
   birthDate?: string;
   address?: string;
   city?: string;

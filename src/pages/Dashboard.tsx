@@ -101,6 +101,12 @@ const Dashboard: React.FC = () => {
                     ${cvData.personalInfo.phone}
                   </div>
                 ` : ''}
+                ${cvData.personalInfo?.turksatEmployeeNumber ? `
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 16px; height: 16px; background: #fff; border-radius: 50%; display: inline-block;"></span>
+                    Türksat Sicil No: ${cvData.personalInfo.turksatEmployeeNumber}
+                  </div>
+                ` : ''}
                 ${cvData.personalInfo?.residenceCity || cvData.personalInfo?.residenceDistrict ? `
                   <div style="display: flex; align-items: center; gap: 8px;">
                     <span style="width: 16px; height: 16px; background: #fff; border-radius: 50%; display: inline-block;"></span>

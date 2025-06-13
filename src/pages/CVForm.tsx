@@ -83,7 +83,8 @@ const CVForm = () => {
       drivingLicense: [],
       linkedIn: '',
       website: '',
-      profileImage: undefined
+      profileImage: undefined,
+      turksatEmployeeNumber: ''
     },
     education: [],
     experience: [],
@@ -724,6 +725,7 @@ const CVForm = () => {
             </h1>
             <p style="color: #6b7280; font-size: 16px;">${formData.personalInfo?.email}</p>
             ${formData.personalInfo?.phone ? `<p style="color: #6b7280; font-size: 16px;">${formData.personalInfo.phone}</p>` : ''}
+            ${formData.personalInfo?.turksatEmployeeNumber ? `<p style="color: #6b7280; font-size: 14px;">Türksat Sicil No: ${formData.personalInfo.turksatEmployeeNumber}</p>` : ''}
             ${formData.personalInfo?.gender ? `<p style="color: #6b7280; font-size: 14px;">Cinsiyet: ${formData.personalInfo.gender}</p>` : ''}
             ${formData.personalInfo?.residenceCity || formData.personalInfo?.residenceDistrict ? `<p style="color: #6b7280; font-size: 14px;">İkametgah: ${formData.personalInfo?.residenceCity || ''}${formData.personalInfo?.residenceCity && formData.personalInfo?.residenceDistrict ? ' / ' : ''}${formData.personalInfo?.residenceDistrict || ''}</p>` : ''}
             ${formData.personalInfo?.linkedIn || formData.personalInfo?.github || formData.personalInfo?.twitter || formData.personalInfo?.website || formData.personalInfo?.instagram || formData.personalInfo?.facebook || formData.personalInfo?.youtube || formData.personalInfo?.tiktok || formData.personalInfo?.discord || formData.personalInfo?.telegram || formData.personalInfo?.whatsapp || formData.personalInfo?.medium || formData.personalInfo?.behance || formData.personalInfo?.dribbble || formData.personalInfo?.stackoverflow ? `
@@ -1101,6 +1103,17 @@ const CVForm = () => {
                   onChange={handlePersonalInfoChange}
                   className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                   required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Türksat Sicil No</label>
+                <input
+                  type="text"
+                  name="turksatEmployeeNumber"
+                  value={formData.personalInfo?.turksatEmployeeNumber || ''}
+                  onChange={handlePersonalInfoChange}
+                  placeholder="Örn: 12345"
+                  className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                 />
               </div>
               <div>
