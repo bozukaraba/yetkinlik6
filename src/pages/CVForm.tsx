@@ -2497,7 +2497,7 @@ const CVForm = () => {
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         <div className="bg-white bg-opacity-95 shadow-lg rounded-lg px-8 py-10 backdrop-blur-sm">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">CV Oluştur</h2>
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Özgeçmiş</h2>
           
           {/* Progress bar */}
           <div className="mb-8">
