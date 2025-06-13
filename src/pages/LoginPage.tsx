@@ -93,9 +93,11 @@ const LoginPage: React.FC = () => {
               <p className="text-base text-black">
                 Sizinle çalışmak bizim için büyük bir mutluluk ve onur. Bu sürecin bir parçası olduğunuz için teşekkür ederiz.
               </p>
-              <p className="text-base text-black">
-                Lütfen, kendinizi en iyi şekilde ifade edin ve mümkün olduğunca detaylı doldurun. Çünkü her bilgi, sizinle daha güçlü bir bağ kurmamıza ve gelişiminize destek olmamıza yardımcı olacak.
-              </p>
+              <blockquote className="border-l-4 border-blue-500 bg-white pl-4 py-3 rounded-r-lg shadow-sm">
+                <p className="text-base text-gray-800 italic">
+                  "Lütfen, kendinizi en iyi şekilde ifade edin ve mümkün olduğunca detaylı doldurun. Çünkü her bilgi, sizinle daha güçlü bir bağ kurmamıza ve gelişiminize destek olmamıza yardımcı olacak."
+                </p>
+              </blockquote>
             </div>
           </div>
         </div>
