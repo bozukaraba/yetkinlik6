@@ -135,7 +135,7 @@ const AdminDashboard: React.FC = () => {
         }
       }
 
-      // Eğitim seviyesi filtresi
+      // Öğrenim düzeyi filtresi
       if (filters.educationLevels.length > 0) {
         const hasRequiredEducation = cv.education?.some(edu =>
           filters.educationLevels.includes(edu.degree || '')
@@ -819,10 +819,10 @@ const AdminDashboard: React.FC = () => {
                 <p className="text-xs text-gray-500 mt-1">Ctrl+click ile çoklu seçim</p>
               </div>
 
-              {/* Eğitim Seviyesi */}
+              {/* Öğrenim Düzeyi */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Eğitim Seviyesi
+                  Öğrenim Düzeyi
                 </label>
                 <select
                   multiple
