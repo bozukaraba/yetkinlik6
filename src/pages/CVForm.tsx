@@ -1112,7 +1112,6 @@ const CVForm = () => {
                   name="turksatEmployeeNumber"
                   value={formData.personalInfo?.turksatEmployeeNumber || ''}
                   onChange={handlePersonalInfoChange}
-                  placeholder="Örn: 12345"
                   className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                 />
               </div>
