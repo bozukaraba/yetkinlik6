@@ -2508,69 +2508,135 @@ const CVForm = () => {
             <div className="grid grid-cols-11 gap-1 text-xs font-medium text-gray-600 mb-4">
               <div 
                 onClick={() => setCurrentStep(1)}
-                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 1 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
-                <span className="block text-sm font-bold">1</span>
-                <span className="block mt-1 text-xs">Kişisel</span>
+                className={`text-center p-3 rounded cursor-pointer transition-all duration-300 hover:bg-blue-50 ${currentStep === 1 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
+                <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  currentStep === 1 
+                    ? 'bg-blue-600 text-white shadow-lg transform scale-110' 
+                    : 'bg-gray-200 text-gray-600 hover:bg-blue-200 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105'
+                }`}>
+                  <span className="text-sm font-bold">1</span>
+                </div>
+                <span className="block text-xs">Kişisel</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(2)}
-                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 2 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
-                <span className="block text-sm font-bold">2</span>
-                <span className="block mt-1 text-xs">Öğrenim</span>
+                className={`text-center p-3 rounded cursor-pointer transition-all duration-300 hover:bg-blue-50 ${currentStep === 2 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
+                <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  currentStep === 2 
+                    ? 'bg-blue-600 text-white shadow-lg transform scale-110' 
+                    : 'bg-gray-200 text-gray-600 hover:bg-blue-200 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105'
+                }`}>
+                  <span className="text-sm font-bold">2</span>
+                </div>
+                <span className="block text-xs">Öğrenim</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(3)}
-                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 3 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
-                <span className="block text-sm font-bold">3</span>
-                <span className="block mt-1 text-xs">Deneyim</span>
+                className={`text-center p-3 rounded cursor-pointer transition-all duration-300 hover:bg-blue-50 ${currentStep === 3 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
+                <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  currentStep === 3 
+                    ? 'bg-blue-600 text-white shadow-lg transform scale-110' 
+                    : 'bg-gray-200 text-gray-600 hover:bg-blue-200 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105'
+                }`}>
+                  <span className="text-sm font-bold">3</span>
+                </div>
+                <span className="block text-xs">Deneyim</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(4)}
-                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 4 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
-                <span className="block text-sm font-bold">4</span>
-                <span className="block mt-1 text-xs">Yetenek ve Yetkinlikler</span>
+                className={`text-center p-3 rounded cursor-pointer transition-all duration-300 hover:bg-blue-50 ${currentStep === 4 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
+                <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  currentStep === 4 
+                    ? 'bg-blue-600 text-white shadow-lg transform scale-110' 
+                    : 'bg-gray-200 text-gray-600 hover:bg-blue-200 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105'
+                }`}>
+                  <span className="text-sm font-bold">4</span>
+                </div>
+                <span className="block text-xs">Yetenek ve Yetkinlikler</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(5)}
-                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 5 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
-                <span className="block text-sm font-bold">5</span>
-                <span className="block mt-1 text-xs">Sertifika ve Eğitimler</span>
+                className={`text-center p-3 rounded cursor-pointer transition-all duration-300 hover:bg-blue-50 ${currentStep === 5 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
+                <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  currentStep === 5 
+                    ? 'bg-blue-600 text-white shadow-lg transform scale-110' 
+                    : 'bg-gray-200 text-gray-600 hover:bg-blue-200 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105'
+                }`}>
+                  <span className="text-sm font-bold">5</span>
+                </div>
+                <span className="block text-xs">Sertifika ve Eğitimler</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(6)}
-                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 6 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
-                <span className="block text-sm font-bold">6</span>
-                <span className="block mt-1 text-xs">Yabancı Dil</span>
+                className={`text-center p-3 rounded cursor-pointer transition-all duration-300 hover:bg-blue-50 ${currentStep === 6 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
+                <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  currentStep === 6 
+                    ? 'bg-blue-600 text-white shadow-lg transform scale-110' 
+                    : 'bg-gray-200 text-gray-600 hover:bg-blue-200 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105'
+                }`}>
+                  <span className="text-sm font-bold">6</span>
+                </div>
+                <span className="block text-xs">Yabancı Dil</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(7)}
-                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 7 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
-                <span className="block text-sm font-bold">7</span>
-                <span className="block mt-1 text-xs">Yayınlar ve Makaleler</span>
+                className={`text-center p-3 rounded cursor-pointer transition-all duration-300 hover:bg-blue-50 ${currentStep === 7 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
+                <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  currentStep === 7 
+                    ? 'bg-blue-600 text-white shadow-lg transform scale-110' 
+                    : 'bg-gray-200 text-gray-600 hover:bg-blue-200 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105'
+                }`}>
+                  <span className="text-sm font-bold">7</span>
+                </div>
+                <span className="block text-xs">Yayınlar ve Makaleler</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(8)}
-                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 8 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
-                <span className="block text-sm font-bold">8</span>
-                <span className="block mt-1 text-xs">Ödül ve Başarılar</span>
+                className={`text-center p-3 rounded cursor-pointer transition-all duration-300 hover:bg-blue-50 ${currentStep === 8 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
+                <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  currentStep === 8 
+                    ? 'bg-blue-600 text-white shadow-lg transform scale-110' 
+                    : 'bg-gray-200 text-gray-600 hover:bg-blue-200 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105'
+                }`}>
+                  <span className="text-sm font-bold">8</span>
+                </div>
+                <span className="block text-xs">Ödül ve Başarılar</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(9)}
-                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 9 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
-                <span className="block text-sm font-bold">9</span>
-                <span className="block mt-1 text-xs">Referans</span>
+                className={`text-center p-3 rounded cursor-pointer transition-all duration-300 hover:bg-blue-50 ${currentStep === 9 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
+                <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  currentStep === 9 
+                    ? 'bg-blue-600 text-white shadow-lg transform scale-110' 
+                    : 'bg-gray-200 text-gray-600 hover:bg-blue-200 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105'
+                }`}>
+                  <span className="text-sm font-bold">9</span>
+                </div>
+                <span className="block text-xs">Referans</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(10)}
-                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 10 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
-                <span className="block text-sm font-bold">10</span>
-                <span className="block mt-1 text-xs">Hobi ve İlgi Alanları</span>
+                className={`text-center p-3 rounded cursor-pointer transition-all duration-300 hover:bg-blue-50 ${currentStep === 10 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
+                <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  currentStep === 10 
+                    ? 'bg-blue-600 text-white shadow-lg transform scale-110' 
+                    : 'bg-gray-200 text-gray-600 hover:bg-blue-200 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105'
+                }`}>
+                  <span className="text-sm font-bold">10</span>
+                </div>
+                <span className="block text-xs">Hobi ve İlgi Alanları</span>
               </div>
               <div 
                 onClick={() => setCurrentStep(11)}
-                className={`text-center p-3 rounded cursor-pointer transition-colors hover:bg-blue-50 ${currentStep === 11 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
-                <span className="block text-sm font-bold">11</span>
-                <span className="block mt-1 text-xs">Değerlendirme</span>
+                className={`text-center p-3 rounded cursor-pointer transition-all duration-300 hover:bg-blue-50 ${currentStep === 11 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
+                <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  currentStep === 11 
+                    ? 'bg-blue-600 text-white shadow-lg transform scale-110' 
+                    : 'bg-gray-200 text-gray-600 hover:bg-blue-200 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105'
+                }`}>
+                  <span className="text-sm font-bold">11</span>
+                </div>
+                <span className="block text-xs">Değerlendirme</span>
               </div>
             </div>
             <div className="h-2 bg-gray-200 rounded-full">
