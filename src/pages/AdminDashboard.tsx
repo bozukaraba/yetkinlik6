@@ -1535,14 +1535,23 @@ const AdminDashboard: React.FC = () => {
                       Hobi ve İlgi Alanları
                     </h2>
                     
-                    <div className="flex flex-wrap gap-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                       {selectedCV.hobbies.map((hobby, index) => (
-                        <span 
+                        <div 
                           key={hobby.id || index} 
-                          className="px-3 py-1 bg-purple-100 text-purple-800 rounded"
+                          className="border border-purple-200 bg-purple-50 rounded-lg p-3"
                         >
-                          {typeof hobby === 'string' ? hobby : (hobby.category === 'Diğer' ? hobby.customValue || 'Diğer' : hobby.category)}
-                        </span>
+                          <div className="flex flex-col">
+                            <span className="font-medium text-purple-800 text-sm">
+                              {typeof hobby === 'string' ? hobby : hobby.category}
+                            </span>
+                            {typeof hobby !== 'string' && hobby.customValue && (
+                              <span className="text-purple-600 text-xs mt-1">
+                                {hobby.customValue}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </div>
