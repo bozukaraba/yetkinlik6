@@ -80,7 +80,7 @@ const AdminDashboard: React.FC = () => {
       });
       if (cv.personalInfo?.city) cities.add(cv.personalInfo.city);
       cv.education?.forEach(edu => {
-        if (edu.degree) educationLevels.add(edu.degree);
+        if (edu.educationLevel) educationLevels.add(edu.educationLevel);
       });
     });
 
@@ -138,7 +138,7 @@ const AdminDashboard: React.FC = () => {
       // Öğrenim düzeyi filtresi
       if (filters.educationLevels.length > 0) {
         const hasRequiredEducation = cv.education?.some(edu =>
-          filters.educationLevels.includes(edu.degree || '')
+          filters.educationLevels.includes(edu.educationLevel || '')
         );
         if (!hasRequiredEducation) return false;
       }
