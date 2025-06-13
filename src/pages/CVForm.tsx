@@ -1619,6 +1619,30 @@ const CVForm = () => {
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         />
                       </div>
+                    </div>
+                    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Görev</label>
+                        <textarea
+                          value={exp.tasks || ''}
+                          onChange={(e) => updateExperience(index, 'tasks', e.target.value)}
+                          rows={3}
+                          placeholder="Görevlerinizi detaylıca açıklayınız..."
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Proje</label>
+                        <textarea
+                          value={exp.projectDetails || ''}
+                          onChange={(e) => updateExperience(index, 'projectDetails', e.target.value)}
+                          rows={3}
+                          placeholder="Yaptığınız projeleri detaylıca açıklayınız..."
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Çalışma Süresi</label>
                         <input
@@ -1656,28 +1680,6 @@ const CVForm = () => {
                           className="h-5 w-5 text-blue-600 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                         />
                         <label className="ml-2 block text-sm text-gray-900">Halen çalışıyorum</label>
-                      </div>
-                    </div>
-                    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Görev</label>
-                        <textarea
-                          value={exp.tasks || ''}
-                          onChange={(e) => updateExperience(index, 'tasks', e.target.value)}
-                          rows={3}
-                          placeholder="Görevlerinizi detaylıca açıklayınız..."
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Proje</label>
-                        <textarea
-                          value={exp.projectDetails || ''}
-                          onChange={(e) => updateExperience(index, 'projectDetails', e.target.value)}
-                          rows={3}
-                          placeholder="Yaptığınız projeleri detaylıca açıklayınız..."
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
                       </div>
                     </div>
                     <div className="mt-4">
