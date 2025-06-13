@@ -1619,6 +1619,16 @@ const CVForm = () => {
                           className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
                         />
                       </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Çalışma Süresi</label>
+                        <input
+                          type="text"
+                          value={exp.workDuration || ''}
+                          onChange={(e) => updateExperience(index, 'workDuration', e.target.value)}
+                          placeholder="Örn: 2 yıl 6 ay, 1.5 yıl, 18 ay"
+                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                        />
+                      </div>
                     </div>
                     <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
@@ -1643,16 +1653,6 @@ const CVForm = () => {
                       </div>
                     </div>
                     <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Çalışma Süresi</label>
-                        <input
-                          type="text"
-                          value={exp.workDuration || ''}
-                          onChange={(e) => updateExperience(index, 'workDuration', e.target.value)}
-                          placeholder="Örn: 2 yıl 6 ay, 1.5 yıl, 18 ay"
-                          className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                        />
-                      </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Başlangıç Tarihi</label>
                         <input

@@ -304,12 +304,12 @@ const Dashboard: React.FC = () => {
           
           if (cvData.personalInfo.email) {
             pdf.text(cvData.personalInfo.email, 10, yPosition);
-            yPosition += lineHeight;
+          yPosition += lineHeight;
           }
           
           if (cvData.personalInfo.phone) {
             pdf.text(cvData.personalInfo.phone, 10, yPosition);
-            yPosition += lineHeight;
+              yPosition += lineHeight;
           }
           
           if (cvData.personalInfo.residenceCity || cvData.personalInfo.residenceDistrict) {
@@ -339,8 +339,8 @@ const Dashboard: React.FC = () => {
               const descLines = pdf.splitTextToSize(edu.description, 180);
               descLines.forEach((line: string) => {
                 pdf.text(line, 10, yPosition);
-                yPosition += lineHeight;
-              });
+          yPosition += lineHeight;
+        });
             }
           });
         }
@@ -352,15 +352,15 @@ const Dashboard: React.FC = () => {
           
           cvData.experience.forEach(exp => {
             pdf.text(`${exp.company} ${exp.title} ${exp.location || ''}`, 10, yPosition);
-            yPosition += lineHeight;
-            
+          yPosition += lineHeight;
+          
             if (exp.description) {
               const descLines = pdf.splitTextToSize(exp.description, 180);
               descLines.forEach((line: string) => {
                 pdf.text(line, 10, yPosition);
-                yPosition += lineHeight;
-              });
-            }
+              yPosition += lineHeight;
+            });
+          }
           });
         }
         
@@ -371,9 +371,9 @@ const Dashboard: React.FC = () => {
           
           cvData.skills.forEach(skill => {
             pdf.text(`${skill.name} ${skill.level || ''} ${skill.yearsOfExperience || ''}`, 10, yPosition);
-            yPosition += lineHeight;
-          });
-        }
+              yPosition += lineHeight;
+            });
+          }
         
         // Sertifikalar
         if (cvData.certificates && cvData.certificates.length > 0) {
@@ -382,8 +382,8 @@ const Dashboard: React.FC = () => {
           
           cvData.certificates.forEach(cert => {
             pdf.text(`${cert.name} ${cert.startDate} ${cert.endDate} ${cert.duration || ''}`, 10, yPosition);
-            yPosition += lineHeight;
-          });
+          yPosition += lineHeight;
+        });
         }
         
         // Diller
@@ -393,7 +393,7 @@ const Dashboard: React.FC = () => {
           
           cvData.languages.forEach(lang => {
             pdf.text(`${lang.name} ${lang.examType || ''} ${lang.examScore || ''}`, 10, yPosition);
-            yPosition += lineHeight;
+          yPosition += lineHeight;
           });
         }
       }

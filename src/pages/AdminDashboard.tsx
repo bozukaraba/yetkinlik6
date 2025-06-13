@@ -964,30 +964,30 @@ const AdminDashboard: React.FC = () => {
                         <div className="flex justify-between items-start">
                           <div className="flex items-start gap-3 flex-1">
                             <div className="flex-1">
-                              <h3 className="font-medium text-gray-900">{cv.personalInfo?.firstName} {cv.personalInfo?.lastName}</h3>
-                              <p className="text-sm text-gray-600">{cv.personalInfo?.email}</p>
-                              
-                              {cv.skills && cv.skills.length > 0 && (
-                                <div className="mt-2 flex flex-wrap gap-1">
-                                  {cv.skills.slice(0, 3).map(skill => (
-                                    <span 
-                                      key={skill.id} 
-                                      className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
-                                    >
-                                      {skill.name}
-                                    </span>
-                                  ))}
-                                  {cv.skills.length > 3 && (
-                                    <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded">
-                                      +{cv.skills.length - 3} daha
-                                    </span>
-                                  )}
-                                </div>
-                              )}
-                            </div>
+                            <h3 className="font-medium text-gray-900">{cv.personalInfo?.firstName} {cv.personalInfo?.lastName}</h3>
+                            <p className="text-sm text-gray-600">{cv.personalInfo?.email}</p>
+                            
+                            {cv.skills && cv.skills.length > 0 && (
+                              <div className="mt-2 flex flex-wrap gap-1">
+                                {cv.skills.slice(0, 3).map(skill => (
+                                  <span 
+                                    key={skill.id} 
+                                    className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
+                                  >
+                                    {skill.name}
+                                  </span>
+                                ))}
+                                {cv.skills.length > 3 && (
+                                  <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded">
+                                    +{cv.skills.length - 3} daha
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <FileText className="h-5 w-5 text-gray-400" />
+                          <FileText className="h-5 w-5 text-gray-400" />
                           </div>
                         </div>
                       </div>
