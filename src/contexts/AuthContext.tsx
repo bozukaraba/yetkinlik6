@@ -1,15 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  User as FirebaseUser,
-  updateProfile,
-  sendPasswordResetEmail
-} from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../lib/firebase';
+import { authAPI, tokenManager, handleApiError } from '../services/apiService';
 
 // Define user types
 export interface User {
@@ -24,7 +14,6 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
-  resetPassword: (email: string) => Promise<void>;
   loading: boolean;
   isAdmin: () => boolean;
 }
@@ -47,223 +36,96 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Load user from Firebase on initial render
+  // Load user from token on initial render
   useEffect(() => {
-    let isMounted = true;
-    
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    const loadUserFromToken = async () => {
       try {
-        if (firebaseUser && isMounted) {
-          console.log('Firebase user found:', firebaseUser.uid);
-          await loadUserProfile(firebaseUser);
-        } else if (isMounted) {
-          console.log('No Firebase user found');
+        const token = tokenManager.getToken();
+        if (token && tokenManager.isTokenValid()) {
+          console.log('Valid token found, loading user profile...');
+          const response = await authAPI.getProfile();
+          if (response.success && response.data?.user) {
+            setCurrentUser(response.data.user);
+            console.log('User profile loaded:', response.data.user);
+          } else {
+            console.log('Failed to load user profile');
+            tokenManager.removeToken();
+            setCurrentUser(null);
+          }
+        } else {
+          console.log('No valid token found');
+          tokenManager.removeToken();
           setCurrentUser(null);
         }
       } catch (error) {
-        console.error('Auth state change error:', error);
-        if (isMounted) {
-          setCurrentUser(null);
-        }
+        console.error('Error loading user from token:', error);
+        tokenManager.removeToken();
+        setCurrentUser(null);
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
-    });
-
-    return () => {
-      isMounted = false;
-      unsubscribe();
     };
+
+    loadUserFromToken();
   }, []);
-
-  const loadUserProfile = async (firebaseUser: FirebaseUser) => {
-    try {
-      console.log('Loading user profile for:', firebaseUser.uid);
-      
-      // Check if user is admin
-      const isAdmin = firebaseUser.email === 'yetkinlikxadmin@turksat.com.tr';
-      
-      // Get user data from Firestore with retry mechanism
-      const userDocRef = doc(db, 'users', firebaseUser.uid);
-      let userDoc = await getDoc(userDocRef);
-      
-      // If user doc doesn't exist, wait a bit and try again (for new registrations)
-      if (!userDoc.exists()) {
-        console.log('User profile not found, waiting and retrying...');
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        userDoc = await getDoc(userDocRef);
-      }
-      
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        console.log('User profile loaded from Firestore:', userData);
-        setCurrentUser({
-          id: firebaseUser.uid,
-          email: firebaseUser.email || '',
-          name: userData.name || firebaseUser.displayName || '',
-          role: userData.role || (isAdmin ? 'admin' : 'user')
-        });
-      } else {
-        console.log('User profile still not found, creating new profile');
-        await createUserProfile(firebaseUser, isAdmin);
-      }
-    } catch (error) {
-      console.error('Error loading user profile:', error);
-      // Fallback user object
-      setCurrentUser({
-        id: firebaseUser.uid,
-        email: firebaseUser.email || '',
-        name: firebaseUser.displayName || firebaseUser.email || '',
-        role: firebaseUser.email === 'yetkinlikxadmin@turksat.com.tr' ? 'admin' : 'user'
-      });
-    }
-  };
-
-  const createUserProfile = async (firebaseUser: FirebaseUser, isAdmin: boolean) => {
-    try {
-      const userData = {
-        id: firebaseUser.uid,
-        email: firebaseUser.email || '',
-        name: firebaseUser.displayName || firebaseUser.email || '',
-        role: isAdmin ? 'admin' : 'user',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-
-      const userDocRef = doc(db, 'users', firebaseUser.uid);
-      await setDoc(userDocRef, userData);
-      
-      console.log('User profile created successfully:', userData);
-      setCurrentUser({
-        id: userData.id,
-        email: userData.email,
-        name: userData.name,
-        role: userData.role as 'user' | 'admin'
-      });
-    } catch (error) {
-      console.error('Failed to create user profile:', error);
-      // Fallback user object
-      setCurrentUser({
-        id: firebaseUser.uid,
-        email: firebaseUser.email || '',
-        name: firebaseUser.displayName || firebaseUser.email || '',
-        role: isAdmin ? 'admin' : 'user'
-      });
-    }
-  };
 
   const login = async (email: string, password: string) => {
     try {
       console.log('Attempting login for:', email);
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log('Login successful for user:', userCredential.user.uid);
+      setLoading(true);
+      
+      const response = await authAPI.login({ email, password });
+      
+      if (response.success && response.data?.user) {
+        setCurrentUser(response.data.user);
+        console.log('Login successful for user:', response.data.user.id);
+      } else {
+        throw new Error(response.message || 'Giriş yapılırken bir hata oluştu');
+      }
     } catch (error: any) {
       console.error('Login error:', error);
       
-      // Handle specific Firebase errors
-      let errorMessage = 'Giriş yapılırken bir hata oluştu';
-      
-      if (error.code === 'auth/user-not-found') {
-        errorMessage = 'Bu e-posta adresi ile kayıtlı kullanıcı bulunamadı. Lütfen önce hesap oluşturun.';
-      } else if (error.code === 'auth/wrong-password') {
-        errorMessage = 'Hatalı şifre. Lütfen şifrenizi kontrol edin.';
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Geçersiz e-posta adresi. Lütfen doğru bir e-posta adresi girin.';
-      } else if (error.code === 'auth/user-disabled') {
-        errorMessage = 'Bu hesap devre dışı bırakılmış. Lütfen yöneticiye başvurun.';
-      } else if (error.code === 'auth/too-many-requests') {
-        errorMessage = 'Çok fazla başarısız giriş denemesi. Lütfen daha sonra tekrar deneyin.';
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
+      const errorMessage = handleApiError(error) || 'Giriş yapılırken bir hata oluştu';
       throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
   const register = async (email: string, password: string, name: string) => {
     try {
       console.log('Attempting registration for:', email);
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      setLoading(true);
       
-      // Update display name
-      await updateProfile(userCredential.user, {
-        displayName: name
-      });
+      const response = await authAPI.register({ email, password, name });
       
-      console.log('Registration successful for user:', userCredential.user.uid);
-      
-      // Create user profile in Firestore immediately
-      const isAdmin = email === 'yetkinlikxadmin@turksat.com.tr';
-      const userData = {
-        id: userCredential.user.uid,
-        email: email,
-        name: name,
-        role: isAdmin ? 'admin' : 'user',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-
-      const userDocRef = doc(db, 'users', userCredential.user.uid);
-      await setDoc(userDocRef, userData);
-      
-      console.log('User profile created in Firestore:', userData);
-      
+      if (response.success && response.data?.user) {
+        setCurrentUser(response.data.user);
+        console.log('Registration successful for user:', response.data.user.id);
+      } else {
+        throw new Error(response.message || 'Kayıt olurken bir hata oluştu');
+      }
     } catch (error: any) {
       console.error('Registration error:', error);
       
-      // Handle specific Firebase errors
-      let errorMessage = 'Kayıt olurken bir hata oluştu';
-      
-      if (error.code === 'auth/email-already-in-use') {
-        errorMessage = 'Bu e-posta adresi zaten kullanımda. Lütfen farklı bir e-posta adresi deneyin veya giriş yapın.';
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = 'Şifre çok zayıf. Lütfen daha güçlü bir şifre seçin.';
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Geçersiz e-posta adresi. Lütfen doğru bir e-posta adresi girin.';
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
+      const errorMessage = handleApiError(error) || 'Kayıt olurken bir hata oluştu';
       throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
   const logout = async () => {
     try {
-      console.log('Logging out user');
-      await signOut(auth);
+      console.log('Attempting logout...');
+      await authAPI.logout();
+      setCurrentUser(null);
       console.log('Logout successful');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Logout error:', error);
-      throw new Error(error.message || 'Çıkış yapılırken bir hata oluştu');
-    }
-  };
-
-  const resetPassword = async (email: string) => {
-    try {
-      console.log('Sending password reset email to:', email);
-      await sendPasswordResetEmail(auth, email);
-      console.log('Password reset email sent successfully');
-    } catch (error: any) {
-      console.error('Password reset error:', error);
-      
-      // Handle specific Firebase errors
-      let errorMessage = 'Şifre sıfırlama e-postası gönderilirken bir hata oluştu';
-      
-      if (error.code === 'auth/user-not-found') {
-        errorMessage = 'Bu e-posta adresi ile kayıtlı kullanıcı bulunamadı.';
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Geçersiz e-posta adresi. Lütfen doğru bir e-posta adresi girin.';
-      } else if (error.code === 'auth/too-many-requests') {
-        errorMessage = 'Çok fazla istek gönderildi. Lütfen daha sonra tekrar deneyin.';
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      throw new Error(errorMessage);
+      // Logout should always succeed locally even if API fails
+      tokenManager.removeToken();
+      setCurrentUser(null);
     }
   };
 
@@ -276,7 +138,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     login,
     register,
     logout,
-    resetPassword,
     loading,
     isAdmin
   };

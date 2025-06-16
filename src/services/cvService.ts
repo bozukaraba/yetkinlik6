@@ -1,49 +1,55 @@
-// PostgreSQL servisleri
-import * as postgresService from './postgresService';
-import { auth } from '../lib/firebase'; // Auth için Firebase kullanmaya devam
+// API servisleri
+import { cvAPI, tokenManager } from './apiService';
 import type { CVData } from '../types/cv';
 
-// Get CV data from PostgreSQL
+// Mevcut kullanıcının ID'sini al
+const getCurrentUserId = (): string | null => {
+  const token = tokenManager.getToken();
+  if (!token || !tokenManager.isTokenValid()) {
+    return null;
+  }
+  
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.userId;
+  } catch {
+    return null;
+  }
+};
+
+// Get CV data from API
 export const getCVData = async (userId: string): Promise<CVData | null> => {
   try {
-    return await postgresService.getCVData(userId);
+    return await cvAPI.getCVData(userId);
   } catch (error) {
     console.error('Error getting CV data:', error);
     throw error;
   }
 };
 
-// Save CV data to PostgreSQL
+// Save CV data to API
 export const saveCVData = async (userId: string, data: CVData): Promise<CVData> => {
   try {
     console.log('=== saveCVData BAŞLADI ===');
     console.log('saveCVData called for user:', userId);
     
     // Check authentication
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
+    const currentUserId = getCurrentUserId();
+    if (!currentUserId) {
       console.error('No current user found');
       throw new Error('Kullanıcı oturumu bulunamadı. Lütfen tekrar giriş yapın.');
     }
     
-    console.log('Current user UID:', currentUser.uid);
+    console.log('Current user ID:', currentUserId);
     console.log('Target user ID:', userId);
     
-    if (currentUser.uid !== userId) {
-      console.error('User ID mismatch:', { currentUser: currentUser.uid, targetUser: userId });
+    if (currentUserId !== userId) {
+      console.error('User ID mismatch:', { currentUser: currentUserId, targetUser: userId });
       throw new Error('Kullanıcı ID eşleşmiyor');
     }
 
-    // Check if user has valid token
-    const token = await currentUser.getIdToken(true);
-    console.log('User token obtained successfully');
-    
-    if (!token) {
-      throw new Error('Authentication token alınamadı. Lütfen tekrar giriş yapın.');
-    }
-
-    // Save to PostgreSQL
-    const result = await postgresService.saveCVData(userId, data);
+    // Save to API
+    const result = await cvAPI.saveCVData(userId, data);
     console.log('CV data saved successfully');
     return result;
   } catch (error: any) {
@@ -61,18 +67,11 @@ export const saveCVData = async (userId: string, data: CVData): Promise<CVData> 
 // Get all CVs (admin only)
 export const getAllCVs = async (): Promise<CVData[]> => {
   try {
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
+    if (!getCurrentUserId()) {
       throw new Error('Kullanıcı oturumu bulunamadı');
     }
 
-    // Check if user is admin
-    const userRole = await postgresService.getUserRole(currentUser.uid);
-    if (userRole !== 'admin') {
-      throw new Error('Bu işlem için admin yetkisi gerekli');
-    }
-
-    return await postgresService.getAllCVs();
+    return await cvAPI.getAllCVs();
   } catch (error) {
     console.error('Error getting all CVs:', error);
     throw error;
@@ -82,20 +81,12 @@ export const getAllCVs = async (): Promise<CVData[]> => {
 // Delete CV
 export const deleteCVData = async (userId: string): Promise<void> => {
   try {
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
+    const currentUserId = getCurrentUserId();
+    if (!currentUserId) {
       throw new Error('Kullanıcı oturumu bulunamadı');
     }
-    
-    // Check if user owns the CV or is admin
-    if (currentUser.uid !== userId) {
-      const userRole = await postgresService.getUserRole(currentUser.uid);
-      if (userRole !== 'admin') {
-        throw new Error('Bu CV\'yi silme yetkiniz yok');
-      }
-    }
 
-    await postgresService.deleteCVData(userId);
+    await cvAPI.deleteCVData(userId);
     console.log('CV deleted successfully');
   } catch (error) {
     console.error('Error deleting CV:', error);
@@ -105,24 +96,18 @@ export const deleteCVData = async (userId: string): Promise<void> => {
 
 // Initialize empty CV for new users
 export const initializeEmptyCV = async (userId: string): Promise<CVData> => {
-  return await postgresService.initializeEmptyCV(userId);
+  return await cvAPI.initializeEmptyCV(userId);
 };
 
 // Search CVs by keywords (admin only)
 export const searchCVsByKeywords = async (keywords: string[]): Promise<CVData[]> => {
   try {
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
+    if (!getCurrentUserId()) {
       throw new Error('Kullanıcı oturumu bulunamadı');
     }
 
-    // Check if user is admin
-    const userRole = await postgresService.getUserRole(currentUser.uid);
-    if (userRole !== 'admin') {
-      throw new Error('Bu işlem için admin yetkisi gerekli');
-    }
-
-    return await postgresService.searchCVsByKeywords(keywords);
+    const keywordString = keywords.join(',');
+    return await cvAPI.searchCVs(keywordString);
   } catch (error) {
     console.error('Error searching CVs:', error);
     throw error;
