@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "init-db": "tsx src/scripts/initDatabase.ts"
+    "init-db": "tsx src/scripts/initDatabase.ts",
+    "check-db": "tsx src/scripts/checkTables.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
