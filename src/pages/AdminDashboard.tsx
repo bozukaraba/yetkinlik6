@@ -25,7 +25,6 @@ const useDebounce = (value: string, delay: number) => {
 };
 
 const AdminDashboard: React.FC = () => {
-  const { currentUser } = useAuth();
   const [allCVs, setAllCVs] = useState<CVData[]>([]);
   const [cvList, setCVList] = useState<CVData[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -231,67 +230,7 @@ const AdminDashboard: React.FC = () => {
 
 
 
-  // PDF Blob oluşturma fonksiyonu
-  const generatePDFBlob = async (cv: CVData): Promise<Blob> => {
-    // PDF oluşturma kodunu buraya taşıyacağız (handleDownloadCV'den)
-    const element = document.createElement('div');
-    element.id = 'cv-preview-temp';
-    element.style.position = 'absolute';
-    element.style.left = '-9999px';
-    element.style.top = '0';
-    element.style.padding = '40px';
-    element.style.width = '210mm';
-    element.style.minHeight = '297mm';
-    element.style.fontFamily = 'Arial, sans-serif';
-    element.style.backgroundColor = '#ffffff';
-    
-    // CV HTML içeriği (handleDownloadCV'deki ile aynı)
-    element.innerHTML = `
-      <div style="max-width: 800px; margin: 0 auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #2d3748; line-height: 1.6;">
-        <!-- CV Header -->
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; margin: -40px -40px 30px -40px; text-align: center; position: relative;">
-          <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);"></div>
-          <div style="position: relative; z-index: 1;">
-            <h1 style="font-size: 36px; font-weight: 700; margin: 0 0 10px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-              ${cv.personalInfo?.firstName} ${cv.personalInfo?.lastName}
-            </h1>
-            <div style="height: 3px; width: 60px; background: #fff; margin: 15px auto 20px auto; border-radius: 2px;"></div>
-            <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; font-size: 16px;">
-              ${cv.personalInfo?.email ? `
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="width: 16px; height: 16px; background: #fff; border-radius: 50%; display: inline-block;"></span>
-                  ${cv.personalInfo.email}
-                </div>
-              ` : ''}
-            </div>
-          </div>
-        </div>
-        <!-- Diğer bölümler buraya eklenecek... -->
-      </div>
-    `;
 
-    document.body.appendChild(element);
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      logging: false
-    });
-    document.body.removeChild(element);
-
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const imgWidth = 210;
-    const pageHeight = 295;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    
-    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-    
-    return new Promise((resolve) => {
-      const blob = pdf.output('blob');
-      resolve(blob);
-    });
-  };
 
   const handleDownloadCV = async (cv: CVData) => {
     try {

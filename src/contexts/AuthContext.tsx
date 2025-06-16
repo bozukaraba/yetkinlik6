@@ -85,7 +85,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } catch (error: any) {
       console.error('Login error:', error);
       
-      const errorMessage = handleApiError(error) || 'Giriş yapılırken bir hata oluştu';
+      const errorMessage = error instanceof Error ? error.message : 'Giriş hatası oluştu';
       throw new Error(errorMessage);
     } finally {
       setLoading(false);
@@ -108,7 +108,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } catch (error: any) {
       console.error('Registration error:', error);
       
-      const errorMessage = handleApiError(error) || 'Kayıt olurken bir hata oluştu';
+      const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata oluştu';
       throw new Error(errorMessage);
     } finally {
       setLoading(false);
