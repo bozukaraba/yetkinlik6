@@ -1,215 +1,93 @@
-# Yetkinlikx CV Management System - Backend API
+# yetkinlik-db
 
-Backend API for the Yetkinlikx CV Management System, designed for Türksat infrastructure.
 
-## 🏗️ Architecture
 
-- **Framework**: Express.js
-- **Database**: PostgreSQL (Türksat Server: 10.101.15.130:6432)
-- **Authentication**: JWT-based
-- **Environment**: Node.js 18+
+## Getting started
 
-## 📋 Prerequisites
+To make it easy for you to get started with GitLab, here's a list of recommended next steps.
 
-- Node.js >= 18.0.0
-- npm or yarn
-- PostgreSQL access to Türksat server
-- PM2 (for production deployment)
+Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
 
-## 🚀 Quick Start
+## Add your files
 
-### Development
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Start with mock database (for testing)
-USE_MOCK_DB=true npm run dev
-```
-
-### Production
-```bash
-# Install dependencies
-npm ci --production
-
-# Start with PM2
-pm2 start ecosystem.config.js
-
-# Or start directly
-npm start
-```
-
-## 🔧 Configuration
-
-### Environment Variables
-
-Create `.env` file:
-
-```env
-# Database Configuration
-DB_HOST=10.101.15.130
-DB_PORT=6432
-DB_NAME=yetkinlik_prod
-DB_USER=yetkinlik_appuser
-DB_PASSWORD=Vaethe!ePhaesoZ2eiPhooKo
-
-# Admin Database User
-DB_ADMIN_USER=ukotbas
-DB_ADMIN_PASSWORD=shie0hieKohhie!leig0eequ
-
-# JWT Configuration
-JWT_SECRET=your-secret-key-here
-
-# Server Configuration
-PORT=3001
-NODE_ENV=production
-CORS_ORIGIN=https://your-frontend-domain.com
-
-# Mock Database (for development)
-USE_MOCK_DB=false
-```
-
-### Database Connection
-
-The system automatically falls back to mock database if PostgreSQL connection fails:
-
-- **Primary**: PostgreSQL (Türksat Server)
-- **Fallback**: Mock Database (Development)
-
-## 📁 Project Structure
+- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
+- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
 
 ```
-backend/
-├── config/
-│   ├── database.js          # PostgreSQL & Mock DB configuration
-│   └── mockDatabase.js      # Mock database implementation
-├── controllers/
-│   ├── authController.js    # Authentication logic
-│   ├── cvController.js      # CV CRUD operations
-│   └── userController.js    # User management
-├── middleware/
-│   ├── auth.js              # JWT authentication middleware
-│   ├── cors.js              # CORS configuration
-│   └── rateLimiter.js       # Rate limiting
-├── routes/
-│   ├── auth.js              # Authentication routes
-│   ├── cv.js                # CV management routes
-│   └── users.js             # User management routes
-├── scripts/
-│   └── checkDb.js           # Database connection tester
-├── server.js                # Main server file
-├── package.json
-└── README.md
+cd existing_repo
+git remote add origin https://gitlab.turksat.com.tr/ygd/websites/yetkinlik-db.git
+git branch -M master
+git push -uf origin master
 ```
 
-## 🛡️ Security Features
+## Integrate with your tools
 
-- JWT-based authentication
-- Password hashing with bcrypt
-- Rate limiting
-- CORS protection
-- Helmet security headers
-- Input validation
+- [ ] [Set up project integrations](https://gitlab.turksat.com.tr/ygd/websites/yetkinlik-db/-/settings/integrations)
 
-## 📊 API Endpoints
+## Collaborate with your team
 
-### Authentication
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `POST /api/auth/logout` - User logout
-- `GET /api/auth/profile` - Get user profile
+- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
+- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
+- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
+- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
+- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
 
-### CV Management
-- `GET /api/cv` - Get user's CV
-- `POST /api/cv` - Create/Update CV
-- `DELETE /api/cv` - Delete CV
-- `GET /api/cv/all` - Get all CVs (Admin only)
-- `GET /api/cv/search` - Search CVs (Admin only)
+## Test and Deploy
 
-### Users (Admin only)
-- `GET /api/users` - Get all users
-- `GET /api/users/:id` - Get specific user
-- `PUT /api/users/:id` - Update user
-- `DELETE /api/users/:id` - Delete user
+Use the built-in continuous integration in GitLab.
 
-## 🏥 Health Check
+- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
+- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
+- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
+- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
+- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
 
-- `GET /health` - Server health status
+***
 
-## 🚀 Deployment
+# Editing this README
 
-### PM2 Configuration
+When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
 
-```javascript
-// ecosystem.config.js
-module.exports = {
-  apps: [{
-    name: 'yetkinlik-backend',
-    script: 'server.js',
-    instances: 'max',
-    exec_mode: 'cluster',
-    env: {
-      NODE_ENV: 'production',
-      PORT: 3001
-    }
-  }]
-};
-```
+## Suggestions for a good README
 
-### Nginx Configuration
+Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
 
-```nginx
-server {
-    listen 80;
-    server_name your-api-domain.com;
+## Name
+Choose a self-explaining name for your project.
 
-    location / {
-        proxy_pass http://localhost:3001;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-```
+## Description
+Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
 
-## 🧪 Testing Database Connection
+## Badges
+On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
 
-```bash
-# Test PostgreSQL connection
-node scripts/checkDb.js
+## Visuals
+Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
 
-# Test with mock database
-USE_MOCK_DB=true node scripts/checkDb.js
-```
+## Installation
+Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
 
-## 📝 Development Notes
+## Usage
+Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
 
-- Mock database automatically activates if PostgreSQL connection fails
-- Rate limiting: 100 requests per 15 minutes
-- JWT tokens expire in 24 hours
-- CORS configured for frontend domain
+## Support
+Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
 
-## 🔧 Türksat Infrastructure
+## Roadmap
+If you have ideas for releases in the future, it is a good idea to list them in the README.
 
-This backend is specifically configured for Türksat's infrastructure:
+## Contributing
+State if you are open to contributions and what your requirements are for accepting them.
 
-- **Database Server**: 10.101.15.130:6432
-- **Database**: yetkinlik_prod
-- **App User**: yetkinlik_appuser
-- **Admin User**: ukotbas
+For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
 
-## 📞 Support
+You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
 
-For technical support or deployment questions, contact the development team.
+## Authors and acknowledgment
+Show your appreciation to those who have contributed to the project.
 
-## 📄 License
+## License
+For open source projects, say how it is licensed.
 
-Internal Türksat Project - Confidential 
+## Project status
+If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
