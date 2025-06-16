@@ -12,11 +12,6 @@ import EvaluationReport from './pages/EvaluationReport';
 import NotFoundPage from './pages/NotFoundPage';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
-// Background image from public folder
-// Import RLS tests for development/testing
-
-// Import admin debug script
-import './debug/checkAdmin';
 
 function AuthAwareRoutes() {
   const { currentUser, loading } = useAuth();
