@@ -1,0 +1,10 @@
+{
+  "http.proxy": "",
+  "http.proxyAuthorization": null,
+  "http.proxyStrictSSL": false,
+  "http.systemCertificates": false,
+  "extensions.verifySignature": false,
+  "security.workspace.trust.enabled": false,
+  "git.ignoreLegacyWarning": true,
+  "git.ignoreRebaseWarning": true
+} 
