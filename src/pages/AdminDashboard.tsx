@@ -225,48 +225,7 @@ const AdminDashboard: React.FC = () => {
     setSelectedCV(cv);
   };
 
-  const handleExportDatabase = async () => {
-    try {
-      console.log('Veritabanı export başlatılıyor...');
-      
-      const exportData = {
-        timestamp: new Date().toISOString(),
-        collections: {
-          cvs: {},
-          users: {}
-        }
-      };
 
-      // CVs koleksiyonunu export et
-      const cvsData: { [key: string]: any } = {};
-      allCVs.forEach(cv => {
-        if (cv.id) {
-          cvsData[cv.id] = cv;
-        }
-      });
-      exportData.collections.cvs = cvsData;
-
-      console.log(`✓ CVs exported: ${Object.keys(cvsData).length} documents`);
-
-      // JSON dosyası olarak indir
-      const dataStr = JSON.stringify(exportData, null, 2);
-      const dataBlob = new Blob([dataStr], { type: 'application/json' });
-      
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(dataBlob);
-      link.download = `firestore-backup-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
-      
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      console.log('✅ Veritabanı export tamamlandı ve indirildi!');
-      
-    } catch (error) {
-      console.error('Export hatası:', error);
-      alert('Export işlemi sırasında hata oluştu!');
-    }
-  };
 
 
 
@@ -977,19 +936,8 @@ const AdminDashboard: React.FC = () => {
           <div className="bg-white bg-opacity-95 rounded-lg shadow-md p-4 backdrop-blur-sm">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-gray-800">CV Listesi</h2>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={handleExportDatabase}
-                  className="px-3 py-1 bg-green-500 text-white text-sm rounded-md hover:bg-green-600 transition-colors flex items-center gap-1"
-                >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-                  </svg>
-                  Dışa Aktar
-                </button>
-                <div className="text-sm text-gray-600">
-                  {isLoading ? 'Yükleniyor...' : `${cvList.length} sonuç`}
-                </div>
+              <div className="text-sm text-gray-600">
+                {isLoading ? 'Yükleniyor...' : `${cvList.length} sonuç`}
               </div>
             </div>
             
