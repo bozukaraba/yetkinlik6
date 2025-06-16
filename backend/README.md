@@ -1,120 +1,215 @@
-# Yetkinlik-X Backend API
+# Yetkinlikx CV Management System - Backend API
 
-## Kurulum
+Backend API for the Yetkinlikx CV Management System, designed for Türksat infrastructure.
 
-### 1. Bağımlılıkları Yükle
+## 🏗️ Architecture
+
+- **Framework**: Express.js
+- **Database**: PostgreSQL (Türksat Server: 10.101.15.130:6432)
+- **Authentication**: JWT-based
+- **Environment**: Node.js 18+
+
+## 📋 Prerequisites
+
+- Node.js >= 18.0.0
+- npm or yarn
+- PostgreSQL access to Türksat server
+- PM2 (for production deployment)
+
+## 🚀 Quick Start
+
+### Development
 ```bash
+# Install dependencies
 npm install
+
+# Start development server
+npm run dev
+
+# Start with mock database (for testing)
+USE_MOCK_DB=true npm run dev
 ```
 
-### 2. Environment Değişkenlerini Ayarla
+### Production
 ```bash
-# .env dosyası oluştur
-cp .env.example .env
+# Install dependencies
+npm ci --production
 
-# Aşağıdaki değişkenleri düzenle:
-PORT=3001
-NODE_ENV=production
+# Start with PM2
+pm2 start ecosystem.config.js
+
+# Or start directly
+npm start
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+
+Create `.env` file:
+
+```env
+# Database Configuration
 DB_HOST=10.101.15.130
 DB_PORT=6432
 DB_NAME=yetkinlik_prod
 DB_USER=yetkinlik_appuser
-DB_PASSWORD=your_password_here
-JWT_SECRET=your_super_secret_jwt_key_here
+DB_PASSWORD=Vaethe!ePhaesoZ2eiPhooKo
+
+# Admin Database User
+DB_ADMIN_USER=ukotbas
+DB_ADMIN_PASSWORD=shie0hieKohhie!leig0eequ
+
+# JWT Configuration
+JWT_SECRET=your-secret-key-here
+
+# Server Configuration
+PORT=3001
+NODE_ENV=production
 CORS_ORIGIN=https://your-frontend-domain.com
+
+# Mock Database (for development)
+USE_MOCK_DB=false
 ```
 
-### 3. Veritabanını Initialize Et
-```bash
-npm run init-db
+### Database Connection
+
+The system automatically falls back to mock database if PostgreSQL connection fails:
+
+- **Primary**: PostgreSQL (Türksat Server)
+- **Fallback**: Mock Database (Development)
+
+## 📁 Project Structure
+
+```
+backend/
+├── config/
+│   ├── database.js          # PostgreSQL & Mock DB configuration
+│   └── mockDatabase.js      # Mock database implementation
+├── controllers/
+│   ├── authController.js    # Authentication logic
+│   ├── cvController.js      # CV CRUD operations
+│   └── userController.js    # User management
+├── middleware/
+│   ├── auth.js              # JWT authentication middleware
+│   ├── cors.js              # CORS configuration
+│   └── rateLimiter.js       # Rate limiting
+├── routes/
+│   ├── auth.js              # Authentication routes
+│   ├── cv.js                # CV management routes
+│   └── users.js             # User management routes
+├── scripts/
+│   └── checkDb.js           # Database connection tester
+├── server.js                # Main server file
+├── package.json
+└── README.md
 ```
 
-### 4. Server'ı Başlat
+## 🛡️ Security Features
 
-#### Development
-```bash
-npm run dev
-```
-
-#### Production
-```bash
-npm start
-```
-
-## API Endpoints
-
-### Authentication
-- `POST /api/auth/register` - Kullanıcı kaydı
-- `POST /api/auth/login` - Giriş
-- `POST /api/auth/logout` - Çıkış
-- `GET /api/auth/profile` - Profil
-
-### CV Management
-- `GET /api/cv/:userId` - CV getir
-- `PUT /api/cv/:userId` - CV kaydet
-- `DELETE /api/cv/:userId` - CV sil
-- `POST /api/cv/:userId/initialize` - Boş CV oluştur
-- `GET /api/cv` - Tüm CV'ler (admin)
-- `GET /api/cv/search/query?keywords=...` - CV ara (admin)
-
-### Health Check
-- `GET /health` - Server durumu
-
-## Güvenlik Özellikleri
-
-- JWT tabanlı authentication
-- Rate limiting (15 dk 100 request, auth için 5 request)
+- JWT-based authentication
+- Password hashing with bcrypt
+- Rate limiting
 - CORS protection
 - Helmet security headers
 - Input validation
-- SQL injection protection
 
-## Production Deployment
+## 📊 API Endpoints
 
-### Türksat Sunucusu
-```bash
-# 1. Kodu sunucuya yükle
-git clone https://github.com/your-repo/yetkinlik.git
-cd yetkinlik/backend
+### Authentication
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
+- `POST /api/auth/logout` - User logout
+- `GET /api/auth/profile` - Get user profile
 
-# 2. Node.js yükle (v18+)
-# 3. Dependencies yükle
-npm install --production
+### CV Management
+- `GET /api/cv` - Get user's CV
+- `POST /api/cv` - Create/Update CV
+- `DELETE /api/cv` - Delete CV
+- `GET /api/cv/all` - Get all CVs (Admin only)
+- `GET /api/cv/search` - Search CVs (Admin only)
 
-# 4. Environment ayarla
-cp .env.example .env
-# .env dosyasını düzenle
+### Users (Admin only)
+- `GET /api/users` - Get all users
+- `GET /api/users/:id` - Get specific user
+- `PUT /api/users/:id` - Update user
+- `DELETE /api/users/:id` - Delete user
 
-# 5. PM2 ile başlat (recommended)
-npm install -g pm2
-pm2 start npm --name "yetkinlik-backend" -- start
-pm2 save
-pm2 startup
+## 🏥 Health Check
 
-# 6. Nginx reverse proxy (optional)
-# /etc/nginx/sites-available/yetkinlik-api
+- `GET /health` - Server health status
+
+## 🚀 Deployment
+
+### PM2 Configuration
+
+```javascript
+// ecosystem.config.js
+module.exports = {
+  apps: [{
+    name: 'yetkinlik-backend',
+    script: 'server.js',
+    instances: 'max',
+    exec_mode: 'cluster',
+    env: {
+      NODE_ENV: 'production',
+      PORT: 3001
+    }
+  }]
+};
+```
+
+### Nginx Configuration
+
+```nginx
 server {
     listen 80;
-    server_name api.yetkinlik.turksat.com.tr;
-    
+    server_name your-api-domain.com;
+
     location / {
         proxy_pass http://localhost:3001;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
     }
 }
 ```
 
-### Frontend Environment
-Frontend `.env` dosyasında:
+## 🧪 Testing Database Connection
+
+```bash
+# Test PostgreSQL connection
+node scripts/checkDb.js
+
+# Test with mock database
+USE_MOCK_DB=true node scripts/checkDb.js
 ```
-VITE_API_URL=http://localhost:3001/api
-# Production için:
-# VITE_API_URL=https://api.yetkinlik.turksat.com.tr/api
-``` 
+
+## 📝 Development Notes
+
+- Mock database automatically activates if PostgreSQL connection fails
+- Rate limiting: 100 requests per 15 minutes
+- JWT tokens expire in 24 hours
+- CORS configured for frontend domain
+
+## 🔧 Türksat Infrastructure
+
+This backend is specifically configured for Türksat's infrastructure:
+
+- **Database Server**: 10.101.15.130:6432
+- **Database**: yetkinlik_prod
+- **App User**: yetkinlik_appuser
+- **Admin User**: ukotbas
+
+## 📞 Support
+
+For technical support or deployment questions, contact the development team.
+
+## 📄 License
+
+Internal Türksat Project - Confidential 
