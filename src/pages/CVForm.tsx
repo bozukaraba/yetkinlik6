@@ -2252,7 +2252,7 @@ const CVForm = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Yakınlık Türü</label>
+                        <label className="block text-sm font-medium text-gray-700">Profesyonel/Kişisel</label>
                         <input
                           type="text"
                           value={ref.type}
