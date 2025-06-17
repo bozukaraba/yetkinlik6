@@ -691,290 +691,204 @@ const CVForm = () => {
       element.style.position = 'absolute';
       element.style.left = '-9999px';
       element.style.top = '0';
-      element.style.padding = '40px';
+      element.style.padding = '30px';
       element.style.width = '210mm';
       element.style.minHeight = '297mm';
-      element.style.fontFamily = 'Arial, sans-serif';
+      element.style.fontFamily = '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif';
       element.style.backgroundColor = '#ffffff';
       
-      // CV içeriğini HTML olarak oluştur - MODERN ESTETİK VERSİYON
+      // BASIT TEMİZ CV TASARIM
       element.innerHTML = `
-        <div style="max-width: 800px; margin: 0 auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #2d3748; line-height: 1.6;">
-          <!-- CV Header -->
-          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; margin: -40px -40px 30px -40px; text-align: center; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);"></div>
-            <div style="position: relative; z-index: 1;">
-              ${formData.personalInfo?.profileImage ? `
-                <div style="margin: 0 auto 20px auto; width: 120px; height: 120px; border-radius: 50%; border: 5px solid white; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.3);">
-                  <img src="${formData.personalInfo.profileImage}" style="width: 100%; height: 100%; object-fit: cover;" />
-                </div>
-              ` : ''}
-              <h1 style="font-size: 36px; font-weight: 700; margin: 0 0 10px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-                ${formData.personalInfo?.firstName} ${formData.personalInfo?.lastName}
-              </h1>
-              <div style="height: 3px; width: 60px; background: #fff; margin: 15px auto 20px auto; border-radius: 2px;"></div>
-              <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; font-size: 16px;">
-                ${formData.personalInfo?.email ? `
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="width: 16px; height: 16px; background: #fff; border-radius: 50%; display: inline-block;"></span>
-                    ${formData.personalInfo.email}
-                  </div>
-                ` : ''}
-                ${formData.personalInfo?.phone ? `
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="width: 16px; height: 16px; background: #fff; border-radius: 50%; display: inline-block;"></span>
-                    ${formData.personalInfo.phone}
-                  </div>
-                ` : ''}
-                ${formData.personalInfo?.turksatEmployeeNumber ? `
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="width: 16px; height: 16px; background: #fff; border-radius: 50%; display: inline-block;"></span>
-                    Türksat Sicil No: ${formData.personalInfo.turksatEmployeeNumber}
-                  </div>
-                ` : ''}
-                ${formData.personalInfo?.residenceCity || formData.personalInfo?.residenceDistrict ? `
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="width: 16px; height: 16px; background: #fff; border-radius: 50%; display: inline-block;"></span>
-                    ${formData.personalInfo?.residenceCity || ''}${formData.personalInfo?.residenceCity && formData.personalInfo?.residenceDistrict ? ' / ' : ''}${formData.personalInfo?.residenceDistrict || ''}
-                  </div>
-                ` : ''}
+        <div style="max-width: 100%; margin: 0; color: #333; line-height: 1.6;">
+          <!-- Header -->
+          <div style="text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 3px solid #2563eb;">
+            ${formData.personalInfo?.profileImage ? `
+              <img src="${formData.personalInfo.profileImage}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; border: 3px solid #2563eb;" />
+            ` : ''}
+            <h1 style="font-size: 28px; font-weight: 700; color: #1e293b; margin: 0 0 15px 0;">
+              ${formData.personalInfo?.firstName} ${formData.personalInfo?.lastName}
+            </h1>
+            <div style="font-size: 16px; color: #64748b; margin-bottom: 15px;">
+              ${formData.personalInfo?.email || ''}
+              ${formData.personalInfo?.phone ? ` | ${formData.personalInfo.phone}` : ''}
+            </div>
+            ${formData.personalInfo?.turksatEmployeeNumber ? `
+              <div style="color: #2563eb; font-weight: 500; font-size: 14px;">
+                Türksat Sicil No: ${formData.personalInfo.turksatEmployeeNumber}
               </div>
-              ${formData.personalInfo?.gender ? `
-                <div style="margin-top: 15px; font-size: 14px; opacity: 0.9;">
-                  Cinsiyet: ${formData.personalInfo.gender}
-                </div>
-              ` : ''}
-              ${formData.personalInfo?.sgkServiceDocument ? `
-                <div style="margin-top: 15px; font-size: 14px; opacity: 0.9; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; display: inline-block;">
-                  ✓ SGK Hizmet Dökümü: Yüklendi
-                </div>
-              ` : ''}
-            </div>
+            ` : ''}
+            ${formData.personalInfo?.sgkServiceDocument ? `
+              <div style="color: #059669; font-weight: 500; font-size: 13px; margin-top: 10px;">
+                ✓ SGK Hizmet Dökümü: Yüklendi
+              </div>
+            ` : ''}
           </div>
 
-          <!-- Summary -->
+          <!-- Özet -->
           ${formData.personalInfo?.summary ? `
-          <div style="margin-bottom: 35px; background: #f8fafc; padding: 25px; border-radius: 12px; border-left: 5px solid #667eea;">
-            <h2 style="font-size: 22px; font-weight: 600; color: #667eea; margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
-              <span style="width: 8px; height: 8px; background: #667eea; border-radius: 50%; display: inline-block;"></span>
-              Hakkımda
+          <div style="margin-bottom: 30px;">
+            <h2 style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+              HAKKIMDA
             </h2>
-            <p style="color: #4a5568; line-height: 1.7; margin: 0; font-size: 15px;">${formData.personalInfo.summary}</p>
+            <p style="color: #475569; font-size: 14px; line-height: 1.7;">${formData.personalInfo.summary}</p>
           </div>
           ` : ''}
 
-          <!-- Social Links -->
-          ${formData.personalInfo?.linkedIn || formData.personalInfo?.github || formData.personalInfo?.twitter || formData.personalInfo?.website || formData.personalInfo?.instagram || formData.personalInfo?.facebook || formData.personalInfo?.youtube || formData.personalInfo?.tiktok || formData.personalInfo?.discord || formData.personalInfo?.telegram || formData.personalInfo?.whatsapp || formData.personalInfo?.medium || formData.personalInfo?.behance || formData.personalInfo?.dribbble || formData.personalInfo?.stackoverflow ? `
-          <div style="margin-bottom: 35px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-            <h2 style="font-size: 22px; font-weight: 600; color: #667eea; margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
-              <span style="width: 24px; height: 24px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">🔗</span>
-              Sosyal Medya & İletişim
-            </h2>
-            <div style="display: flex; flex-wrap: wrap; gap: 12px;">
-              ${formData.personalInfo?.linkedIn ? `<div style="background: #0077b5; color: white; padding: 8px 12px; border-radius: 6px; font-size: 13px; font-weight: 500;">LinkedIn: ${formData.personalInfo.linkedIn}</div>` : ''}
-              ${formData.personalInfo?.github ? `<div style="background: #333; color: white; padding: 8px 12px; border-radius: 6px; font-size: 13px; font-weight: 500;">GitHub: ${formData.personalInfo.github}</div>` : ''}
-              ${formData.personalInfo?.twitter ? `<div style="background: #1da1f2; color: white; padding: 8px 12px; border-radius: 6px; font-size: 13px; font-weight: 500;">Twitter: ${formData.personalInfo.twitter}</div>` : ''}
-              ${formData.personalInfo?.instagram ? `<div style="background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d); color: white; padding: 8px 12px; border-radius: 6px; font-size: 13px; font-weight: 500;">Instagram: ${formData.personalInfo.instagram}</div>` : ''}
-              ${formData.personalInfo?.facebook ? `<div style="background: #4267b2; color: white; padding: 8px 12px; border-radius: 6px; font-size: 13px; font-weight: 500;">Facebook: ${formData.personalInfo.facebook}</div>` : ''}
-              ${formData.personalInfo?.youtube ? `<div style="background: #ff0000; color: white; padding: 8px 12px; border-radius: 6px; font-size: 13px; font-weight: 500;">YouTube: ${formData.personalInfo.youtube}</div>` : ''}
-              ${formData.personalInfo?.website ? `<div style="background: #4a5568; color: white; padding: 8px 12px; border-radius: 6px; font-size: 13px; font-weight: 500;">Website: ${formData.personalInfo.website}</div>` : ''}
-            </div>
-          </div>
-          ` : ''}
-
-          <!-- Skills -->
-          ${formData.skills && formData.skills.length > 0 ? `
-          <div style="margin-bottom: 35px;">
-            <h2 style="font-size: 22px; font-weight: 600; color: #667eea; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
-              <span style="width: 24px; height: 24px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">⚡</span>
-              Yetenek ve Yetkinlikler
-            </h2>
-            <div style="display: flex; flex-wrap: wrap; gap: 12px;">
-              ${formData.skills.map(skill => `
-                <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 10px 16px; border-radius: 25px; font-size: 14px; font-weight: 500; box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3); display: flex; align-items: center; gap: 8px;">
-                  <span style="width: 6px; height: 6px; background: white; border-radius: 50%; display: inline-block;"></span>
-                  ${skill.name}${skill.level ? ` (${skill.level}/5)` : ''}${skill.yearsOfExperience ? ` - ${skill.yearsOfExperience} yıl` : ''}
-                </div>
-              `).join('')}
-            </div>
-          </div>
-          ` : ''}
-
-          <!-- Experience -->
+          <!-- İş Deneyimi -->
           ${formData.experience && formData.experience.length > 0 ? `
-          <div style="margin-bottom: 35px;">
-            <h2 style="font-size: 22px; font-weight: 600; color: #667eea; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
-              <span style="width: 24px; height: 24px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">💼</span>
-              İş Deneyimi
+          <div style="margin-bottom: 30px;">
+            <h2 style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+              İŞ DENEYİMİ
             </h2>
-            ${formData.experience.map((exp, index) => `
-              <div style="margin-bottom: 25px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid #ed8936; position: relative;">
-                <div style="position: absolute; top: -5px; left: -7px; width: 14px; height: 14px; background: #ed8936; border-radius: 50%; border: 3px solid white;"></div>
-                <h3 style="font-weight: 600; color: #2d3748; margin: 0 0 5px 0; font-size: 16px;">${exp.company}</h3>
-                <p style="color: #667eea; font-weight: 500; font-size: 15px; margin: 0 0 8px 0;">${exp.title}</p>
-                ${exp.department ? `<p style="color: #6b7280; font-size: 13px; margin: 0 0 5px 0; font-style: italic;">🏢 Departman: ${exp.department}</p>` : ''}
-                ${exp.location ? `<p style="color: #a0aec0; font-size: 13px; margin: 0 0 5px 0;">📍 ${exp.location}</p>` : ''}
-                <p style="color: #a0aec0; font-size: 13px; margin: 0 0 15px 0; display: flex; align-items: center; gap: 5px;">
-                  <span style="width: 6px; height: 6px; background: #ed8936; border-radius: 50%; display: inline-block;"></span>
+            ${formData.experience.map(exp => `
+              <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <h3 style="font-weight: 600; color: #1e293b; margin: 0 0 8px 0; font-size: 16px;">${exp.company}</h3>
+                <div style="color: #2563eb; font-weight: 500; margin-bottom: 5px;">${exp.title}</div>
+                ${exp.department ? `<div style="color: #64748b; font-size: 13px; margin-bottom: 5px;">Departman: ${exp.department}</div>` : ''}
+                <div style="color: #64748b; font-size: 13px; margin-bottom: 10px;">
                   ${new Date(exp.startDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' })} - 
                   ${exp.current ? 'Günümüz' : exp.endDate ? new Date(exp.endDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' }) : 'Belirtilmemiş'}
-                  ${exp.workDuration ? ` (${exp.workDuration})` : ''}
-                </p>
-                ${exp.tasks ? `<div style="margin-bottom: 12px;"><strong style="color: #2d3748; font-size: 14px;">📋 Görevler:</strong><p style="color: #4a5568; line-height: 1.6; margin: 5px 0 0 0; font-size: 14px;">${exp.tasks}</p></div>` : ''}
-                ${exp.projectDetails ? `<div style="margin-bottom: 12px;"><strong style="color: #2d3748; font-size: 14px;">🚀 Projeler:</strong><p style="color: #4a5568; line-height: 1.6; margin: 5px 0 0 0; font-size: 14px;">${exp.projectDetails}</p></div>` : ''}
-                ${exp.description ? `<div style="margin-bottom: 0;"><strong style="color: #2d3748; font-size: 14px;">📝 Açıklama:</strong><p style="color: #4a5568; line-height: 1.6; margin: 5px 0 0 0; font-size: 14px;">${exp.description}</p></div>` : ''}
+                </div>
+                ${exp.tasks ? `<div style="margin-bottom: 8px;"><strong style="color: #1e293b;">Görevler:</strong> ${exp.tasks}</div>` : ''}
+                ${exp.description ? `<div style="color: #475569; font-size: 14px;">${exp.description}</div>` : ''}
               </div>
             `).join('')}
           </div>
           ` : ''}
 
-          <!-- Education -->
+          <!-- Eğitim -->
           ${formData.education && formData.education.length > 0 ? `
-          <div style="margin-bottom: 35px;">
-            <h2 style="font-size: 22px; font-weight: 600; color: #667eea; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
-              <span style="width: 24px; height: 24px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">🎓</span>
-              Öğrenim
+          <div style="margin-bottom: 30px;">
+            <h2 style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+              EĞİTİM
             </h2>
-            ${formData.education.map((edu, index) => `
-              <div style="margin-bottom: 25px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid #38b2ac; position: relative;">
-                <div style="position: absolute; top: -5px; left: -7px; width: 14px; height: 14px; background: #38b2ac; border-radius: 50%; border: 3px solid white;"></div>
-                <h3 style="font-weight: 600; color: #2d3748; margin: 0 0 8px 0; font-size: 16px;">${edu.degree}</h3>
-                <p style="color: #667eea; font-weight: 500; font-size: 14px; margin: 0 0 5px 0;">${edu.fieldOfStudy} - ${edu.institution}</p>
-                ${edu.educationLevel ? `<p style="color: #9ca3af; font-size: 13px; margin: 0 0 5px 0;">${edu.educationLevel}</p>` : ''}
-                <p style="color: #a0aec0; font-size: 13px; margin: 0 0 15px 0; display: flex; align-items: center; gap: 5px;">
-                  <span style="width: 6px; height: 6px; background: #38b2ac; border-radius: 50%; display: inline-block;"></span>
-                  ${edu.current ? 'Devam ediyor' : edu.endDate ? `Mezun: ${new Date(edu.endDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' })}` : 'Mezuniyet tarihi belirtilmemiş'}
-                </p>
-                ${edu.description ? `<p style="color: #4a5568; line-height: 1.6; margin: 0; font-size: 14px; font-style: italic;">${edu.description}</p>` : ''}
+            ${formData.education.map(edu => `
+              <div style="margin-bottom: 15px; padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <h3 style="font-weight: 600; color: #1e293b; margin: 0 0 5px 0;">${edu.degree}</h3>
+                <div style="color: #2563eb; margin-bottom: 5px;">${edu.fieldOfStudy} - ${edu.institution}</div>
+                <div style="color: #64748b; font-size: 13px;">
+                  ${edu.current ? 'Devam ediyor' : edu.endDate ? `Mezun: ${new Date(edu.endDate).toLocaleDateString('tr-TR', { year: 'numeric' })}` : 'Mezuniyet tarihi belirtilmemiş'}
+                </div>
+                ${edu.description ? `<div style="color: #475569; font-size: 14px; margin-top: 8px;">${edu.description}</div>` : ''}
               </div>
             `).join('')}
           </div>
           ` : ''}
 
-          <!-- Languages -->
-          ${formData.languages && formData.languages.length > 0 ? `
-          <div style="margin-bottom: 35px;">
-            <h2 style="font-size: 22px; font-weight: 600; color: #667eea; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
-              <span style="width: 24px; height: 24px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">🌍</span>
-              Yabancı Dil
+          <!-- Beceriler -->
+          ${formData.skills && formData.skills.length > 0 ? `
+          <div style="margin-bottom: 30px;">
+            <h2 style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+              BECERILER
             </h2>
-            <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-              ${formData.languages.map(lang => `
-                <div style="background: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); border: 2px solid #e2e8f0; min-width: 150px; text-align: center;">
-                  <div style="font-weight: 600; color: #2d3748; font-size: 15px; margin-bottom: 5px;">${lang.name}</div>
-                  ${lang.examType ? `<div style="color: #667eea; font-size: 13px; margin-bottom: 3px;">${lang.examType}</div>` : ''}
-                  ${lang.examScore ? `<div style="color: #38a169; font-weight: 500; font-size: 14px;">${lang.examScore}</div>` : ''}
-                </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              ${formData.skills.map(skill => `
+                <span style="background: #2563eb; color: white; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 500;">
+                  ${skill.name}${skill.level ? ` (${skill.level}/5)` : ''}
+                </span>
               `).join('')}
             </div>
           </div>
           ` : ''}
 
-          <!-- Certificates -->
+          <!-- Sertifikalar -->
           ${formData.certificates && formData.certificates.length > 0 ? `
-          <div style="margin-bottom: 35px;">
-            <h2 style="font-size: 22px; font-weight: 600; color: #667eea; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
-              <span style="width: 24px; height: 24px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">🏆</span>
-              Sertifikalar
+          <div style="margin-bottom: 30px;">
+            <h2 style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+              SERTİFİKALAR
             </h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-              ${formData.certificates.map(cert => `
-                <div style="background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); border-left: 4px solid #38a169; position: relative;">
-                  <div style="position: absolute; top: -5px; left: -7px; width: 14px; height: 14px; background: #38a169; border-radius: 50%; border: 3px solid white;"></div>
-                  <h3 style="font-weight: 600; color: #2d3748; margin: 0 0 8px 0; font-size: 15px;">${cert.name}</h3>
-                  <p style="color: #a0aec0; font-size: 13px; margin: 0;">📅 ${cert.startDate} - ${cert.endDate}</p>
-                  ${cert.duration ? `<p style="color: #a0aec0; font-size: 13px; margin: 5px 0 0 0;">⏱️ Süre: ${cert.duration} saat</p>` : ''}
-                </div>
-              `).join('')}
-            </div>
+            ${formData.certificates.map(cert => `
+              <div style="margin-bottom: 10px; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                <div style="font-weight: 600; color: #1e293b;">${cert.name}</div>
+                <div style="color: #64748b; font-size: 13px;">${cert.startDate} - ${cert.endDate}</div>
+              </div>
+            `).join('')}
           </div>
           ` : ''}
 
-          <!-- Awards -->
+          <!-- Diller -->
+          ${formData.languages && formData.languages.length > 0 ? `
+          <div style="margin-bottom: 30px;">
+            <h2 style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+              YABANCI DİL
+            </h2>
+            ${formData.languages.map(lang => `
+              <div style="margin-bottom: 8px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                <span style="font-weight: 600; color: #1e293b;">${lang.name}</span>
+                ${lang.examType ? ` - ${lang.examType}` : ''}
+                ${lang.examScore ? ` (${lang.examScore})` : ''}
+              </div>
+            `).join('')}
+          </div>
+          ` : ''}
+
+          <!-- Ödüller -->
           ${formData.awards && formData.awards.length > 0 ? `
-          <div style="margin-bottom: 35px;">
-            <h2 style="font-size: 22px; font-weight: 600; color: #667eea; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
-              <span style="width: 24px; height: 24px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">🏅</span>
-              Ödüller ve Başarılar
+          <div style="margin-bottom: 30px;">
+            <h2 style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+              ÖDÜLLER VE BAŞARILAR
             </h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-              ${formData.awards.map(award => `
-                <div style="background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); border-left: 4px solid #f56565; position: relative;">
-                  <div style="position: absolute; top: -5px; left: -7px; width: 14px; height: 14px; background: #f56565; border-radius: 50%; border: 3px solid white;"></div>
-                  <h3 style="font-weight: 600; color: #2d3748; margin: 0 0 8px 0; font-size: 15px;">${award.title}</h3>
-                  <p style="color: #667eea; font-size: 14px; margin: 0 0 5px 0;">${award.organization}</p>
-                  <p style="color: #a0aec0; font-size: 13px; margin: 0;">📅 ${award.date}</p>
-                  ${award.description ? `<p style="color: #4a5568; font-size: 13px; margin: 8px 0 0 0; font-style: italic;">${award.description}</p>` : ''}
-                </div>
-              `).join('')}
-            </div>
+            ${formData.awards.map(award => `
+              <div style="margin-bottom: 10px; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                <div style="font-weight: 600; color: #1e293b;">${award.title}</div>
+                <div style="color: #2563eb; font-size: 14px;">${award.organization}</div>
+                <div style="color: #64748b; font-size: 13px;">${award.date}</div>
+              </div>
+            `).join('')}
           </div>
           ` : ''}
 
-          <!-- Publications -->
+          <!-- Yayınlar -->
           ${formData.publications && formData.publications.length > 0 ? `
-          <div style="margin-bottom: 35px;">
-            <h2 style="font-size: 22px; font-weight: 600; color: #667eea; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
-              <span style="width: 24px; height: 24px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">📚</span>
-              Yayınlar ve Makaleler
+          <div style="margin-bottom: 30px;">
+            <h2 style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+              YAYINLAR VE MAKALELER
             </h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-              ${formData.publications.map(pub => `
-                <div style="background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); border-left: 4px solid #9f7aea; position: relative;">
-                  <div style="position: absolute; top: -5px; left: -7px; width: 14px; height: 14px; background: #9f7aea; border-radius: 50%; border: 3px solid white;"></div>
-                  <h3 style="font-weight: 600; color: #2d3748; margin: 0 0 8px 0; font-size: 15px;">${pub.title}</h3>
-                  <p style="color: #667eea; font-size: 14px; margin: 0 0 5px 0;">Yayınlayıcı: ${pub.publisher}</p>
-                  <p style="color: #a0aec0; font-size: 13px; margin: 0;">📅 ${pub.publishDate}</p>
-                  ${pub.description ? `<p style="color: #4a5568; font-size: 13px; margin: 8px 0 0 0; font-style: italic;">${pub.description}</p>` : ''}
-                </div>
-              `).join('')}
-            </div>
+            ${formData.publications.map(pub => `
+              <div style="margin-bottom: 10px; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                <div style="font-weight: 600; color: #1e293b;">${pub.title}</div>
+                <div style="color: #2563eb; font-size: 14px;">Yayınlayıcı: ${pub.publisher}</div>
+                <div style="color: #64748b; font-size: 13px;">${pub.publishDate}</div>
+              </div>
+            `).join('')}
           </div>
           ` : ''}
 
-          <!-- Hobbies -->
+          <!-- Hobiler -->
           ${formData.hobbies && formData.hobbies.length > 0 ? `
-          <div style="margin-bottom: 35px;">
-            <h2 style="font-size: 22px; font-weight: 600; color: #667eea; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
-              <span style="width: 24px; height: 24px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">🎨</span>
-              Hobi ve İlgi Alanları
+          <div style="margin-bottom: 30px;">
+            <h2 style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+              HOBİ VE İLGİ ALANLARI
             </h2>
-            <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
               ${formData.hobbies.map(hobby => `
-                <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 500; box-shadow: 0 2px 6px rgba(240, 147, 251, 0.3);">
+                <span style="background: #10b981; color: white; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 500;">
                   ${hobby.category === 'Diğer' ? hobby.customValue || 'Diğer' : hobby.category}
-                </div>
+                </span>
               `).join('')}
             </div>
           </div>
           ` : ''}
 
-          <!-- References -->
+          <!-- Referanslar -->
           ${formData.references && formData.references.length > 0 ? `
-          <div style="margin-bottom: 35px;">
-            <h2 style="font-size: 22px; font-weight: 600; color: #667eea; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
-              <span style="width: 24px; height: 24px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">👥</span>
-              Referanslar
+          <div style="margin-bottom: 30px;">
+            <h2 style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+              REFERANSLAR
             </h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-              ${formData.references.map(ref => `
-                <div style="background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); border-left: 4px solid #4299e1; position: relative;">
-                  <div style="position: absolute; top: -5px; left: -7px; width: 14px; height: 14px; background: #4299e1; border-radius: 50%; border: 3px solid white;"></div>
-                  <h3 style="font-weight: 600; color: #2d3748; margin: 0 0 8px 0; font-size: 15px;">${ref.name}</h3>
-                  <p style="color: #667eea; font-size: 14px; margin: 0 0 5px 0;">${ref.company}</p>
-                  <p style="color: #a0aec0; font-size: 13px; margin: 0;">📞 ${ref.phone}</p>
-                  ${ref.type ? `<p style="color: #4a5568; font-size: 13px; margin: 5px 0 0 0; font-style: italic;">${ref.type}</p>` : ''}
-                </div>
-              `).join('')}
-            </div>
+            ${formData.references.map(ref => `
+              <div style="margin-bottom: 10px; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                <div style="font-weight: 600; color: #1e293b;">${ref.name}</div>
+                <div style="color: #2563eb; font-size: 14px;">${ref.company}</div>
+                <div style="color: #64748b; font-size: 13px;">${ref.phone}</div>
+              </div>
+            `).join('')}
           </div>
           ` : ''}
 
           <!-- Footer -->
-          <div style="margin-top: 40px; padding: 20px; background: #f7fafc; border-radius: 10px; text-align: center; border: 2px dashed #e2e8f0;">
-            <p style="color: #a0aec0; font-size: 12px; margin: 0;">
-              Bu CV Yetkinlik-X Sistemi ile oluşturulmuştur • ${new Date().toLocaleDateString('tr-TR')}
-            </p>
+          <div style="margin-top: 40px; text-align: center; color: #94a3b8; font-size: 12px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+            Bu CV Yetkinlik-X sistemi ile oluşturulmuştur | ${new Date().toLocaleDateString('tr-TR')}
           </div>
         </div>
       `;
