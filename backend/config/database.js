@@ -37,6 +37,38 @@ const adminPoolConfig = {
 export const db = new Pool(poolConfig);
 export const adminDb = new Pool(adminPoolConfig);
 
+// Database initialization
+const initDatabaseStructure = async () => {
+  try {
+    console.log('🔧 Database yapısı kontrol ediliyor...');
+    
+    // Users tablosu kontrol
+    const checkUsersTable = `
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name = 'users' AND table_schema = 'public';
+    `;
+    
+    const userColumns = await adminDb.query(checkUsersTable);
+    const columnNames = userColumns.rows.map(row => row.column_name);
+    
+    // password_hash kolonu yoksa ekle
+    if (!columnNames.includes('password_hash')) {
+      console.log('password_hash kolonu ekleniyor...');
+      await adminDb.query('ALTER TABLE users ADD COLUMN password_hash VARCHAR(255)');
+    }
+    
+    // Kullanıcı izinlerini ver
+    await adminDb.query('GRANT SELECT, INSERT, UPDATE ON users TO yetkinlik_appuser');
+    await adminDb.query('GRANT SELECT, INSERT, UPDATE, DELETE ON sessions TO yetkinlik_appuser');
+    await adminDb.query('GRANT SELECT, INSERT, UPDATE, DELETE ON cvs TO yetkinlik_appuser');
+    
+    console.log('✅ Database yapısı hazır');
+  } catch (error) {
+    console.error('⚠️ Database init hatası (devam ediliyor):', error.message);
+  }
+};
+
 // Bağlantı test fonksiyonu
 export const testConnection = async () => {
   if (USE_MOCK_DB) {
@@ -48,6 +80,10 @@ export const testConnection = async () => {
     const result = await client.query('SELECT NOW()');
     client.release();
     console.log('PostgreSQL bağlantısı başarılı:', result.rows[0]);
+    
+    // Database yapısını init et
+    await initDatabaseStructure();
+    
     return true;
   } catch (error) {
     console.error('PostgreSQL bağlantı hatası:', error);

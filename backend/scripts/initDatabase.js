@@ -58,24 +58,62 @@ const initializeTables = async () => {
 };
 
 const initDatabase = async () => {
-  console.log('🔗 PostgreSQL veritabanı bağlantısı test ediliyor...');
-  
-  const connectionSuccess = await testConnection();
-  
-  if (!connectionSuccess) {
-    console.error('❌ Veritabanı bağlantısı başarısız!');
-    process.exit(1);
-  }
-  
-  console.log('📋 Veritabanı tabloları oluşturuluyor...');
-  
   try {
-    await initializeTables();
-    console.log('🎉 Veritabanı başarıyla initialize edildi!');
+    console.log('🔧 Database tabloları kontrol ediliyor...');
+
+    // Users tablosu kontrol ve düzeltme
+    const checkUsersTable = `
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name = 'users' AND table_schema = 'public';
+    `;
+    
+    const userColumns = await adminQuery(checkUsersTable);
+    const columnNames = userColumns.rows.map(row => row.column_name);
+    
+    console.log('Mevcut users tablosu kolonları:', columnNames);
+    
+    // password_hash kolonu yoksa ekle
+    if (!columnNames.includes('password_hash')) {
+      console.log('password_hash kolonu ekleniyor...');
+      await adminQuery('ALTER TABLE users ADD COLUMN password_hash VARCHAR(255)');
+    }
+    
+    // role kolonu yoksa ekle
+    if (!columnNames.includes('role')) {
+      console.log('role kolonu ekleniyor...');
+      await adminQuery('ALTER TABLE users ADD COLUMN role VARCHAR(50) DEFAULT \'user\'');
+    }
+    
+    // is_active kolonu yoksa ekle
+    if (!columnNames.includes('is_active')) {
+      console.log('is_active kolonu ekleniyor...');
+      await adminQuery('ALTER TABLE users ADD COLUMN is_active BOOLEAN DEFAULT true');
+    }
+    
+    // yetkinlik_appuser kullanıcısına izin ver
+    console.log('Kullanıcı izinleri kontrol ediliyor...');
+    await adminQuery('GRANT SELECT, INSERT, UPDATE ON users TO yetkinlik_appuser');
+    await adminQuery('GRANT SELECT, INSERT, UPDATE, DELETE ON sessions TO yetkinlik_appuser');
+    await adminQuery('GRANT SELECT, INSERT, UPDATE, DELETE ON cvs TO yetkinlik_appuser');
+    
+    console.log('✅ Database tabloları hazır');
+    
   } catch (error) {
-    console.error('❌ Veritabanı initialize hatası:', error);
-    process.exit(1);
+    console.error('❌ Database init hatası:', error);
+    throw error;
   }
 };
 
-initDatabase(); 
+// Script doğrudan çalıştırılırsa
+if (import.meta.url === `file://${process.argv[1]}`) {
+  initDatabase().then(() => {
+    console.log('Database init tamamlandı');
+    process.exit(0);
+  }).catch(error => {
+    console.error('Database init başarısız:', error);
+    process.exit(1);
+  });
+}
+
+export { initDatabase }; 
