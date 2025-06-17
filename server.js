@@ -10,7 +10,7 @@ import authRoutes from './routes/auth.js';
 import cvRoutes from './routes/cv.js';
 
 // Environment değişkenlerini yükle
-dotenv.config();
+dotenv.config({ path: './backend/config.env' });
 
 const app = express();
 const PORT = process.env.PORT || 3001;
