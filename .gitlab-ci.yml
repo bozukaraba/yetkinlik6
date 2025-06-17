@@ -1,0 +1,4 @@
+include:
+  - project: 'ygd/gitops/cicd-templates'
+    file:
+      - '.yetkinlik-frontend-gitlab-ci.yml'
