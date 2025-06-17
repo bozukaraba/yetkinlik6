@@ -26,7 +26,7 @@ build:
   only:
     - main
     - develop
-    - feature/updates
+    - feature/cv-updates-new
 
 deploy:
   stage: deploy
@@ -39,4 +39,4 @@ deploy:
   only:
     - main
     - develop
-    - feature/updates
+    - feature/cv-updates-new
