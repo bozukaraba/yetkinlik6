@@ -12,6 +12,7 @@ const Dashboard: React.FC = () => {
   const [cvData, setCVData] = useState<CVData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [adminStats, setAdminStats] = useState<{ totalCVs: number; totalUsers: number } | null>(null);
+  const [adminStatsLoading, setAdminStatsLoading] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -22,18 +23,34 @@ const Dashboard: React.FC = () => {
           
           // Load admin stats if user is admin
           if (isAdmin()) {
+            setAdminStatsLoading(true);
             try {
+              console.log('Loading admin stats...');
               const allCVs = await getAllCVs();
-              setAdminStats({
+              console.log('All CVs loaded:', allCVs);
+              console.log('Total CVs:', allCVs.length);
+              
+              const emailsWithData = allCVs.map(cv => cv.personalInfo?.email).filter(Boolean);
+              console.log('Emails with data:', emailsWithData);
+              
+              const uniqueEmails = new Set(emailsWithData);
+              console.log('Unique emails:', uniqueEmails);
+              
+              const stats = {
                 totalCVs: allCVs.length,
-                totalUsers: new Set(allCVs.map(cv => cv.personalInfo?.email).filter(Boolean)).size
-              });
+                totalUsers: uniqueEmails.size
+              };
+              
+              console.log('Setting admin stats:', stats);
+              setAdminStats(stats);
             } catch (error) {
               console.error('Error loading admin stats:', error);
               setAdminStats({
                 totalCVs: 0,
                 totalUsers: 0
               });
+            } finally {
+              setAdminStatsLoading(false);
             }
           }
         } catch (error) {
@@ -563,7 +580,7 @@ const Dashboard: React.FC = () => {
                   <div className="ml-3 flex-1">
                     <div className="text-sm font-medium text-gray-500">Toplam CV</div>
                     <div className="text-3xl font-bold text-blue-900">
-                      {adminStats ? adminStats.totalCVs : '0'}
+                      {adminStatsLoading ? '...' : (adminStats ? adminStats.totalCVs : '0')}
                     </div>
                   </div>
                 </div>
@@ -577,7 +594,7 @@ const Dashboard: React.FC = () => {
                   <div className="ml-3 flex-1">
                     <div className="text-sm font-medium text-gray-500">Kullanıcı</div>
                     <div className="text-3xl font-bold text-green-900">
-                      {adminStats ? adminStats.totalUsers : '0'}
+                      {adminStatsLoading ? '...' : (adminStats ? adminStats.totalUsers : '0')}
                     </div>
                   </div>
                 </div>
