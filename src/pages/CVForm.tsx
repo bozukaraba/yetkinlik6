@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getCVData, saveCVData } from '../services/cvService';
-import { CVData, Education, Experience, Skill, Language, Reference, Certificate, Award, Publication, Evaluation, Hobby } from '../types/cv';
+import { CVData, Education, Experience, Skill, Language, Reference, Certificate, Award, Publication, Hobby } from '../types/cv';
 import { ChevronLeft, ChevronRight, Save, Trash2, Download, GripVertical } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -96,14 +96,7 @@ const CVForm = () => {
     volunteer: [],
     references: [],
     hobbies: [],
-    awards: [],
-    evaluation: {
-      workSatisfaction: 0,
-      facilitiesSatisfaction: 0,
-      longTermIntent: 0,
-      recommendation: 0,
-      applicationSatisfaction: 0
-    }
+    awards: []
   };
   
   const [formData, setFormData] = useState<CVData>(initialFormData);
@@ -645,15 +638,7 @@ const CVForm = () => {
     }));
   };
 
-  const updateEvaluation = (field: keyof Evaluation, value: number) => {
-    setFormData(prev => ({
-      ...prev,
-      evaluation: {
-        ...prev.evaluation,
-        [field]: value
-      } as Evaluation
-    }));
-  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -2351,147 +2336,7 @@ const CVForm = () => {
             )}
           </div>
         );
-      case 11:
-        return (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Değerlendirmelerim</h3>
-              <p className="text-sm text-gray-500">Lütfen her soruyu 1-5 yıldız ile değerlendirin</p>
-            </div>
-            
-            <div className="space-y-8">
-              {/* Soru 1 */}
-              <div className="bg-gray-50 p-6 rounded-lg">
-                <h4 className="text-lg font-medium text-gray-900 mb-4">
-                  1) Türksat'ta çalışmaktan memnunum.
-                </h4>
-                <div className="flex items-center space-x-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => updateEvaluation('workSatisfaction', star)}
-                      className={`text-3xl transition-colors ${
-                        (formData.evaluation?.workSatisfaction || 0) >= star
-                          ? 'text-yellow-400 hover:text-yellow-500'
-                          : 'text-gray-300 hover:text-yellow-300'
-                      }`}
-                    >
-                      ★
-                    </button>
-                  ))}
-                  <span className="ml-4 text-sm text-gray-600">
-                    {formData.evaluation?.workSatisfaction || 0}/5
-                  </span>
-                </div>
-              </div>
 
-              {/* Soru 2 */}
-              <div className="bg-gray-50 p-6 rounded-lg">
-                <h4 className="text-lg font-medium text-gray-900 mb-4">
-                  2) Türksat'ın çalışma ile ilgili sağladığı imkânlardan memnunum.
-                </h4>
-                <div className="flex items-center space-x-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => updateEvaluation('facilitiesSatisfaction', star)}
-                      className={`text-3xl transition-colors ${
-                        (formData.evaluation?.facilitiesSatisfaction || 0) >= star
-                          ? 'text-yellow-400 hover:text-yellow-500'
-                          : 'text-gray-300 hover:text-yellow-300'
-                      }`}
-                    >
-                      ★
-                    </button>
-                  ))}
-                  <span className="ml-4 text-sm text-gray-600">
-                    {formData.evaluation?.facilitiesSatisfaction || 0}/5
-                  </span>
-                </div>
-              </div>
-
-              {/* Soru 3 */}
-              <div className="bg-gray-50 p-6 rounded-lg">
-                <h4 className="text-lg font-medium text-gray-900 mb-4">
-                  3) Türksat'ta uzun süre çalışmak isterim.
-                </h4>
-                <div className="flex items-center space-x-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => updateEvaluation('longTermIntent', star)}
-                      className={`text-3xl transition-colors ${
-                        (formData.evaluation?.longTermIntent || 0) >= star
-                          ? 'text-yellow-400 hover:text-yellow-500'
-                          : 'text-gray-300 hover:text-yellow-300'
-                      }`}
-                    >
-                      ★
-                    </button>
-                  ))}
-                  <span className="ml-4 text-sm text-gray-600">
-                    {formData.evaluation?.longTermIntent || 0}/5
-                  </span>
-                </div>
-              </div>
-
-              {/* Soru 4 */}
-              <div className="bg-gray-50 p-6 rounded-lg">
-                <h4 className="text-lg font-medium text-gray-900 mb-4">
-                  4) Türksat'ı arkadaşlarıma tavsiye ederim.
-                </h4>
-                <div className="flex items-center space-x-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => updateEvaluation('recommendation', star)}
-                      className={`text-3xl transition-colors ${
-                        (formData.evaluation?.recommendation || 0) >= star
-                          ? 'text-yellow-400 hover:text-yellow-500'
-                          : 'text-gray-300 hover:text-yellow-300'
-                      }`}
-                    >
-                      ★
-                    </button>
-                  ))}
-                  <span className="ml-4 text-sm text-gray-600">
-                    {formData.evaluation?.recommendation || 0}/5
-                  </span>
-                </div>
-              </div>
-
-              {/* Soru 5 */}
-              <div className="bg-gray-50 p-6 rounded-lg">
-                <h4 className="text-lg font-medium text-gray-900 mb-4">
-                  5) Bu "Yetkinlik-X" uygulamasını beğendim.
-                </h4>
-                <div className="flex items-center space-x-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => updateEvaluation('applicationSatisfaction', star)}
-                      className={`text-3xl transition-colors ${
-                        (formData.evaluation?.applicationSatisfaction || 0) >= star
-                          ? 'text-yellow-400 hover:text-yellow-500'
-                          : 'text-gray-300 hover:text-yellow-300'
-                      }`}
-                    >
-                      ★
-                    </button>
-                  ))}
-                  <span className="ml-4 text-sm text-gray-600">
-                    {formData.evaluation?.applicationSatisfaction || 0}/5
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
       default:
         return null;
     }
@@ -2505,7 +2350,7 @@ const CVForm = () => {
           
           {/* Progress bar */}
           <div className="mb-8">
-            <div className="grid grid-cols-11 gap-1 text-xs font-medium text-gray-600 mb-4">
+            <div className="grid grid-cols-10 gap-1 text-xs font-medium text-gray-600 mb-4">
               <div 
                 onClick={() => setCurrentStep(1)}
                 className={`text-center p-3 rounded cursor-pointer transition-all duration-300 hover:bg-blue-50 ${currentStep === 1 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
@@ -2626,23 +2471,12 @@ const CVForm = () => {
                 </div>
                 <span className="block text-xs">Hobi ve İlgi Alanları</span>
               </div>
-              <div 
-                onClick={() => setCurrentStep(11)}
-                className={`text-center p-3 rounded cursor-pointer transition-all duration-300 hover:bg-blue-50 ${currentStep === 11 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
-                <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center transition-all duration-300 ${
-                  currentStep === 11 
-                    ? 'bg-blue-600 text-white shadow-lg transform scale-110' 
-                    : 'bg-gray-200 text-gray-600 hover:bg-blue-200 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105'
-                }`}>
-                  <span className="text-sm font-bold">11</span>
-                </div>
-                <span className="block text-xs">Değerlendirme</span>
-              </div>
+
             </div>
             <div className="h-2 bg-gray-200 rounded-full">
               <div
                 className="h-2 bg-blue-500 rounded-full transition-all duration-300"
-                style={{ width: `${(currentStep / 11) * 100}%` }}
+                style={{ width: `${(currentStep / 10) * 100}%` }}
               ></div>
             </div>
           </div>
@@ -2682,10 +2516,10 @@ const CVForm = () => {
                   CV İndir
                 </button>
                 
-                {currentStep < 11 ? (
+                {currentStep < 10 ? (
                   <button
                     type="button"
-                    onClick={() => setCurrentStep(prev => Math.min(11, prev + 1))}
+                    onClick={() => setCurrentStep(prev => Math.min(10, prev + 1))}
                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
                   >
                     İleri
