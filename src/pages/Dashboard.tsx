@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { FileEdit, Clock, CheckCircle2, AlertCircle, Settings, Users } from 'lucide-react';
-import { getCVData, getAllCVs } from '../services/cvService';
+import { getCVData } from '../services/cvService';
 import { CVData } from '../types/cv';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -11,8 +11,6 @@ const Dashboard: React.FC = () => {
   const { currentUser, isAdmin } = useAuth();
   const [cvData, setCVData] = useState<CVData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [adminStats, setAdminStats] = useState<{ totalCVs: number; totalUsers: number } | null>(null);
-  const [adminStatsLoading, setAdminStatsLoading] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -20,39 +18,6 @@ const Dashboard: React.FC = () => {
         try {
           const data = await getCVData(currentUser.id);
           setCVData(data);
-          
-          // Load admin stats if user is admin
-          if (isAdmin()) {
-            setAdminStatsLoading(true);
-            try {
-              console.log('Loading admin stats...');
-              const allCVs = await getAllCVs();
-              console.log('All CVs loaded:', allCVs);
-              console.log('Total CVs:', allCVs.length);
-              
-              const emailsWithData = allCVs.map(cv => cv.personalInfo?.email).filter(Boolean);
-              console.log('Emails with data:', emailsWithData);
-              
-              const uniqueEmails = new Set(emailsWithData);
-              console.log('Unique emails:', uniqueEmails);
-              
-              const stats = {
-                totalCVs: allCVs.length,
-                totalUsers: uniqueEmails.size
-              };
-              
-              console.log('Setting admin stats:', stats);
-              setAdminStats(stats);
-            } catch (error) {
-              console.error('Error loading admin stats:', error);
-              setAdminStats({
-                totalCVs: 0,
-                totalUsers: 0
-              });
-            } finally {
-              setAdminStatsLoading(false);
-            }
-          }
         } catch (error) {
           console.error('Error loading CV data:', error);
         } finally {
@@ -62,7 +27,7 @@ const Dashboard: React.FC = () => {
     };
 
     loadData();
-  }, [currentUser, isAdmin]);
+  }, [currentUser]);
 
   // Calculate CV completion percentage
   const calculateCompletion = () => {
@@ -568,37 +533,6 @@ const Dashboard: React.FC = () => {
                 </p>
               </div>
               <Settings className="h-8 w-8 text-red-500" />
-            </div>
-            
-            {/* İstatistik Kartları */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 border-l-4 border-blue-500">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <FileEdit className="h-8 w-8 text-blue-600" />
-                  </div>
-                  <div className="ml-3 flex-1">
-                    <div className="text-sm font-medium text-gray-500">Toplam CV</div>
-                    <div className="text-3xl font-bold text-blue-900">
-                      {adminStatsLoading ? '...' : (adminStats ? adminStats.totalCVs : '0')}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 border-l-4 border-green-500">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <Users className="h-8 w-8 text-green-600" />
-                  </div>
-                  <div className="ml-3 flex-1">
-                    <div className="text-sm font-medium text-gray-500">Kullanıcı</div>
-                    <div className="text-3xl font-bold text-green-900">
-                      {adminStatsLoading ? '...' : (adminStats ? adminStats.totalUsers : '0')}
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
             
             <div className="flex gap-3">
