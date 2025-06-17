@@ -11,6 +11,12 @@ import { verifyToken, requireAdmin, requireOwnerOrAdmin } from '../middleware/au
 
 const router = express.Router();
 
+// Tüm CV'leri getir (sadece admin) - Önce spesifik route'lar
+router.get('/', verifyToken, requireAdmin, getAllCVs);
+
+// CV ara (sadece admin)
+router.get('/search/query', verifyToken, requireAdmin, searchCVs);
+
 // CV verilerini getir (kullanıcı kendi CV'sini veya admin hepsini görebilir)
 router.get('/:userId', verifyToken, requireOwnerOrAdmin('userId'), getCVData);
 
@@ -22,11 +28,5 @@ router.delete('/:userId', verifyToken, requireOwnerOrAdmin('userId'), deleteCVDa
 
 // Boş CV oluştur (kullanıcı kendi CV'sini oluşturabilir)
 router.post('/:userId/initialize', verifyToken, requireOwnerOrAdmin('userId'), initializeEmptyCV);
-
-// Tüm CV'leri getir (sadece admin)
-router.get('/', verifyToken, requireAdmin, getAllCVs);
-
-// CV ara (sadece admin)
-router.get('/search/query', verifyToken, requireAdmin, searchCVs);
 
 export default router; 
