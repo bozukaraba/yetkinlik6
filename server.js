@@ -15,6 +15,12 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// HOTFIX: Trust proxy for load balancer
+app.set('trust proxy', true);
+
+// Trust proxy for production load balancers
+app.set('trust proxy', true);
+
 // Security middleware
 app.use(helmet());
 
