@@ -602,45 +602,6 @@ const AdminDashboard: React.FC = () => {
             Değerlendirme Raporu
           </Link>
         </div>
-
-        {/* İstatistik Kartları */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-blue-500">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <FileText className="h-8 w-8 text-blue-600" />
-              </div>
-              <div className="ml-4 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Toplam CV
-                  </dt>
-                  <dd className="text-3xl font-bold text-gray-900">
-                    {allCVs.length}
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-green-500">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Users className="h-8 w-8 text-green-600" />
-              </div>
-              <div className="ml-4 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Kullanıcı
-                  </dt>
-                  <dd className="text-3xl font-bold text-gray-900">
-                    {uniqueUsers}
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Search bar */}
