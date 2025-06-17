@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getAllCVs, searchCVsByKeywords } from '../services/cvService';
 import { CVData } from '../types/cv';
-import { Search, FileText, User, Calendar, Briefcase, Tag, Download, Star, BarChart3, Filter, X } from 'lucide-react';
+import { Search, FileText, User, Calendar, Briefcase, Tag, Download, Star, BarChart3, Filter, X, Users } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -31,6 +31,7 @@ const AdminDashboard: React.FC = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [selectedCV, setSelectedCV] = useState<CVData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [uniqueUsers, setUniqueUsers] = useState<number>(0);
   
 
   
@@ -57,6 +58,10 @@ const AdminDashboard: React.FC = () => {
         const data = await getAllCVs();
         setAllCVs(data);
         setCVList(data);
+        
+        // Benzersiz kullanıcı sayısını hesapla (email bazında)
+        const uniqueEmails = new Set(data.map(cv => cv.personalInfo?.email).filter(Boolean));
+        setUniqueUsers(uniqueEmails.size);
       } catch (error) {
         console.error('Error loading CVs:', error);
       } finally {
@@ -586,7 +591,7 @@ const AdminDashboard: React.FC = () => {
               Yönetici Paneli
             </h1>
             <p className="mt-2 text-lg text-gray-600">
-              Aday CV'lerini ara ve yönet
+              Tüm CV'leri görüntüleyin ve yönetin
             </p>
           </div>
           <Link
@@ -596,6 +601,45 @@ const AdminDashboard: React.FC = () => {
             <BarChart3 className="h-5 w-5 mr-2" />
             Değerlendirme Raporu
           </Link>
+        </div>
+      </div>
+
+      {/* İstatistik Kartları */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="bg-white bg-opacity-95 rounded-lg p-6 backdrop-blur-sm border-l-4 border-blue-500 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <FileText className="h-8 w-8 text-blue-600" />
+            </div>
+            <div className="ml-5 w-0 flex-1">
+              <dl>
+                <dt className="text-sm font-medium text-gray-500 truncate">
+                  Toplam CV
+                </dt>
+                <dd className="text-3xl font-bold text-gray-900">
+                  {allCVs.length}
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white bg-opacity-95 rounded-lg p-6 backdrop-blur-sm border-l-4 border-green-500 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <Users className="h-8 w-8 text-green-600" />
+            </div>
+            <div className="ml-5 w-0 flex-1">
+              <dl>
+                <dt className="text-sm font-medium text-gray-500 truncate">
+                  Kullanıcı
+                </dt>
+                <dd className="text-3xl font-bold text-gray-900">
+                  {uniqueUsers}
+                </dd>
+              </dl>
+            </div>
+          </div>
         </div>
       </div>
 
