@@ -26,10 +26,14 @@ const Dashboard: React.FC = () => {
               const allCVs = await getAllCVs();
               setAdminStats({
                 totalCVs: allCVs.length,
-                totalUsers: new Set(allCVs.map(cv => cv.userId)).size
+                totalUsers: new Set(allCVs.map(cv => cv.personalInfo?.email).filter(Boolean)).size
               });
             } catch (error) {
               console.error('Error loading admin stats:', error);
+              setAdminStats({
+                totalCVs: 0,
+                totalUsers: 0
+              });
             }
           }
         } catch (error) {
