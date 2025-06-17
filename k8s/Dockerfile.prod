@@ -1,0 +1,18 @@
+FROM docker-shared.turksat.com.tr/node:22.16.0-alpine as build
+WORKDIR /app
+
+COPY package*.json ./
+COPY package-lock.json ./
+RUN npm ci
+
+COPY . ./
+COPY .env ./.env
+
+RUN npm run build
+
+FROM docker-shared.turksat.com.tr/nginx:1.27.3
+COPY --from=build /app/dist /usr/share/nginx/html
+
+EXPOSE 3000
+
+CMD ["nginx", "-g", "daemon off;"]
