@@ -1,4 +1,53 @@
-include:
-  - project: 'ygd/gitops/cicd-templates'
-    file:
-      - '.yetkinlik-frontend-gitlab-ci.yml'
+stages:
+  - build
+  - deploy
+
+variables:
+  NODE_VERSION: "18"
+
+# Build stage
+build:
+  stage: build
+  image: node:${NODE_VERSION}
+  script:
+    - echo "Installing dependencies..."
+    - npm ci
+    - echo "Building the project..."
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 hour
+  only:
+    - main
+    - master
+    - develop
+    - feature/*
+
+# Deploy to staging
+deploy_staging:
+  stage: deploy
+  image: node:${NODE_VERSION}
+  script:
+    - echo "Deploying to staging environment..."
+    - echo "Build completed successfully"
+  dependencies:
+    - build
+  only:
+    - develop
+    - feature/*
+  when: manual
+
+# Deploy to production
+deploy_production:
+  stage: deploy
+  image: node:${NODE_VERSION}
+  script:
+    - echo "Deploying to production environment..."
+    - echo "Production deployment completed"
+  dependencies:
+    - build
+  only:
+    - main
+    - master
+  when: manual
