@@ -903,46 +903,7 @@ const CVForm = () => {
           </div>
           ` : ''}
           
-          <!-- Evaluation -->
-          ${formData.evaluation && (formData.evaluation.workSatisfaction > 0 || formData.evaluation.facilitiesSatisfaction > 0 || formData.evaluation.longTermIntent > 0 || formData.evaluation.recommendation > 0) ? `
-          <div style="margin-bottom: 25px;">
-            <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">
-              Değerlendirmeler
-            </h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-              ${formData.evaluation.workSatisfaction > 0 ? `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
-                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">Türksat'ta çalışmaktan memnunum</h3>
-                  <p style="color: #6b7280; font-size: 14px;">${'★'.repeat(formData.evaluation.workSatisfaction)}${'☆'.repeat(5 - formData.evaluation.workSatisfaction)} (${formData.evaluation.workSatisfaction}/5)</p>
-                </div>
-              ` : ''}
-              ${formData.evaluation.facilitiesSatisfaction > 0 ? `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
-                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">Türksat'ın sağladığı imkânlardan memnunum</h3>
-                  <p style="color: #6b7280; font-size: 14px;">${'★'.repeat(formData.evaluation.facilitiesSatisfaction)}${'☆'.repeat(5 - formData.evaluation.facilitiesSatisfaction)} (${formData.evaluation.facilitiesSatisfaction}/5)</p>
-                </div>
-              ` : ''}
-              ${formData.evaluation.longTermIntent > 0 ? `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
-                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">Türksat'ta uzun süre çalışmak isterim</h3>
-                  <p style="color: #6b7280; font-size: 14px;">${'★'.repeat(formData.evaluation.longTermIntent)}${'☆'.repeat(5 - formData.evaluation.longTermIntent)} (${formData.evaluation.longTermIntent}/5)</p>
-                </div>
-              ` : ''}
-              ${formData.evaluation.recommendation > 0 ? `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
-                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">Türksat'ı arkadaşlarıma tavsiye ederim</h3>
-                  <p style="color: #6b7280; font-size: 14px;">${'★'.repeat(formData.evaluation.recommendation)}${'☆'.repeat(5 - formData.evaluation.recommendation)} (${formData.evaluation.recommendation}/5)</p>
-                </div>
-              ` : ''}
-              ${formData.evaluation.applicationSatisfaction > 0 ? `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; background: #f9fafb;">
-                  <h3 style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">Bu "Yetkinlik-X" uygulamasını beğendim</h3>
-                  <p style="color: #6b7280; font-size: 14px;">${'★'.repeat(formData.evaluation.applicationSatisfaction)}${'☆'.repeat(5 - formData.evaluation.applicationSatisfaction)} (${formData.evaluation.applicationSatisfaction}/5)</p>
-                </div>
-              ` : ''}
-            </div>
-          </div>
-          ` : ''}
+
         </div>
       `;
       
