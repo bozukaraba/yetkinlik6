@@ -166,13 +166,7 @@ export interface Hobby {
   sortOrder?: number;
 }
 
-export interface Evaluation {
-  workSatisfaction: number; // Türksat'ta çalışmaktan memnunum
-  facilitiesSatisfaction: number; // Türksat'ın çalışma ile ilgili sağladığı imkânlardan memnunum
-  longTermIntent: number; // Türksat'ta uzun süre çalışmak isterim
-  recommendation: number; // Türksat'ı arkadaşlarıma tavsiye ederim
-  applicationSatisfaction: number; // Yetkinlik-X uygulaması değerlendirmesi
-}
+
 
 export interface CVData {
   id?: string;
@@ -189,7 +183,6 @@ export interface CVData {
   references?: Reference[];
   hobbies?: Hobby[];
   awards?: Award[];
-  evaluation?: Evaluation;
   createdAt?: string;
   updatedAt?: string;
 }
