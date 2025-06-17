@@ -1,42 +1,4 @@
-stages:
-  - build
-  - deploy
-
-variables:
-  NODE_VERSION: "18"
-
-cache:
-  paths:
-    - node_modules/
-
-before_script:
-  - node --version
-  - npm --version
-
-build:
-  stage: build
-  image: node:18-alpine
-  script:
-    - npm ci
-    - npm run build
-  artifacts:
-    paths:
-      - dist/
-    expire_in: 1 hour
-  only:
-    - main
-    - develop
-    - feature/updates
-
-deploy:
-  stage: deploy
-  image: alpine:latest
-  script:
-    - echo "Deploy to staging"
-    - echo "Build artifacts ready for deployment"
-  dependencies:
-    - build
-  only:
-    - main
-    - develop
-    - feature/updates
+include:
+  - project: 'ygd/gitops/cicd-templates'
+    file:
+      - '.yetkinlik-frontend-gitlab-ci.yml'
