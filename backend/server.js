@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import { testConnection } from './config/database.js';
+import { fixDatabase } from './scripts/fixDatabase.js';
 
 // Routes
 import authRoutes from './routes/auth.js';
@@ -15,7 +16,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Trust proxy for GitLab load balancer
+// Trust proxy for production load balancers
 app.set('trust proxy', true);
 
 // Security middleware
@@ -126,6 +127,13 @@ const startServer = async () => {
     if (!dbConnected) {
       console.error('❌ Veritabanı bağlantısı başarısız!');
       console.log('⚠️  Server yine de başlatılıyor, ancak veritabanı işlemleri çalışmayabilir.');
+    } else {
+      // Database yapısını düzelt
+      try {
+        await fixDatabase();
+      } catch (error) {
+        console.error('⚠️ Database fix hatası (devam ediliyor):', error.message);
+      }
     }
     
     app.listen(PORT, () => {
