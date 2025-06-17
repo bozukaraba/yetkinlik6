@@ -539,7 +539,7 @@ const Dashboard: React.FC = () => {
         {/* Admin Panel Card - Only show for admins */}
         {isAdmin() && (
           <div className="bg-white bg-opacity-95 rounded-lg shadow-md p-6 border-t-4 border-red-500 backdrop-blur-sm">
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-start mb-6">
               <div>
                 <h2 className="text-xl font-semibold text-gray-800">Yönetici Paneli</h2>
                 <p className="text-gray-600 mt-1">
@@ -549,23 +549,41 @@ const Dashboard: React.FC = () => {
               <Settings className="h-8 w-8 text-red-500" />
             </div>
             
-            {adminStats && (
-              <div className="mt-4 grid grid-cols-2 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">{adminStats.totalCVs}</div>
-                  <div className="text-sm text-gray-600">Toplam CV</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">{adminStats.totalUsers}</div>
-                  <div className="text-sm text-gray-600">Kullanıcı</div>
+            {/* İstatistik Kartları */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 border-l-4 border-blue-500">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <FileEdit className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <div className="ml-3 flex-1">
+                    <div className="text-sm font-medium text-gray-500">Toplam CV</div>
+                    <div className="text-3xl font-bold text-blue-900">
+                      {adminStats ? adminStats.totalCVs : '0'}
+                    </div>
+                  </div>
                 </div>
               </div>
-            )}
+              
+              <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 border-l-4 border-green-500">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <Users className="h-8 w-8 text-green-600" />
+                  </div>
+                  <div className="ml-3 flex-1">
+                    <div className="text-sm font-medium text-gray-500">Kullanıcı</div>
+                    <div className="text-3xl font-bold text-green-900">
+                      {adminStats ? adminStats.totalUsers : '0'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             
-            <div className="mt-4">
+            <div className="flex gap-3">
               <Link
                 to="/admin"
-                className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
                 <Users className="h-4 w-4 mr-2" />
                 Yönetici Paneline Git
