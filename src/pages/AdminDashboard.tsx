@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+
 import { useAuth } from '../contexts/AuthContext';
 import { getAllCVs, searchCVsByKeywords } from '../services/cvService';
 import { CVData } from '../types/cv';
-import { Search, FileText, User, Calendar, Briefcase, Tag, Download, Star, BarChart3, Filter, X, Users } from 'lucide-react';
+import { Search, FileText, User, Calendar, Briefcase, Tag, Download, Star, Filter, X, Users } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -594,13 +594,6 @@ const AdminDashboard: React.FC = () => {
               Tüm CV'leri görüntüleyin ve yönetin
             </p>
           </div>
-          <Link
-            to="/admin/reports"
-            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-          >
-            <BarChart3 className="h-5 w-5 mr-2" />
-            Değerlendirme Raporu
-          </Link>
         </div>
       </div>
 
@@ -1528,87 +1521,7 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 )}
                 
-                {/* Evaluations */}
-                {selectedCV.evaluation && (selectedCV.evaluation.workSatisfaction > 0 || selectedCV.evaluation.facilitiesSatisfaction > 0 || selectedCV.evaluation.longTermIntent > 0 || selectedCV.evaluation.recommendation > 0 || selectedCV.evaluation.applicationSatisfaction > 0) && (
-                  <div className="mb-6">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                      <Star className="h-5 w-5 mr-2 text-yellow-500" />
-                      Değerlendirmeler
-                    </h2>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {selectedCV.evaluation.workSatisfaction > 0 && (
-                        <div className="border border-gray-200 rounded-lg p-4">
-                          <h3 className="font-medium text-gray-900 mb-2">Türksat'ta çalışmaktan memnunum</h3>
-                          <div className="flex items-center">
-                            <div className="flex text-yellow-400">
-                              {[...Array(5)].map((_, i) => (
-                                <span key={i} className={i < (selectedCV.evaluation?.workSatisfaction || 0) ? 'text-yellow-400' : 'text-gray-300'}>★</span>
-                              ))}
-                            </div>
-                            <span className="ml-2 text-sm text-gray-600">({selectedCV.evaluation?.workSatisfaction || 0}/5)</span>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {selectedCV.evaluation.facilitiesSatisfaction > 0 && (
-                        <div className="border border-gray-200 rounded-lg p-4">
-                          <h3 className="font-medium text-gray-900 mb-2">Türksat'ın sağladığı imkânlardan memnunum</h3>
-                          <div className="flex items-center">
-                            <div className="flex text-yellow-400">
-                              {[...Array(5)].map((_, i) => (
-                                <span key={i} className={i < (selectedCV.evaluation?.facilitiesSatisfaction || 0) ? 'text-yellow-400' : 'text-gray-300'}>★</span>
-                              ))}
-                            </div>
-                            <span className="ml-2 text-sm text-gray-600">({selectedCV.evaluation?.facilitiesSatisfaction || 0}/5)</span>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {selectedCV.evaluation.longTermIntent > 0 && (
-                        <div className="border border-gray-200 rounded-lg p-4">
-                          <h3 className="font-medium text-gray-900 mb-2">Türksat'ta uzun süre çalışmak isterim</h3>
-                          <div className="flex items-center">
-                            <div className="flex text-yellow-400">
-                              {[...Array(5)].map((_, i) => (
-                                <span key={i} className={i < (selectedCV.evaluation?.longTermIntent || 0) ? 'text-yellow-400' : 'text-gray-300'}>★</span>
-                              ))}
-                            </div>
-                            <span className="ml-2 text-sm text-gray-600">({selectedCV.evaluation?.longTermIntent || 0}/5)</span>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {selectedCV.evaluation.recommendation > 0 && (
-                        <div className="border border-gray-200 rounded-lg p-4">
-                          <h3 className="font-medium text-gray-900 mb-2">Türksat'ı arkadaşlarıma tavsiye ederim</h3>
-                          <div className="flex items-center">
-                            <div className="flex text-yellow-400">
-                              {[...Array(5)].map((_, i) => (
-                                <span key={i} className={i < (selectedCV.evaluation?.recommendation || 0) ? 'text-yellow-400' : 'text-gray-300'}>★</span>
-                              ))}
-                            </div>
-                            <span className="ml-2 text-sm text-gray-600">({selectedCV.evaluation.recommendation}/5)</span>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {selectedCV.evaluation.applicationSatisfaction > 0 && (
-                        <div className="border border-gray-200 rounded-lg p-4">
-                          <h3 className="font-medium text-gray-900 mb-2">Bu "Yetkinlik-X" uygulamasını beğendim</h3>
-                          <div className="flex items-center">
-                            <div className="flex text-yellow-400">
-                              {[...Array(5)].map((_, i) => (
-                                <span key={i} className={i < (selectedCV.evaluation?.applicationSatisfaction || 0) ? 'text-yellow-400' : 'text-gray-300'}>★</span>
-                              ))}
-                            </div>
-                            <span className="ml-2 text-sm text-gray-600">({selectedCV.evaluation.applicationSatisfaction}/5)</span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
+
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
