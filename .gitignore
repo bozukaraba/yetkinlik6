@@ -11,7 +11,7 @@ lerna-debug.log*
 node_modules
 
 # Build outputs
-dist
+# dist   # CV layout değişiklikleri için geçici olarak enable edildi
 dist-ssr
 
 # Local environment variables
