@@ -954,36 +954,36 @@ const CVForm = () => {
           <div className="space-y-6">
             <h3 className="text-xl font-semibold text-gray-900">Kişisel Bilgiler</h3>
             
-            {/* Profil Resmi ve Ad Soyad */}
-            <div className="flex flex-col md:flex-row md:items-start gap-6">
-              {/* Profil Resmi */}
-              <div className="flex flex-col items-center md:items-start space-y-4 md:shrink-0">
+            {/* Profil Resmi ve Ad Soyad - Optimize Layout */}
+            <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-6">
+              {/* Profil Resmi - Sol tarafa yaslanmış */}
+              <div className="flex flex-col items-center md:items-start space-y-3 shrink-0">
                 <div className="relative">
                   {formData.personalInfo?.profileImage ? (
                     <div className="relative">
                       <img
                         src={formData.personalInfo.profileImage}
                         alt="Profil"
-                        className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
+                        className="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover border-4 border-gray-200 shadow-md"
                       />
                       <button
                         type="button"
                         onClick={removeImage}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600"
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors shadow-md"
                       >
                         ×
                       </button>
                     </div>
                   ) : (
-                    <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center">
-                      <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-gray-200 flex items-center justify-center border-4 border-gray-300 shadow-md">
+                      <svg className="w-10 h-10 md:w-12 md:h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
                   )}
                 </div>
-                <div>
-                  <label className="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">
+                <div className="text-center md:text-left">
+                  <label className="cursor-pointer bg-blue-500 text-white px-3 py-2 text-sm rounded-md hover:bg-blue-600 transition-colors shadow-sm">
                     Resim Seç
                     <input
                       type="file"
@@ -995,29 +995,33 @@ const CVForm = () => {
                 </div>
               </div>
 
-              {/* Ad ve Soyad */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Ad</label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={formData.personalInfo?.firstName || ''}
-                    onChange={handlePersonalInfoChange}
-                    className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Soyad</label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.personalInfo?.lastName || ''}
-                    onChange={handlePersonalInfoChange}
-                    className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                    required
-                  />
+              {/* Ad ve Soyad - Fotoğrafın yanında */}
+              <div className="flex-1 min-w-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Ad *</label>
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={formData.personalInfo?.firstName || ''}
+                      onChange={handlePersonalInfoChange}
+                      className="w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                      placeholder="Adınız"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Soyad *</label>
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={formData.personalInfo?.lastName || ''}
+                      onChange={handlePersonalInfoChange}
+                      className="w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                      placeholder="Soyadınız"
+                      required
+                    />
+                  </div>
                 </div>
               </div>
             </div>
