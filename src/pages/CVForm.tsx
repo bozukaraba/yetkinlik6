@@ -954,68 +954,75 @@ const CVForm = () => {
           <div className="space-y-6">
             <h3 className="text-xl font-semibold text-gray-900">Kişisel Bilgiler</h3>
             
-            {/* Profil Resmi */}
-            <div className="flex flex-col items-center space-y-4">
-              <div className="relative">
-                {formData.personalInfo?.profileImage ? (
-                  <div className="relative">
-                    <img
-                      src={formData.personalInfo.profileImage}
-                      alt="Profil"
-                      className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
+            {/* Profil Resmi ve Ad Soyad */}
+            <div className="flex flex-col md:flex-row md:items-start gap-6">
+              {/* Profil Resmi */}
+              <div className="flex flex-col items-center md:items-start space-y-4 md:shrink-0">
+                <div className="relative">
+                  {formData.personalInfo?.profileImage ? (
+                    <div className="relative">
+                      <img
+                        src={formData.personalInfo.profileImage}
+                        alt="Profil"
+                        className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center">
+                      <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label className="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">
+                    Resim Seç
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
                     />
-                    <button
-                      type="button"
-                      onClick={removeImage}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ) : (
-                  <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center">
-                    <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  </div>
-                )}
+                  </label>
+                </div>
               </div>
-              <div>
-                <label className="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">
-                  Resim Seç
+
+              {/* Ad ve Soyad */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Ad</label>
                   <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
+                    type="text"
+                    name="firstName"
+                    value={formData.personalInfo?.firstName || ''}
+                    onChange={handlePersonalInfoChange}
+                    className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                    required
                   />
-                </label>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Soyad</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.personalInfo?.lastName || ''}
+                    onChange={handlePersonalInfoChange}
+                    className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                    required
+                  />
+                </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Ad</label>
-                <input
-                  type="text"
-                  name="firstName"
-                  value={formData.personalInfo?.firstName || ''}
-                  onChange={handlePersonalInfoChange}
-                  className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Soyad</label>
-                <input
-                  type="text"
-                  name="lastName"
-                  value={formData.personalInfo?.lastName || ''}
-                  onChange={handlePersonalInfoChange}
-                  className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-lg shadow-md px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                  required
-                />
-              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">E-posta</label>
                 <input
