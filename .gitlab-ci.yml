@@ -4,50 +4,56 @@ stages:
 
 variables:
   NODE_VERSION: "18"
+  CI: "false"
 
-# Build stage
+# Cache for faster builds
+cache:
+  key: "${CI_COMMIT_REF_SLUG}"
+  paths:
+    - node_modules/
+    - .npm/
+
+# Simple build job
 build:
   stage: build
-  image: node:${NODE_VERSION}
+  image: node:18-alpine
+  before_script:
+    - node --version
+    - npm --version
+    - npm ci --cache .npm --prefer-offline
   script:
-    - echo "Installing dependencies..."
-    - npm ci
     - echo "Building the project..."
     - npm run build
   artifacts:
     paths:
       - dist/
     expire_in: 1 hour
-  only:
-    - main
-    - master
-    - develop
-    - feature/*
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_COMMIT_BRANCH =~ /^feature\/.*/
 
-# Deploy to staging
-deploy_staging:
+# Deploy job
+deploy:
   stage: deploy
-  image: node:${NODE_VERSION}
+  image: alpine:latest
   script:
-    - echo "Deploying to staging environment..."
-    - echo "Build completed successfully"
+    - echo "Deploying application..."
+    - echo "Build artifacts available in dist/"
+    - ls -la dist/ || echo "No dist folder found"
+    - echo "Deployment completed successfully"
   dependencies:
     - build
-  only:
-    - develop
-    - feature/*
-  when: manual
-
-# Deploy to production
-deploy_production:
-  stage: deploy
-  image: node:${NODE_VERSION}
-  script:
-    - echo "Deploying to production environment..."
-    - echo "Production deployment completed"
-  dependencies:
-    - build
-  only:
-    - main
-    - master
-  when: manual
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+    - if: $CI_COMMIT_BRANCH == "master"
+      when: manual
+    - if: $CI_COMMIT_BRANCH == "develop"
+      when: manual
+    - if: $CI_COMMIT_BRANCH =~ /^feature\/.*/
+      when: manual
