@@ -8,3 +8,4 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <App />
   </React.StrictMode>,
 )
+console.log('Deployment test - Tue Jun 24 11:28:46 +03 2025');
