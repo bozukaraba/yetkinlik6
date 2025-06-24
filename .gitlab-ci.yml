@@ -10,11 +10,11 @@ build:
   stage: build
   image: node:18
   script:
-    - echo "🔧 Installing dependencies..."
+    - echo "Installing dependencies..."
     - npm ci
-    - echo "🏗️ Building frontend..."
+    - echo "Building frontend..."
     - npm run build
-    - echo "✅ Build completed successfully"
+    - echo "Build completed successfully"
     - ls -la dist/
   artifacts:
     paths:
@@ -29,15 +29,12 @@ deploy_production:
   stage: deploy
   image: alpine:latest
   before_script:
-    - echo "🚀 Starting deployment to production..."
+    - echo "Starting deployment to production..."
     - apk add --no-cache rsync openssh curl
   script:
-    - echo "📦 Deploying dist/ files to production server..."
-    - echo "✅ Frontend deployed successfully"
-    - echo "🌐 Site URL: https://yetkinlik-x.turksat.com.tr"
-  artifacts:
-    reports:
-      dotenv: deploy.env
+    - echo "Deploying dist/ files to production server..."
+    - echo "Frontend deployed successfully"
+    - echo "Site URL: https://yetkinlik-x.turksat.com.tr"
   dependencies:
     - build
   only:
@@ -50,9 +47,9 @@ notify_success:
   stage: deploy
   image: alpine:latest
   script:
-    - echo "✅ Deployment completed successfully!"
-    - echo "🌐 Production site: https://yetkinlik-x.turksat.com.tr"
-    - echo "📝 Changes deployed from commit: $CI_COMMIT_SHA"
+    - echo "Deployment completed successfully!"
+    - echo "Production site: https://yetkinlik-x.turksat.com.tr"
+    - echo "Changes deployed from commit: $CI_COMMIT_SHA"
   dependencies:
     - deploy_production
   only:
