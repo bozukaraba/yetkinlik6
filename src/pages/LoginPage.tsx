@@ -98,6 +98,20 @@ const LoginPage: React.FC = () => {
                   "Lütfen, kendinizi en iyi şekilde ifade edin ve mümkün olduğunca detaylı doldurun. Çünkü her bilgi, sizinle daha güçlü bir bağ kurmamıza ve gelişiminize destek olmamıza yardımcı olacak."
                 </p>
               </blockquote>
+              
+              {/* Kahve Molası Bölümü */}
+              <div className="mt-6 bg-white p-4 rounded-lg shadow-sm border border-blue-100">
+                <div className="flex items-center justify-center space-x-4">
+                  <img 
+                    src="/kahve.png" 
+                    alt="Kahve" 
+                    className="w-12 h-12 object-contain opacity-80"
+                  />
+                  <p className="text-sm text-gray-700 italic text-center">
+                    Bir kahve molası verip doldurmaya başlayabilirsiniz.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
