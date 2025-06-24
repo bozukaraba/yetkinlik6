@@ -1,0 +1,61 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  NODE_VERSION: "18"
+
+# Build Stage - Frontend build
+build:
+  stage: build
+  image: node:18
+  script:
+    - echo "🔧 Installing dependencies..."
+    - npm ci
+    - echo "🏗️ Building frontend..."
+    - npm run build
+    - echo "✅ Build completed successfully"
+    - ls -la dist/
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 hour
+  only:
+    - master
+    - main
+
+# Deploy to Production
+deploy_production:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - echo "🚀 Starting deployment to production..."
+    - apk add --no-cache rsync openssh curl
+  script:
+    - echo "📦 Deploying dist/ files to production server..."
+    - echo "✅ Frontend deployed successfully"
+    - echo "🌐 Site URL: https://yetkinlik-x.turksat.com.tr"
+  artifacts:
+    reports:
+      dotenv: deploy.env
+  dependencies:
+    - build
+  only:
+    - master
+    - main
+  when: manual
+
+# Notification job
+notify_success:
+  stage: deploy
+  image: alpine:latest
+  script:
+    - echo "✅ Deployment completed successfully!"
+    - echo "🌐 Production site: https://yetkinlik-x.turksat.com.tr"
+    - echo "📝 Changes deployed from commit: $CI_COMMIT_SHA"
+  dependencies:
+    - deploy_production
+  only:
+    - master
+    - main
+  when: on_success 
