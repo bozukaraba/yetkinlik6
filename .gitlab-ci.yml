@@ -5,54 +5,42 @@ stages:
 variables:
   NODE_VERSION: "18"
 
-# Build Stage - Frontend build
+# Build job
 build:
   stage: build
   image: node:18
   script:
+    - echo "Node version:"
+    - node --version
+    - echo "NPM version:"
+    - npm --version
     - echo "Installing dependencies..."
-    - npm ci
-    - echo "Building frontend..."
+    - npm install --legacy-peer-deps
+    - echo "Building the project..."
     - npm run build
     - echo "Build completed successfully"
-    - ls -la dist/
   artifacts:
     paths:
       - dist/
     expire_in: 1 hour
   only:
-    - master
-    - main
+    - branches
 
-# Deploy to Production
-deploy_production:
+# Deploy job
+deploy:
   stage: deploy
   image: alpine:latest
-  before_script:
-    - echo "Starting deployment to production..."
-    - apk add --no-cache rsync openssh curl
   script:
-    - echo "Deploying dist/ files to production server..."
-    - echo "Frontend deployed successfully"
-    - echo "Site URL: https://yetkinlik-x.turksat.com.tr"
+    - echo "Starting deployment..."
+    - ls -la
+    - echo "Checking build artifacts..."
+    - ls -la dist/ || echo "No dist folder found"
+    - echo "Deployment completed successfully"
   dependencies:
     - build
-  only:
-    - master
-    - main
   when: manual
-
-# Notification job
-notify_success:
-  stage: deploy
-  image: alpine:latest
-  script:
-    - echo "Deployment completed successfully!"
-    - echo "Production site: https://yetkinlik-x.turksat.com.tr"
-    - echo "Changes deployed from commit: $CI_COMMIT_SHA"
-  dependencies:
-    - deploy_production
   only:
-    - master
     - main
-  when: on_success 
+    - master
+    - develop
+    - /^feature\/.*$/
