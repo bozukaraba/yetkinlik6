@@ -44,7 +44,7 @@ const Navbar: React.FC = () => {
           {/* Yetkinlkx Logo */}
           <div className="hidden md:block">
             <img 
-              src="/yetkinlkx.png" 
+              src="public/yetkinlkx.png" 
               alt="Yetkinlkx" 
               className="h-10 mx-4 opacity-90 hover:opacity-100 transition-opacity"
             />
