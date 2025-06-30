@@ -19,6 +19,10 @@ export const loginValidation = [
   body('password').notEmpty().withMessage('Şifre gerekli')
 ];
 
+export const resetPasswordValidation = [
+  body('email').isEmail().withMessage('Geçerli bir email adresi girin')
+];
+
 // Helper function to generate JWT
 const generateToken = (userId) => {
   return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
@@ -210,6 +214,58 @@ export const getProfile = async (req, res) => {
     });
   } catch (error) {
     console.error('Profil hatası:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Sunucu hatası'
+    });
+  }
+};
+
+// Şifre sıfırlama
+export const resetPassword = async (req, res) => {
+  try {
+    // Validation kontrolü
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation hatası',
+        errors: errors.array()
+      });
+    }
+
+    const { email } = req.body;
+
+    // Kullanıcıyı kontrol et
+    const userResult = await query(
+      'SELECT id, email, name FROM users WHERE email = $1',
+      [email]
+    );
+
+    // Güvenlik için her durumda başarılı yanıt döndür
+    // Gerçek uygulamada email gönderme servisi burada çalışır
+    res.json({
+      success: true,
+      message: 'Şifre sıfırlama e-postası gönderildi (eğer email kayıtlıysa)'
+    });
+
+    // Kullanıcı varsa reset token oluştur ve kaydet
+    if (userResult.rows.length > 0) {
+      const user = userResult.rows[0];
+      const resetToken = uuidv4();
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 1); // 1 saat
+
+      await query(
+        'INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES ($1, $2, $3) ON CONFLICT (user_id) DO UPDATE SET token = $2, expires_at = $3',
+        [user.id, resetToken, expiresAt]
+      );
+
+      console.log(`Şifre sıfırlama token'ı oluşturuldu: ${resetToken} (${user.email})`);
+      // Burada email gönderme servisi çalışacak
+    }
+  } catch (error) {
+    console.error('Şifre sıfırlama hatası:', error);
     res.status(500).json({
       success: false,
       message: 'Sunucu hatası'

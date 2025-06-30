@@ -41,17 +41,7 @@ const Navbar: React.FC = () => {
             </div>
           </div>
 
-          {/* Yetkinlkx Logo */}
-          <div className="hidden md:block">
-            <img 
-              src="/yetkinlkx.png" 
-              alt="Yetkinlkx" 
-              className="h-10 mx-4 opacity-90 hover:opacity-100 transition-opacity"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-          </div>
+
 
           {/* Desktop navigation */}
           <div className="hidden md:flex items-center space-x-6">

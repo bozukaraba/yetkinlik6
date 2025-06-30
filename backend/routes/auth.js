@@ -4,8 +4,10 @@ import {
   login,
   logout,
   getProfile,
+  resetPassword,
   registerValidation,
-  loginValidation
+  loginValidation,
+  resetPasswordValidation
 } from '../controllers/authController.js';
 import { verifyToken } from '../middleware/auth.js';
 
@@ -22,5 +24,8 @@ router.post('/logout', verifyToken, logout);
 
 // Kullanıcı profili (token gerekli)
 router.get('/profile', verifyToken, getProfile);
+
+// Şifre sıfırlama
+router.post('/reset-password', resetPasswordValidation, resetPassword);
 
 export default router; 

@@ -14,6 +14,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   loading: boolean;
   isAdmin: () => boolean;
 }
@@ -115,6 +116,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  const resetPassword = async (email: string) => {
+    try {
+      console.log('Attempting password reset for:', email);
+      
+      const response = await authAPI.resetPassword({ email });
+      
+      if (!response.success) {
+        throw new Error(response.message || 'Şifre sıfırlama e-postası gönderilemedi');
+      }
+      console.log('Password reset email sent successfully');
+    } catch (error: any) {
+      console.error('Password reset error:', error);
+      
+      const errorMessage = error instanceof Error ? error.message : 'Şifre sıfırlama hatası oluştu';
+      throw new Error(errorMessage);
+    }
+  };
+
   const logout = async () => {
     try {
       console.log('Attempting logout...');
@@ -138,6 +157,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     login,
     register,
     logout,
+    resetPassword,
     loading,
     isAdmin
   };

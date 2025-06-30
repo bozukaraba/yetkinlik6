@@ -126,6 +126,11 @@ export const authAPI = {
   getProfile: async () => {
     const response: ApiResponse<{ user: any }> = await apiClient.get('/auth/profile');
     return response;
+  },
+
+  resetPassword: async (emailData: { email: string }) => {
+    const response: ApiResponse<any> = await apiClient.post('/auth/reset-password', emailData);
+    return response;
   }
 };
 
