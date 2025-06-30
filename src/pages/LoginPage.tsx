@@ -186,7 +186,7 @@ const LoginPage: React.FC = () => {
                   className="text-blue-600 hover:text-blue-500 ml-1"
                 >
                   ugur.kotbas@turksat.com.tr
-                </a>  
+                </a>{' '}
                 adresine mail atabilirsiniz.
               </p>
             </div>
