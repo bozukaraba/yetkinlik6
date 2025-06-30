@@ -53,7 +53,6 @@ const Navbar: React.FC = () => {
                   <FileEdit className="h-5 w-5 mr-1" />
                   <span>CV'im</span>
                 </Link>
-                {/* DEBUG: Current user role: {currentUser.role} - isAdmin: {isAdmin()} */}
                 {(currentUser.role === 'admin' || isAdmin()) && (
                   <>
                     <Link to="/admin" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
@@ -123,7 +122,7 @@ const Navbar: React.FC = () => {
                 >
                   CV'im
                 </Link>
-                {isAdmin() && (
+                {(currentUser.role === 'admin' || isAdmin()) && (
                   <>
                     <Link 
                       to="/admin" 
