@@ -9,6 +9,7 @@ import { fixDatabase } from './scripts/fixDatabase.js';
 // Routes
 import authRoutes from './routes/auth.js';
 import cvRoutes from './routes/cv.js';
+import adminRoutes from './routes/admin.js';
 
 // Environment değişkenlerini yükle
 dotenv.config();
@@ -81,6 +82,7 @@ app.get('/health', async (req, res) => {
 // Routes
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/cv', cvRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {

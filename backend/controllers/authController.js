@@ -271,4 +271,82 @@ export const resetPassword = async (req, res) => {
       message: 'Sunucu hatası'
     });
   }
+};
+
+// Admin: Tüm kullanıcıları getir
+export const getUsers = async (req, res) => {
+  try {
+    const usersResult = await query(
+      'SELECT id, email, name, role, is_active, created_at FROM users ORDER BY created_at DESC'
+    );
+
+    res.json({
+      success: true,
+      data: usersResult.rows
+    });
+  } catch (error) {
+    console.error('Kullanıcı listesi hatası:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Kullanıcı listesi alınamadı'
+    });
+  }
+};
+
+// Admin: Kullanıcı şifresi sıfırlama
+export const resetUserPassword = async (req, res) => {
+  try {
+    const { userId, newPassword } = req.body;
+
+    if (!userId || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Kullanıcı ID ve yeni şifre gerekli'
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Şifre en az 6 karakter olmalıdır'
+      });
+    }
+
+    // Kullanıcıyı kontrol et
+    const userResult = await query(
+      'SELECT id, email, name FROM users WHERE id = $1',
+      [userId]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Kullanıcı bulunamadı'
+      });
+    }
+
+    // Şifreyi hash'le ve güncelle
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    await query(
+      'UPDATE users SET password_hash = $1 WHERE id = $2',
+      [passwordHash, userId]
+    );
+
+    // Kullanıcının tüm session'larını sil (yeniden giriş yapmaya zorla)
+    await query(
+      'DELETE FROM sessions WHERE user_id = $1',
+      [userId]
+    );
+
+    res.json({
+      success: true,
+      message: 'Kullanıcı şifresi başarıyla güncellendi'
+    });
+  } catch (error) {
+    console.error('Şifre sıfırlama hatası:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Şifre güncellenemedi'
+    });
+  }
 }; 

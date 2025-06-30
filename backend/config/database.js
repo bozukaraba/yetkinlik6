@@ -130,6 +130,11 @@ const mockQuery = async (text, params = []) => {
     return { rows: [user] };
   }
   
+  if (sql.includes('select') && sql.includes('from users') && !sql.includes('email') && !sql.includes('id =')) {
+    const users = await mockDB.getAllUsers();
+    return { rows: users };
+  }
+  
   if (sql.includes('select') && sql.includes('from cvs')) {
     if (sql.includes('user_id')) {
       const userId = params[0];

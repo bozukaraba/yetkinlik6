@@ -36,6 +36,17 @@ export const mockDB = {
     return newUser;
   },
 
+  async getAllUsers() {
+    return mockUsers.map(user => ({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      is_active: user.is_active,
+      created_at: user.created_at
+    }));
+  },
+
   // CV operations
   async findCVByUserId(userId) {
     const cv = mockCVs.find(cv => cv.user_id === userId);
