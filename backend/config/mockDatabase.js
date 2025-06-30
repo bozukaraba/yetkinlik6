@@ -28,10 +28,17 @@ export const mockDB = {
   async createUser(userData) {
     const newUser = {
       ...userData,
+      role: userData.role || 'user', // Default role
       created_at: new Date(),
       updated_at: new Date(),
       is_active: true
     };
+    
+    // Test için admin@test.com'u admin yap
+    if (userData.email === 'admin@test.com') {
+      newUser.role = 'admin';
+    }
+    
     mockUsers.push(newUser);
     return newUser;
   },
