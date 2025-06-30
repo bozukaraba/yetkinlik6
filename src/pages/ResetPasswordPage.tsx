@@ -79,22 +79,15 @@ const ResetPasswordPage: React.FC = () => {
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
-            {/* Token Input (Development için görünür) */}
-            <div>
-              <label htmlFor="token" className="block text-sm font-medium text-gray-700">
-                Token
-              </label>
-              <input
-                id="token"
-                name="token"
-                type="text"
-                value={formData.token}
-                onChange={(e) => setFormData(prev => ({ ...prev, token: e.target.value }))}
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Reset token'ı buraya yapıştırın"
-                required
-              />
-            </div>
+            {/* Token - Sadece URL'den gelir, input alanı YOK */}
+            {!formData.token && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-md">
+                <h3 className="text-sm font-medium text-red-800">⚠️ Geçersiz Link</h3>
+                <p className="mt-1 text-xs text-red-700">
+                  Bu sayfaya email linki üzerinden erişmelisiniz.
+                </p>
+              </div>
+            )}
 
             {/* Yeni Şifre */}
             <div>
@@ -152,11 +145,12 @@ const ResetPasswordPage: React.FC = () => {
           </div>
         </form>
 
-        {/* Development Info */}
-        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-          <h3 className="text-sm font-medium text-yellow-800">🛠️ Development Mode</h3>
-          <p className="mt-1 text-xs text-yellow-700">
-            Console'dan token'ı alıp yukarıdaki alana yapıştırın
+        {/* Güvenlik Uyarısı */}
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
+          <h3 className="text-sm font-medium text-blue-800">🔒 Güvenlik</h3>
+          <p className="mt-1 text-xs text-blue-700">
+            Bu sayfaya sadece email ile gönderilen bağlantı üzerinden erişebilirsiniz.
+            Şifre sıfırlama talebi için admin ile iletişime geçin.
           </p>
         </div>
       </div>

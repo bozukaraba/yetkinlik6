@@ -56,9 +56,14 @@ const Navbar: React.FC = () => {
                   <span>CV'im</span>
                 </Link>
                 {isAdmin() && (
-                  <Link to="/admin" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
-                    🔧 Yönetici Paneli
-                  </Link>
+                  <>
+                    <Link to="/admin" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
+                      📊 CV Yönetimi
+                    </Link>
+                    <Link to="/admin/users" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
+                      👥 Kullanıcı Yönetimi
+                    </Link>
+                  </>
                 )}
                 <div className="flex items-center">
                   <UserCircle className="h-5 w-5 text-gray-600 mr-1" />
@@ -120,13 +125,22 @@ const Navbar: React.FC = () => {
                   CV'im
                 </Link>
                 {isAdmin() && (
-                  <Link 
-                    to="/admin" 
-                    className="block py-2 text-gray-600 hover:text-blue-600 transition-colors font-medium"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    🔧 Yönetici Paneli
-                  </Link>
+                  <>
+                    <Link 
+                      to="/admin" 
+                      className="block py-2 text-gray-600 hover:text-blue-600 transition-colors font-medium"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      📊 CV Yönetimi
+                    </Link>
+                    <Link 
+                      to="/admin/users" 
+                      className="block py-2 text-gray-600 hover:text-blue-600 transition-colors font-medium"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      👥 Kullanıcı Yönetimi
+                    </Link>
+                  </>
                 )}
                 <button 
                   onClick={() => {
