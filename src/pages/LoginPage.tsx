@@ -1,20 +1,14 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { UserCircle, Lock, AlertCircle, Mail, X } from 'lucide-react';
+import { UserCircle, Lock, AlertCircle } from 'lucide-react';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showResetModal, setShowResetModal] = useState(false);
-  const [resetEmail, setResetEmail] = useState('');
-  const [resetError, setResetError] = useState('');
-  const [resetSuccess, setResetSuccess] = useState('');
-  const [isResetLoading, setIsResetLoading] = useState(false);
-  const { login, resetPassword } = useAuth();
-  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,43 +29,6 @@ const LoginPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handlePasswordReset = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setResetError('');
-    setResetSuccess('');
-    
-    if (!resetEmail) {
-      setResetError('Lütfen e-posta adresinizi girin');
-      return;
-    }
-    
-    try {
-      setIsResetLoading(true);
-      await resetPassword(resetEmail);
-      setResetSuccess('Şifre sıfırlama e-postası gönderildi. E-posta kutunuzu kontrol edin.');
-      setResetEmail('');
-    } catch (err: any) {
-      setResetError(err.message || 'Şifre sıfırlama e-postası gönderilemedi.');
-      console.error(err);
-    } finally {
-      setIsResetLoading(false);
-    }
-  };
-
-  const openResetModal = () => {
-    setShowResetModal(true);
-    setResetEmail('');
-    setResetError('');
-    setResetSuccess('');
-  };
-
-  const closeResetModal = () => {
-    setShowResetModal(false);
-    setResetEmail('');
-    setResetError('');
-    setResetSuccess('');
   };
 
   return (
@@ -196,8 +153,6 @@ const LoginPage: React.FC = () => {
                 Beni hatırla
               </label>
             </div>
-
-
           </div>
 
           <div>
@@ -231,7 +186,7 @@ const LoginPage: React.FC = () => {
                   className="text-blue-600 hover:text-blue-500 ml-1"
                 >
                   ugur.kotbas@turksat.com.tr
-                </a> 
+                </a>  
                 adresine mail atabilirsiniz.
               </p>
             </div>
@@ -239,96 +194,6 @@ const LoginPage: React.FC = () => {
         </form>
         </div>
       </div>
-
-      {/* Password Reset Modal */}
-      {showResetModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Şifre Sıfırlama</h3>
-              <button
-                onClick={closeResetModal}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <p className="text-sm text-gray-600 mb-4">
-              E-posta adresinizi girin, size şifre sıfırlama bağlantısı gönderelim.
-            </p>
-
-            {resetError && (
-              <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4 flex items-center">
-                <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
-                <p className="text-sm text-red-700">{resetError}</p>
-              </div>
-            )}
-
-            {resetSuccess && (
-              <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-4 flex items-center">
-                <Mail className="h-5 w-5 text-green-500 mr-2" />
-                <p className="text-sm text-green-700">{resetSuccess}</p>
-              </div>
-            )}
-
-            <form onSubmit={handlePasswordReset} className="space-y-4">
-              <div>
-                <label htmlFor="resetEmail" className="block text-sm font-medium text-gray-700 mb-1">
-                  E-posta Adresi
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    id="resetEmail"
-                    name="resetEmail"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={resetEmail}
-                    onChange={(e) => setResetEmail(e.target.value)}
-                    className="pl-10 focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
-                    placeholder="E-posta adresinizi girin"
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={closeResetModal}
-                  className="flex-1 py-2 px-4 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  İptal
-                </button>
-                <button
-                  type="submit"
-                  disabled={isResetLoading}
-                  className={`flex-1 py-2 px-4 border border-transparent rounded-md text-sm font-medium text-white ${
-                    isResetLoading 
-                      ? 'bg-blue-400' 
-                      : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
-                  }`}
-                >
-                  {isResetLoading ? (
-                    <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Gönderiliyor...
-                    </span>
-                  ) : (
-                    'E-posta Gönder'
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
