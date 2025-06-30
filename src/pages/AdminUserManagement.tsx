@@ -13,7 +13,7 @@ interface UserData {
 }
 
 const AdminUserManagement: React.FC = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, loading: authLoading } = useAuth();
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -25,8 +25,10 @@ const AdminUserManagement: React.FC = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    loadUsers();
-  }, []);
+    if (!authLoading && currentUser?.role === 'admin') {
+      loadUsers();
+    }
+  }, [authLoading, currentUser]);
 
   const loadUsers = async () => {
     try {
@@ -84,6 +86,19 @@ const AdminUserManagement: React.FC = () => {
     user.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Auth loading durumu
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-500">Yetki kontrolü yapılıyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Admin yetkisi kontrol
   if (!currentUser || currentUser.role !== 'admin') {
     return (
       <div className="min-h-screen flex items-center justify-center">
