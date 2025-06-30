@@ -8,6 +8,7 @@ import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
 import CVForm from './pages/CVForm';
 import AdminDashboard from './pages/AdminDashboard';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 import NotFoundPage from './pages/NotFoundPage';
 import Navbar from './components/layout/Navbar';
@@ -49,6 +50,10 @@ function AuthAwareRoutes() {
             <Navigate to="/dashboard" replace /> : 
             <RegisterPage />
         } 
+      />
+      <Route 
+        path="/reset-password" 
+        element={<ResetPasswordPage />} 
       />
       <Route 
         path="/dashboard" 
