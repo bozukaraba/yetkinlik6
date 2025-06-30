@@ -25,19 +25,28 @@ const AdminUserManagement: React.FC = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    if (!authLoading && currentUser?.role === 'admin') {
-      loadUsers();
+    if (!authLoading) {
+      if (currentUser?.role === 'admin') {
+        console.log('Admin kullanıcı tespit edildi, kullanıcılar yükleniyor...');
+        loadUsers();
+      } else if (currentUser) {
+        console.log('Admin olmayan kullanıcı:', currentUser.role);
+        setLoading(false);
+      }
     }
   }, [authLoading, currentUser]);
 
   const loadUsers = async () => {
     try {
       setLoading(true);
-      const response: any = await apiClient.get('/admin/users');
+      setMessage('');
+      console.log('Admin users endpoint çağrılıyor...');
+      const response: any = await apiClient.get('/auth/admin/users');
+      console.log('Response:', response);
       setUsers(response.data || []);
     } catch (error: any) {
       console.error('Kullanıcı listesi yüklenemedi:', error);
-      setMessage('Kullanıcı listesi yüklenemedi');
+      setMessage(`Kullanıcı listesi yüklenemedi: ${error.message || 'Bilinmeyen hata'}`);
     } finally {
       setLoading(false);
     }
@@ -60,7 +69,7 @@ const AdminUserManagement: React.FC = () => {
     setMessage('');
 
     try {
-      const response: any = await apiClient.post('/admin/reset-user-password', {
+      const response: any = await apiClient.post('/auth/admin/reset-user-password', {
         userId: selectedUser.id,
         newPassword: newPassword
       });

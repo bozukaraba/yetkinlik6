@@ -197,15 +197,7 @@ const LoginPage: React.FC = () => {
               </label>
             </div>
 
-            <div className="text-sm">
-              <button 
-                type="button"
-                onClick={openResetModal}
-                className="font-medium text-blue-600 hover:text-blue-500"
-              >
-                Şifremi unuttum
-              </button>
-            </div>
+
           </div>
 
           <div>

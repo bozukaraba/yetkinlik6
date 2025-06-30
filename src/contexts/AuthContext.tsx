@@ -63,7 +63,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         tokenManager.removeToken();
         setCurrentUser(null);
       } finally {
-        setLoading(false);
+        setTimeout(() => setLoading(false), 100); // Biraz gecikme ekle
       }
     };
 
