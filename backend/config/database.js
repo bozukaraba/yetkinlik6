@@ -4,8 +4,8 @@ import { mockDB, testMockConnection } from './mockDatabase.js';
 
 dotenv.config();
 
-// Mock mode flag
-const USE_MOCK_DB = process.env.USE_MOCK_DB === 'true' || process.env.NODE_ENV === 'development';
+// Mock mode flag - Production database kullan
+const USE_MOCK_DB = process.env.USE_MOCK_DB === 'true';
 
 // PostgreSQL bağlantı konfigürasyonu
 const poolConfig = {
@@ -16,7 +16,7 @@ const poolConfig = {
   password: process.env.DB_PASSWORD || 'Vaethe!ePhaesoZ2eiPhooKo',
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 10000,
   ssl: false
 };
 
@@ -29,7 +29,7 @@ const adminPoolConfig = {
   password: process.env.DB_ADMIN_PASSWORD || 'shie0hieKohhie!leig0eequ',
   max: 10,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 10000,
   ssl: false
 };
 
@@ -87,9 +87,9 @@ export const testConnection = async () => {
     return true;
   } catch (error) {
     console.error('PostgreSQL bağlantı hatası:', error);
-    console.log('🔄 Mock database moduna geçiliyor...');
-    process.env.USE_MOCK_DB = 'true';
-    return await testMockConnection();
+    console.log('❌ Veritabanı bağlantısı başarısız!');
+    console.log('🔗 Lütfen veritabanı bağlantı ayarlarını kontrol edin.');
+    return false;
   }
 };
 
