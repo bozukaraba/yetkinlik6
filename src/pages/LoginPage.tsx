@@ -100,14 +100,14 @@ const LoginPage: React.FC = () => {
               </blockquote>
               
               {/* Kahve Molası Bölümü */}
-              <div className="mt-6 bg-white p-4 rounded-lg shadow-sm border border-blue-100">
+              <div className="mt-6 bg-yellow-50 p-4 rounded-lg shadow-sm border border-yellow-200">
                 <div className="flex items-center justify-center space-x-4">
                   <img 
                     src="/kahve.png" 
                     alt="Kahve" 
-                    className="w-12 h-12 object-contain opacity-80"
+                    className="w-16 h-16 object-contain opacity-80"
                   />
-                  <p className="text-sm text-gray-700 italic text-center">
+                  <p className="text-base text-gray-700 italic text-center">
                     Bir kahve molası verip doldurmaya başlayabilirsiniz.
                   </p>
                 </div>
