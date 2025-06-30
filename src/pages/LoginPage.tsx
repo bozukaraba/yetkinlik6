@@ -222,6 +222,19 @@ const LoginPage: React.FC = () => {
                 'Giriş Yap'
               )}
             </button>
+            
+            <div className="mt-4 text-center">
+              <p className="text-xs text-gray-500">
+                Teknik Sorunlar İçin: 
+                <a 
+                  href="mailto:ugur.kotbas@turksat.com.tr" 
+                  className="text-blue-600 hover:text-blue-500 ml-1"
+                >
+                  ugur.kotbas@turksat.com.tr
+                </a> 
+                adresine mail atabilirsiniz.
+              </p>
+            </div>
           </div>
         </form>
         </div>
