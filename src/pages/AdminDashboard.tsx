@@ -730,6 +730,25 @@ const AdminDashboard: React.FC = () => {
                               }
                             </p>
                           )}
+                          {selectedCV.personalInfo?.address && (
+                            <p className="flex items-center text-gray-600">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                              </svg>
+                              Adres: {selectedCV.personalInfo.address}
+                              {selectedCV.personalInfo?.city && ` - ${selectedCV.personalInfo.city}`}
+                              {selectedCV.personalInfo?.postalCode && ` (${selectedCV.personalInfo.postalCode})`}
+                              {selectedCV.personalInfo?.country && ` - ${selectedCV.personalInfo.country}`}
+                            </p>
+                          )}
+                          {selectedCV.personalInfo?.drivingLicense && selectedCV.personalInfo.drivingLicense.length > 0 && (
+                            <p className="flex items-center text-gray-600">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h3a1 1 0 011 1v3a1 1 0 01-1 1h-1v8a2 2 0 01-2 2H7a2 2 0 01-2-2v-8H4a1 1 0 01-1-1V5a1 1 0 011-1h3zM9 3v1h6V3H9zm1 6h4v2h-4V9z" />
+                              </svg>
+                              Sürücü Belgesi: {selectedCV.personalInfo.drivingLicense.join(', ')}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -1024,6 +1043,166 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 )}
                 
+                {/* Projects */}
+                {selectedCV.projects && selectedCV.projects.length > 0 && (
+                  <div className="mb-6">
+                    <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                      </svg>
+                      Projeler
+                    </h2>
+                    
+                    <div className="space-y-4">
+                      {selectedCV.projects.map(project => (
+                        <div key={project.id} className="border border-gray-200 rounded-lg p-4">
+                          <h3 className="font-medium text-gray-900">{project.title}</h3>
+                          <p className="text-sm text-gray-700 mt-2">{project.description}</p>
+                          {project.role && (
+                            <p className="text-sm text-gray-600 mt-1">Rol: {project.role}</p>
+                          )}
+                          {project.url && (
+                            <a
+                              href={project.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-600 hover:text-blue-800 mt-1 inline-block"
+                            >
+                              Proje Linki →
+                            </a>
+                          )}
+                          {project.technologies && project.technologies.length > 0 && (
+                            <div className="mt-2 flex flex-wrap gap-1">
+                              {project.technologies.map((tech, index) => (
+                                <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                                  {tech}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          {(project.startDate || project.endDate) && (
+                            <p className="text-sm text-gray-500 mt-2">
+                              {project.startDate} - {project.endDate || 'Devam ediyor'}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Publications */}
+                {selectedCV.publications && selectedCV.publications.length > 0 && (
+                  <div className="mb-6">
+                    <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                      Yayınlar
+                    </h2>
+                    
+                    <div className="space-y-4">
+                      {selectedCV.publications.map(pub => (
+                        <div key={pub.id} className="border border-gray-200 rounded-lg p-4">
+                          <h3 className="font-medium text-gray-900">{pub.title}</h3>
+                          <p className="text-sm text-gray-600">Yazarlar: {pub.authors.join(', ')}</p>
+                          <p className="text-sm text-gray-600">Yayın Tarihi: {pub.publishDate}</p>
+                          {pub.publisher && (
+                            <p className="text-sm text-gray-600">Yayıncı: {pub.publisher}</p>
+                          )}
+                          {pub.description && (
+                            <p className="text-sm text-gray-700 mt-2">{pub.description}</p>
+                          )}
+                          {pub.url && (
+                            <a
+                              href={pub.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-600 hover:text-blue-800 mt-2 inline-block"
+                            >
+                              Yayını Görüntüle →
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Volunteer Experience */}
+                {selectedCV.volunteer && selectedCV.volunteer.length > 0 && (
+                  <div className="mb-6">
+                    <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      </svg>
+                      Gönüllü Deneyim
+                    </h2>
+                    
+                    <div className="space-y-4">
+                      {selectedCV.volunteer.map(vol => (
+                        <div key={vol.id} className="border-l-2 border-gray-200 pl-4">
+                          <h3 className="font-medium text-gray-900">{vol.organization} - {vol.role}</h3>
+                          <p className="text-sm text-gray-500">
+                            {vol.startDate} - {vol.current ? 'Devam ediyor' : (vol.endDate || 'Bitiş tarihi belirtilmemiş')}
+                          </p>
+                          {vol.description && (
+                            <p className="mt-2 text-gray-700">{vol.description}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Awards */}
+                {selectedCV.awards && selectedCV.awards.length > 0 && (
+                  <div className="mb-6">
+                    <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                      </svg>
+                      Ödüller & Başarılar
+                    </h2>
+                    
+                    <div className="space-y-4">
+                      {selectedCV.awards.map(award => (
+                        <div key={award.id} className="border border-gray-200 rounded-lg p-4">
+                          <h3 className="font-medium text-gray-900">{award.title}</h3>
+                          <p className="text-sm text-gray-600">{award.organization}</p>
+                          <p className="text-sm text-gray-500">Tarih: {award.date}</p>
+                          {award.description && (
+                            <p className="text-sm text-gray-700 mt-2">{award.description}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Hobbies */}
+                {selectedCV.hobbies && selectedCV.hobbies.length > 0 && (
+                  <div className="mb-6">
+                    <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-12 5.757c0 1.061.421 2.078 1.172 2.828L12 21l8.828-8.415A4.005 4.005 0 0022 10.172V6.828a1 1 0 00-.293-.707l-2.828-2.828A1 1 0 0018.172 3H5.828a1 1 0 00-.707.293L2.293 6.121A1 1 0 002 6.828v3.344a4.005 4.005 0 001.172 2.828L12 21z" />
+                      </svg>
+                      Hobiler & İlgi Alanları
+                    </h2>
+                    
+                    <div className="flex flex-wrap gap-2">
+                      {selectedCV.hobbies.map(hobby => (
+                        <span 
+                          key={hobby.id} 
+                          className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
+                        >
+                          {hobby.category === 'Diğer' && hobby.customValue ? hobby.customValue : hobby.category}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* References */}
                 {selectedCV.references && selectedCV.references.length > 0 && (
                   <div className="mb-6">
