@@ -8,7 +8,6 @@ import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
 import CVForm from './pages/CVForm';
 import AdminDashboard from './pages/AdminDashboard';
-import AdminUserManagement from './pages/AdminUserManagement';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 
 import NotFoundPage from './pages/NotFoundPage';
@@ -77,14 +76,6 @@ function AuthAwareRoutes() {
         element={
           <AdminRoute>
             <AdminDashboard />
-          </AdminRoute>
-        } 
-      />
-      <Route 
-        path="/admin/users" 
-        element={
-          <AdminRoute>
-            <AdminUserManagement />
           </AdminRoute>
         } 
       />

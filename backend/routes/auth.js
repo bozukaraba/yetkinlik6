@@ -5,13 +5,11 @@ import {
   logout,
   getProfile,
   resetPassword,
-  getUsers,
-  resetUserPassword,
   registerValidation,
   loginValidation,
   resetPasswordValidation
 } from '../controllers/authController.js';
-import { verifyToken, requireAdmin } from '../middleware/auth.js';
+import { verifyToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -29,9 +27,5 @@ router.get('/profile', verifyToken, getProfile);
 
 // Şifre sıfırlama
 router.post('/reset-password', resetPasswordValidation, resetPassword);
-
-// Admin route'ları
-router.get('/admin/users', verifyToken, requireAdmin, getUsers);
-router.post('/admin/reset-user-password', verifyToken, requireAdmin, resetUserPassword);
 
 export default router; 

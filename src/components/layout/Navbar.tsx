@@ -58,9 +58,6 @@ const Navbar: React.FC = () => {
                     <Link to="/admin" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
                       📊 CV Yönetimi
                     </Link>
-                    <Link to="/admin/users" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
-                      👥 Kullanıcı Yönetimi
-                    </Link>
                   </>
                 )}
                 <div className="flex items-center">
@@ -130,13 +127,6 @@ const Navbar: React.FC = () => {
                       onClick={() => setIsMenuOpen(false)}
                     >
                       📊 CV Yönetimi
-                    </Link>
-                    <Link 
-                      to="/admin/users" 
-                      className="block py-2 text-gray-600 hover:text-blue-600 transition-colors font-medium"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      👥 Kullanıcı Yönetimi
                     </Link>
                   </>
                 )}
