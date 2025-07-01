@@ -1190,14 +1190,23 @@ const AdminDashboard: React.FC = () => {
                       Hobiler & İlgi Alanları
                     </h2>
                     
-                    <div className="flex flex-wrap gap-2">
+                    <div className="space-y-3">
                       {selectedCV.hobbies.map(hobby => (
-                        <span 
+                        <div 
                           key={hobby.id} 
-                          className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
+                          className="border border-gray-200 rounded-lg p-3 bg-gray-50"
                         >
-                          {hobby.category === 'Diğer' && hobby.customValue ? hobby.customValue : hobby.category}
-                        </span>
+                          <div className="flex items-start gap-2">
+                            <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                              {hobby.category === 'Diğer' && hobby.customValue ? hobby.customValue : hobby.category}
+                            </span>
+                          </div>
+                          {hobby.category !== 'Diğer' && hobby.customValue && (
+                            <p className="text-sm text-gray-700 mt-2 pl-1">
+                              <span className="font-medium">Detay:</span> {hobby.customValue}
+                            </p>
+                          )}
+                        </div>
                       ))}
                     </div>
                   </div>
