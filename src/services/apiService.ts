@@ -131,22 +131,6 @@ export const authAPI = {
   resetPassword: async (emailData: { email: string }) => {
     const response: ApiResponse<any> = await apiClient.post('/auth/reset-password', emailData);
     return response;
-  },
-
-  // Admin fonksiyonları
-  getAllUsers: async () => {
-    const response: ApiResponse<{ users: any[] }> = await apiClient.get('/auth/admin/users');
-    return response;
-  },
-
-  updateUserRole: async (userId: string, role: 'user' | 'admin') => {
-    const response: ApiResponse<{ user: any }> = await apiClient.put('/auth/admin/user/role', { userId, role });
-    return response;
-  },
-
-  updateUserPassword: async (userId: string, newPassword: string) => {
-    const response: ApiResponse<any> = await apiClient.put('/auth/admin/user/password', { userId, newPassword });
-    return response;
   }
 };
 

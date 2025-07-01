@@ -5,9 +5,6 @@ import {
   logout,
   getProfile,
   resetPassword,
-  getAllUsers,
-  updateUserRole,
-  updateUserPassword,
   registerValidation,
   loginValidation,
   resetPasswordValidation
@@ -30,10 +27,5 @@ router.get('/profile', verifyToken, getProfile);
 
 // Şifre sıfırlama
 router.post('/reset-password', resetPasswordValidation, resetPassword);
-
-// Admin endpoint'leri
-router.get('/admin/users', verifyToken, getAllUsers);
-router.put('/admin/user/role', verifyToken, updateUserRole);
-router.put('/admin/user/password', verifyToken, updateUserPassword);
 
 export default router; 
