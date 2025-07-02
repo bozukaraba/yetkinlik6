@@ -292,7 +292,11 @@ const Dashboard: React.FC = () => {
         });
       }
     } catch (error: any) {
-      alert(error.message || 'Şifre değiştirme işlemi başarısız!');
+      if (error.message && error.message.includes('Endpoint bulunamadı')) {
+        alert('Şifre değiştirme özelliği henüz aktif değil. Lütfen daha sonra tekrar deneyin.');
+      } else {
+        alert(error.message || 'Şifre değiştirme işlemi başarısız!');
+      }
     } finally {
       setPasswordLoading(false);
     }
