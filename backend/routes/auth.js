@@ -5,9 +5,11 @@ import {
   logout,
   getProfile,
   resetPassword,
+  changePassword,
   registerValidation,
   loginValidation,
-  resetPasswordValidation
+  resetPasswordValidation,
+  changePasswordValidation
 } from '../controllers/authController.js';
 import { verifyToken } from '../middleware/auth.js';
 
@@ -27,5 +29,10 @@ router.get('/profile', verifyToken, getProfile);
 
 // Şifre sıfırlama
 router.post('/reset-password', resetPasswordValidation, resetPassword);
+
+// Şifre değiştirme (token gerekli)
+router.post('/change-password', verifyToken, changePasswordValidation, changePassword);
+
+console.log('Auth routes registered: /register, /login, /logout, /profile, /reset-password, /change-password');
 
 export default router; 

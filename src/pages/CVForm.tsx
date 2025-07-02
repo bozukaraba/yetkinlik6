@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getCVData, saveCVData } from '../services/cvService';
 import { CVData, Education, Experience, Skill, Language, Reference, Certificate, Award, Publication, Hobby } from '../types/cv';
@@ -60,9 +60,13 @@ const SortableItem: React.FC<SortableItemProps> = ({ id, children }) => {
 
 const CVForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentUser, logout } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [shouldBlock, setShouldBlock] = useState(false);
   
   // Başlangıç formunu oluştur
   const initialFormData: CVData = {
@@ -222,15 +226,123 @@ const CVForm = () => {
           console.error('CV yüklenirken hata oluştu:', error);
         } finally {
           setLoading(false);
+          setIsInitialLoad(false);
         }
       } else {
         // currentUser yoksa da loading'i false yap
         setLoading(false);
+        setIsInitialLoad(false);
       }
     };
 
     loadExistingCV();
   }, [currentUser]);
+
+  // Sayfa değişikliklerini takip et ve uyarı göster
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = 'Doldurduğunuz bilgileri kaydetmeyi unutmayın! Kaydetmeden çıkarsanız bilgileriniz kaybolacak.';
+        return e.returnValue;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [hasUnsavedChanges]);
+
+  // Form değişikliklerini takip et
+  useEffect(() => {
+    // Sadece initial load bittikten sonra değişiklikleri takip et
+    if (!isInitialLoad && !loading) {
+      setHasUnsavedChanges(true);
+    }
+    }, [formData, isInitialLoad, loading]);
+
+  // Site içi navigasyon kontrolü
+  const handleNavigation = useCallback((path: string) => {
+    if (hasUnsavedChanges) {
+      const shouldProceed = window.confirm(
+        'Doldurduğunuz bilgileri kaydetmeyi unutmayın! Kaydetmeden çıkarsanız bilgileriniz kaybolacak.\n\nYine de çıkmak istiyor musunuz?'
+      );
+      
+      if (shouldProceed) {
+        setHasUnsavedChanges(false);
+        navigate(path);
+      }
+    } else {
+      navigate(path);
+    }
+  }, [hasUnsavedChanges, navigate]);
+
+  // Browser back/forward button kontrolü
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (hasUnsavedChanges) {
+        event.preventDefault();
+        const shouldProceed = window.confirm(
+          'Doldurduğunuz bilgileri kaydetmeyi unutmayın! Kaydetmeden çıkarsanız bilgileriniz kaybolacak.\n\nYine de çıkmak istiyor musunuz?'
+        );
+        
+        if (!shouldProceed) {
+          // Geri butonu engellendi, history'yi restore et
+          window.history.pushState(null, '', location.pathname);
+        } else {
+          setHasUnsavedChanges(false);
+        }
+      }
+    };
+
+    // History state'i push et ki popstate tetiklensin
+    if (hasUnsavedChanges) {
+      window.history.pushState(null, '', location.pathname);
+      window.addEventListener('popstate', handlePopState);
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [hasUnsavedChanges, location.pathname]);
+
+  // Link click'lerini yakala
+  useEffect(() => {
+    const handleLinkClick = (event: MouseEvent) => {
+      if (!hasUnsavedChanges) return;
+
+      const target = event.target as HTMLElement;
+      const link = target.closest('a[href]') as HTMLAnchorElement;
+      
+      if (link && link.href && !link.href.startsWith('mailto:') && !link.href.startsWith('tel:')) {
+        // Eğer external link değilse (aynı domain içindeyse)
+        const linkUrl = new URL(link.href);
+        const currentUrl = new URL(window.location.href);
+        
+        if (linkUrl.origin === currentUrl.origin && linkUrl.pathname !== currentUrl.pathname) {
+          event.preventDefault();
+          
+          const shouldProceed = window.confirm(
+            'Doldurduğunuz bilgileri kaydetmeyi unutmayın! Kaydetmeden çıkarsanız bilgileriniz kaybolacak.\n\nYine de çıkmak istiyor musunuz?'
+          );
+          
+          if (shouldProceed) {
+            setHasUnsavedChanges(false);
+            // Link'e tıklanmasını simüle et
+            window.location.href = link.href;
+          }
+        }
+      }
+    };
+
+    document.addEventListener('click', handleLinkClick);
+    
+    return () => {
+      document.removeEventListener('click', handleLinkClick);
+    };
+  }, [hasUnsavedChanges]);
 
   const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -665,6 +777,9 @@ const CVForm = () => {
       
       const savedCV = await saveCVData(currentUser.id, dataToSave);
       console.log('CV saved successfully:', savedCV);
+      
+      // Başarılı kayıt sonrası değişiklik flag'ini sıfırla
+      setHasUnsavedChanges(false);
       
       alert('CV başarıyla kaydedildi!');
       navigate('/dashboard');

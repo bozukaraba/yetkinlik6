@@ -131,6 +131,11 @@ export const authAPI = {
   resetPassword: async (emailData: { email: string }) => {
     const response: ApiResponse<any> = await apiClient.post('/auth/reset-password', emailData);
     return response;
+  },
+
+  changePassword: async (passwordData: { currentPassword: string; newPassword: string; confirmPassword: string }) => {
+    const response: ApiResponse<any> = await apiClient.post('/auth/change-password', passwordData);
+    return response;
   }
 };
 

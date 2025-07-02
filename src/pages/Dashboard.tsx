@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { FileEdit, Clock, CheckCircle2, AlertCircle, Settings, Users } from 'lucide-react';
+import { FileEdit, Clock, CheckCircle2, AlertCircle, Settings, Users, Key, Eye, EyeOff } from 'lucide-react';
 import { getCVData } from '../services/cvService';
 import { CVData } from '../types/cv';
+import { authAPI } from '../services/apiService';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -11,6 +12,20 @@ const Dashboard: React.FC = () => {
   const { currentUser, isAdmin } = useAuth();
   const [cvData, setCVData] = useState<CVData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Şifre değiştirme state'leri
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -236,6 +251,53 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  // Şifre değiştirme fonksiyonları
+  const handlePasswordChange = (field: string, value: string) => {
+    setPasswordForm(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const togglePasswordVisibility = (field: 'current' | 'new' | 'confirm') => {
+    setShowPasswords(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }));
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      alert('Yeni şifre ve tekrarı eşleşmiyor!');
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      alert('Yeni şifre en az 6 karakter olmalıdır!');
+      return;
+    }
+
+    setPasswordLoading(true);
+    try {
+      const response = await authAPI.changePassword(passwordForm);
+      if (response.success) {
+        alert('Şifre başarıyla değiştirildi!');
+        setShowPasswordForm(false);
+        setPasswordForm({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        });
+      }
+    } catch (error: any) {
+      alert(error.message || 'Şifre değiştirme işlemi başarısız!');
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
   const completionPercentage = calculateCompletion();
   
   return (
@@ -362,6 +424,125 @@ const Dashboard: React.FC = () => {
               </button>
             )}
           </div>
+        </div>
+
+        {/* Password Change Card */}
+        <div className="bg-white bg-opacity-95 rounded-lg shadow-md p-6 border-t-4 border-orange-500 backdrop-blur-sm">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-800">Şifre Değiştir</h2>
+              <p className="text-gray-600 mt-1">
+                Hesap güvenliğiniz için şifrenizi güncelleyin
+              </p>
+            </div>
+            <Key className="h-8 w-8 text-orange-500" />
+          </div>
+          
+          {!showPasswordForm ? (
+            <button
+              onClick={() => setShowPasswordForm(true)}
+              className="w-full bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors"
+            >
+              Şifremi Değiştir
+            </button>
+          ) : (
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              {/* Mevcut Şifre */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Mevcut Şifre
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPasswords.current ? 'text' : 'password'}
+                    value={passwordForm.currentPassword}
+                    onChange={(e) => handlePasswordChange('currentPassword', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 pr-10"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => togglePasswordVisibility('current')}
+                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPasswords.current ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Yeni Şifre */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Yeni Şifre
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPasswords.new ? 'text' : 'password'}
+                    value={passwordForm.newPassword}
+                    onChange={(e) => handlePasswordChange('newPassword', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 pr-10"
+                    minLength={6}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => togglePasswordVisibility('new')}
+                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPasswords.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Şifre Tekrar */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Yeni Şifre Tekrar
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPasswords.confirm ? 'text' : 'password'}
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) => handlePasswordChange('confirmPassword', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 pr-10"
+                    minLength={6}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => togglePasswordVisibility('confirm')}
+                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPasswords.confirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={passwordLoading}
+                  className="flex-1 bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50"
+                >
+                  {passwordLoading ? 'Değiştiriliyor...' : 'Şifreyi Değiştir'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPasswordForm(false);
+                    setPasswordForm({
+                      currentPassword: '',
+                      newPassword: '',
+                      confirmPassword: ''
+                    });
+                  }}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  İptal
+                </button>
+              </div>
+            </form>
+          )}
         </div>
 
         {/* Admin Panel Card - Only show for admins */}

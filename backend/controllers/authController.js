@@ -23,6 +23,17 @@ export const resetPasswordValidation = [
   body('email').isEmail().withMessage('Geçerli bir email adresi girin')
 ];
 
+export const changePasswordValidation = [
+  body('currentPassword').notEmpty().withMessage('Mevcut şifre gerekli'),
+  body('newPassword').isLength({ min: 6 }).withMessage('Yeni şifre en az 6 karakter olmalı'),
+  body('confirmPassword').custom((value, { req }) => {
+    if (value !== req.body.newPassword) {
+      throw new Error('Şifre tekrarı eşleşmiyor');
+    }
+    return true;
+  })
+];
+
 // Helper function to generate JWT
 const generateToken = (userId) => {
   return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
@@ -266,6 +277,75 @@ export const resetPassword = async (req, res) => {
     }
   } catch (error) {
     console.error('Şifre sıfırlama hatası:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Sunucu hatası'
+    });
+  }
+};
+
+// Şifre değiştirme
+export const changePassword = async (req, res) => {
+  try {
+    // Validation kontrolü
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation hatası',
+        errors: errors.array()
+      });
+    }
+
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.id;
+
+    // Kullanıcının mevcut şifresini al
+    const userResult = await query(
+      'SELECT password_hash FROM users WHERE id = $1',
+      [userId]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Kullanıcı bulunamadı'
+      });
+    }
+
+    const user = userResult.rows[0];
+
+    // Mevcut şifreyi kontrol et
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password_hash);
+    
+    if (!isCurrentPasswordValid) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mevcut şifre yanlış'
+      });
+    }
+
+    // Yeni şifreyi hash'le
+    const newPasswordHash = await bcrypt.hash(newPassword, 10);
+
+    // Şifreyi güncelle
+    await query(
+      'UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2',
+      [newPasswordHash, userId]
+    );
+
+    // Güvenlik için diğer tüm session'ları temizle
+    await query(
+      'DELETE FROM sessions WHERE user_id = $1 AND token_hash != $2',
+      [userId, req.token]
+    );
+
+    res.json({
+      success: true,
+      message: 'Şifre başarıyla değiştirildi'
+    });
+  } catch (error) {
+    console.error('Şifre değiştirme hatası:', error);
     res.status(500).json({
       success: false,
       message: 'Sunucu hatası'
