@@ -12,17 +12,6 @@ const Footer: React.FC = () => {
               &copy; {year} Yetkinlikx. Tüm hakları saklıdır.
             </p>
           </div>
-          <div className="flex space-x-6">
-            <a href="#" className="text-gray-300 hover:text-white transition-colors">
-              Gizlilik Politikası
-            </a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors">
-              Kullanım Şartları
-            </a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors">
-              İletişim
-            </a>
-          </div>
         </div>
       </div>
     </footer>

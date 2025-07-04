@@ -2,8 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getCVData, saveCVData } from '../services/cvService';
-import { CVData, Education, Experience, Skill, Language, Reference, Certificate, Award, Publication, Hobby } from '../types/cv';
+import { CVData, Education, Experience, Skill, Language, Reference, Certificate, Award, Publication, Hobby, Goals } from '../types/cv';
 import { ChevronLeft, ChevronRight, Save, Trash2, Download, GripVertical } from 'lucide-react';
+import { FaBuilding, FaUser, FaBriefcase, FaCalendarAlt, FaTasks, FaProjectDiagram } from 'react-icons/fa';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import {
@@ -100,7 +101,8 @@ const CVForm = () => {
     volunteer: [],
     references: [],
     hobbies: [],
-    awards: []
+    awards: [],
+    goals: []
   };
   
   const [formData, setFormData] = useState<CVData>(initialFormData);
@@ -219,6 +221,7 @@ const CVForm = () => {
               awards: existingCV.awards?.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)),
               publications: existingCV.publications?.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)),
               references: existingCV.references?.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)),
+              goals: existingCV.goals?.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)),
             };
             setFormData(sortedCV);
           }
@@ -750,7 +753,53 @@ const CVForm = () => {
     }));
   };
 
+  // Goals fonksiyonları
+  const addGoal = () => {
+    const goalCategories = [
+      'Ücret ve Yan Haklar',
+      'Kariyer Yolu', 
+      'Çalışma Ortamı',
+      'Eğitim ve Gelişim',
+      'Şirketin Konumu ve Önemi',
+      'Yaptığınız İşin Niteliği'
+    ];
+    
+    const existingCategories = formData.goals?.map(goal => goal.category) || [];
+    const availableCategories = goalCategories.filter(cat => !existingCategories.includes(cat as any));
+    
+    if (availableCategories.length === 0) {
+      alert('Tüm hedef kategorileri zaten eklenmiş.');
+      return;
+    }
+    
+    const newGoal: Goals = {
+      id: Date.now().toString(),
+      category: availableCategories[0] as any,
+      rating: 1,
+      sortOrder: formData.goals?.length || 0
+    };
+    
+    setFormData(prev => ({
+      ...prev,
+      goals: [...(prev.goals || []), newGoal]
+    }));
+  };
 
+  const updateGoal = (index: number, field: keyof Goals, value: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      goals: prev.goals?.map((goal, i) => 
+        i === index ? { ...goal, [field]: value } : goal
+      ) || []
+    }));
+  };
+
+  const removeGoal = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      goals: prev.goals?.filter((_, i) => i !== index) || []
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -857,14 +906,16 @@ const CVForm = () => {
             </h2>
             ${formData.experience.map(exp => `
               <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px;">
-                <h3 style="font-weight: 600; color: #1e293b; margin: 0 0 8px 0; font-size: 16px;">${exp.company}</h3>
-                <div style="color: #2563eb; font-weight: 500; margin-bottom: 5px;">${exp.title}</div>
-                ${exp.department ? `<div style="color: #64748b; font-size: 13px; margin-bottom: 5px;">Departman: ${exp.department}</div>` : ''}
+                <h3 style="font-weight: 600; color: #1e293b; margin: 0 0 8px 0; font-size: 16px;">🏢 ${exp.company}</h3>
+                <div style="color: #2563eb; font-weight: 500; margin-bottom: 5px;">💼 ${exp.title}</div>
+                ${exp.department ? `<div style="color: #64748b; font-size: 13px; margin-bottom: 5px;">👤 Departman: ${exp.department}</div>` : ''}
                 <div style="color: #64748b; font-size: 13px; margin-bottom: 10px;">
-                  ${new Date(exp.startDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' })} - 
+                  📅 ${new Date(exp.startDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' })} - 
                   ${exp.current ? 'Günümüz' : exp.endDate ? new Date(exp.endDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short' }) : 'Belirtilmemiş'}
                 </div>
-                ${exp.tasks ? `<div style="margin-bottom: 8px;"><strong style="color: #1e293b;">Görevler:</strong> ${exp.tasks}</div>` : ''}
+                ${exp.workDuration ? `<div style="color: #64748b; font-size: 13px; margin-bottom: 8px;">⏱️ Çalışma Süresi: ${exp.workDuration}</div>` : ''}
+                ${exp.tasks ? `<div style="margin-bottom: 8px;"><strong style="color: #1e293b;">✅ Görevler:</strong> ${exp.tasks}</div>` : ''}
+                ${exp.projectDetails ? `<div style="margin-bottom: 8px;"><strong style="color: #1e293b;">🚀 Projeler:</strong> ${exp.projectDetails}</div>` : ''}
                 ${exp.description ? `<div style="color: #475569; font-size: 14px;">${exp.description}</div>` : ''}
               </div>
             `).join('')}
@@ -1652,7 +1703,10 @@ const CVForm = () => {
                           </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Şirket</label>
+                        <label className="flex items-center text-sm font-medium text-gray-700">
+                          <FaBuilding className="w-4 h-4 mr-2 text-blue-600" />
+                          Şirket
+                        </label>
                         <input
                           type="text"
                           value={exp.company}
@@ -1661,7 +1715,10 @@ const CVForm = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Çalıştığınız Departman</label>
+                        <label className="flex items-center text-sm font-medium text-gray-700">
+                          <FaUser className="w-4 h-4 mr-2 text-blue-600" />
+                          Çalıştığınız Departman
+                        </label>
                         <input
                           type="text"
                           value={exp.department || ''}
@@ -1670,7 +1727,10 @@ const CVForm = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Pozisyon Unvanı</label>
+                        <label className="flex items-center text-sm font-medium text-gray-700">
+                          <FaBriefcase className="w-4 h-4 mr-2 text-blue-600" />
+                          Pozisyon Unvanı
+                        </label>
                         <input
                           type="text"
                           value={exp.title}
@@ -1679,7 +1739,10 @@ const CVForm = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Çalışma Süresi</label>
+                        <label className="flex items-center text-sm font-medium text-gray-700">
+                          <FaCalendarAlt className="w-4 h-4 mr-2 text-blue-600" />
+                          Çalışma Süresi
+                        </label>
                         <input
                           type="text"
                           value={exp.workDuration || ''}
@@ -1691,7 +1754,10 @@ const CVForm = () => {
                     </div>
                     <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Görev</label>
+                        <label className="flex items-center text-sm font-medium text-gray-700">
+                          <FaTasks className="w-4 h-4 mr-2 text-blue-600" />
+                          Görev
+                        </label>
                         <textarea
                           value={exp.tasks || ''}
                           onChange={(e) => updateExperience(index, 'tasks', e.target.value)}
@@ -1701,7 +1767,10 @@ const CVForm = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Proje</label>
+                        <label className="flex items-center text-sm font-medium text-gray-700">
+                          <FaProjectDiagram className="w-4 h-4 mr-2 text-blue-600" />
+                          Proje
+                        </label>
                         <textarea
                           value={exp.projectDetails || ''}
                           onChange={(e) => updateExperience(index, 'projectDetails', e.target.value)}
@@ -1713,7 +1782,10 @@ const CVForm = () => {
                     </div>
                     <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Başlangıç Tarihi</label>
+                        <label className="flex items-center text-sm font-medium text-gray-700">
+                          <FaCalendarAlt className="w-4 h-4 mr-2 text-blue-600" />
+                          Başlangıç Tarihi
+                        </label>
                         <input
                           type="date"
                           value={exp.startDate}
@@ -1722,7 +1794,10 @@ const CVForm = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Bitiş Tarihi</label>
+                        <label className="flex items-center text-sm font-medium text-gray-700">
+                          <FaCalendarAlt className="w-4 h-4 mr-2 text-blue-600" />
+                          Bitiş Tarihi
+                        </label>
                         <input
                           type="date"
                           value={exp.endDate || ''}
@@ -2410,6 +2485,85 @@ const CVForm = () => {
             )}
           </div>
         );
+             case 11:
+         const goalCategories = [
+           'Ücret ve Yan Haklar',
+           'Kariyer Yolu', 
+           'Çalışma Ortamı',
+           'Eğitim ve Gelişim',
+           'Şirketin Konumu ve Önemi',
+           'Yaptığınız İşin Niteliği'
+         ];
+
+         // Initialize goals if not exists
+         if (!formData.goals || formData.goals.length === 0) {
+                       const initialGoals: Goals[] = goalCategories.map((category, index) => ({
+              id: (Date.now() + index).toString(),
+              category: category as any,
+              rating: 1,
+              sortOrder: index
+            }));
+           
+           setFormData(prev => ({
+             ...prev,
+             goals: initialGoals
+           }));
+         }
+
+         const renderStars = (rating: number, onRate: (rate: number) => void) => {
+           return (
+             <div className="flex items-center space-x-1">
+               {[1, 2, 3, 4, 5].map((star) => (
+                 <button
+                   key={star}
+                   type="button"
+                   onClick={() => onRate(star)}
+                   className={`w-8 h-8 transition-colors ${
+                     star <= rating
+                       ? 'text-yellow-400 hover:text-yellow-500'
+                       : 'text-gray-300 hover:text-gray-400'
+                   }`}
+                 >
+                   <svg fill="currentColor" viewBox="0 0 20 20" className="w-full h-full">
+                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.286 3.957c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.957a1 1 0 00-.364-1.118L2.049 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.957z" />
+                   </svg>
+                 </button>
+               ))}
+               <span className="ml-2 text-sm text-gray-600">({rating}/5)</span>
+             </div>
+           );
+         };
+
+         return (
+           <div className="space-y-6">
+             <div className="text-center mb-6">
+               <h3 className="text-xl font-semibold text-gray-900">Hedefleriniz</h3>
+               <p className="text-sm text-gray-600 mt-2">
+               Her kategori için 1-5 arası yıldız ile puanlama yapınız.
+               </p>
+             </div>
+             
+             <div className="space-y-6">
+               {goalCategories.map((category, index) => {
+                 const existingGoal = formData.goals?.find(g => g.category === category);
+                 const goalIndex = formData.goals?.findIndex(g => g.category === category) ?? -1;
+                 
+                 return (
+                   <div key={category} className="border rounded-lg p-6 bg-gray-50">
+                     <h4 className="text-lg font-medium text-gray-900 mb-4">{category}</h4>
+                     
+                                           <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-3">
+                          Bu kategoriye verdiğiniz önem derecesi (1-5 yıldız)
+                        </label>
+                        {renderStars(existingGoal?.rating || 1, (rating) => updateGoal(goalIndex, 'rating', rating))}
+                      </div>
+                   </div>
+                 );
+               })}
+             </div>
+           </div>
+         );
 
       default:
         return null;
@@ -2424,7 +2578,7 @@ const CVForm = () => {
           
           {/* Progress bar */}
           <div className="mb-8">
-            <div className="grid grid-cols-10 gap-1 text-xs font-medium text-gray-600 mb-4">
+            <div className="grid grid-cols-11 gap-1 text-xs font-medium text-gray-600 mb-4">
               <div 
                 onClick={() => setCurrentStep(1)}
                 className={`text-center p-3 rounded cursor-pointer transition-all duration-300 hover:bg-blue-50 ${currentStep === 1 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
@@ -2545,12 +2699,24 @@ const CVForm = () => {
                 </div>
                 <span className="block text-xs">Hobi ve İlgi Alanları</span>
               </div>
+              <div 
+                onClick={() => setCurrentStep(11)}
+                className={`text-center p-3 rounded cursor-pointer transition-all duration-300 hover:bg-blue-50 ${currentStep === 11 ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}>
+                <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  currentStep === 11 
+                    ? 'bg-blue-600 text-white shadow-lg transform scale-110' 
+                    : 'bg-gray-200 text-gray-600 hover:bg-blue-200 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105'
+                }`}>
+                  <span className="text-sm font-bold">11</span>
+                </div>
+                <span className="block text-xs">Hedefleriniz</span>
+              </div>
 
             </div>
             <div className="h-2 bg-gray-200 rounded-full">
               <div
                 className="h-2 bg-blue-500 rounded-full transition-all duration-300"
-                style={{ width: `${(currentStep / 10) * 100}%` }}
+                style={{ width: `${(currentStep / 11) * 100}%` }}
               ></div>
             </div>
           </div>
@@ -2590,10 +2756,10 @@ const CVForm = () => {
                   CV İndir
                 </button>
                 
-                {currentStep < 10 ? (
+                {currentStep < 11 ? (
                   <button
                     type="button"
-                    onClick={() => setCurrentStep(prev => Math.min(10, prev + 1))}
+                    onClick={() => setCurrentStep(prev => Math.min(11, prev + 1))}
                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
                   >
                     İleri

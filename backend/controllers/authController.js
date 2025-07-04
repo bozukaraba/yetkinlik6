@@ -35,14 +35,19 @@ export const changePasswordValidation = [
 ];
 
 // Helper function to generate JWT
-const generateToken = (userId) => {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+const generateToken = (userId, rememberMe = false) => {
+  const expiresIn = rememberMe ? '30d' : '24h'; // Remember me: 30 gün, normal: 24 saat
+  return jwt.sign({ userId }, JWT_SECRET, { expiresIn });
 };
 
 // Helper function to save session
-const saveSession = async (userId, token) => {
+const saveSession = async (userId, token, rememberMe = false) => {
   const expiresAt = new Date();
-  expiresAt.setHours(expiresAt.getHours() + 24); // 24 saat
+  if (rememberMe) {
+    expiresAt.setDate(expiresAt.getDate() + 30); // 30 gün
+  } else {
+    expiresAt.setHours(expiresAt.getHours() + 24); // 24 saat
+  }
   
   await query(
     'INSERT INTO sessions (user_id, token_hash, expires_at) VALUES ($1, $2, $3)',
@@ -89,8 +94,8 @@ export const register = async (req, res) => {
     );
 
     // Token oluştur
-    const token = generateToken(userId);
-    await saveSession(userId, token);
+    const token = generateToken(userId, false);
+    await saveSession(userId, token, false);
 
     // Kullanıcı bilgilerini al (şifre hariç)
     const userResult = await query(
@@ -128,7 +133,7 @@ export const login = async (req, res) => {
       });
     }
 
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
 
     // Kullanıcıyı bul
     const userResult = await query(
@@ -169,8 +174,8 @@ export const login = async (req, res) => {
     );
 
     // Token oluştur
-    const token = generateToken(user.id);
-    await saveSession(user.id, token);
+    const token = generateToken(user.id, rememberMe);
+    await saveSession(user.id, token, rememberMe);
 
     // Kullanıcı bilgilerini döndür (şifre hariç)
     const { password_hash, ...userWithoutPassword } = user;

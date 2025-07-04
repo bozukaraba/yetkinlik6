@@ -1,13 +1,19 @@
 FROM docker-shared.turksat.com.tr/node:22.16.0-alpine as build
 WORKDIR /app
 
-COPY package*.json ./
-COPY package-lock.json ./
-RUN npm ci
+# Copy package files first for better caching
+COPY package.json package-lock.json ./
 
+# Install dependencies
+RUN npm ci --only=production=false
+
+# Copy source code
 COPY . ./
+
+# Copy environment file
 COPY .env ./.env
 
+# Build the application
 RUN npm run build
 
 FROM docker-shared.turksat.com.tr/nginx:1.27.3

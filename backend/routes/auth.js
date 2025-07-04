@@ -33,6 +33,4 @@ router.post('/reset-password', resetPasswordValidation, resetPassword);
 // Şifre değiştirme (token gerekli)
 router.post('/change-password', verifyToken, changePasswordValidation, changePassword);
 
-console.log('Auth routes registered: /register, /login, /logout, /profile, /reset-password, /change-password');
-
 export default router; 

@@ -1236,6 +1236,33 @@ const AdminDashboard: React.FC = () => {
                     </div>
                   </div>
                 )}
+
+                {/* Goals (Hedefleriniz) */}
+                {selectedCV.goals && selectedCV.goals.length > 0 && (
+                  <div className="mb-6">
+                    <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                      </svg>
+                      Hedefleriniz
+                    </h2>
+                    <div className="space-y-3">
+                      {selectedCV.goals.map(goal => (
+                        <div key={goal.category} className="flex items-center gap-3 border border-gray-200 rounded-lg p-3 bg-gray-50">
+                          <span className="font-medium text-gray-800 w-56">{goal.category}</span>
+                          <span className="flex items-center">
+                            {[1,2,3,4,5].map(star => (
+                              <svg key={star} className={`w-5 h-5 ${star <= goal.rating ? 'text-yellow-400' : 'text-gray-300'}`} fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.286 3.957c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.957a1 1 0 00-.364-1.118L2.049 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.957z" />
+                              </svg>
+                            ))}
+                            <span className="ml-2 text-sm text-gray-600">({goal.rating}/5)</span>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">

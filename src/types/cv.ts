@@ -166,7 +166,12 @@ export interface Hobby {
   sortOrder?: number;
 }
 
-
+export interface Goals {
+  id: string;
+  category: 'Ücret ve Yan Haklar' | 'Kariyer Yolu' | 'Çalışma Ortamı' | 'Eğitim ve Gelişim' | 'Şirketin Konumu ve Önemi' | 'Yaptığınız İşin Niteliği';
+  rating: number; // 1-5 arası yıldız puanı
+  sortOrder?: number;
+}
 
 export interface CVData {
   id?: string;
@@ -183,6 +188,7 @@ export interface CVData {
   references?: Reference[];
   hobbies?: Hobby[];
   awards?: Award[];
+  goals?: Goals[];
   createdAt?: string;
   updatedAt?: string;
 }

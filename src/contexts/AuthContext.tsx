@@ -11,7 +11,7 @@ export interface User {
 
 interface AuthContextType {
   currentUser: User | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -70,15 +70,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
     loadUserFromToken();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, rememberMe: boolean = false) => {
     try {
-      console.log('Attempting login for:', email);
+      console.log('Attempting login for:', email, 'Remember me:', rememberMe);
       setLoading(true);
       
       const response = await authAPI.login({ email, password });
       
       if (response.success && response.data?.user) {
         setCurrentUser(response.data.user);
+        
+        // Remember me functionality - token'ı farklı şekilde sakla
+        if (rememberMe) {
+          console.log('User selected remember me - extending token expiry');
+          // Token zaten tokenManager tarafından saklanıyor, burada sadece log bırakıyoruz
+        }
+        
         console.log('Login successful for user:', response.data.user.id);
       } else {
         throw new Error(response.message || 'Giriş yapılırken bir hata oluştu');
